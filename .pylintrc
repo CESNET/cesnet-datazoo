@@ -1,0 +1,9 @@
+[MASTER]
+disable=line-too-long,
+        missing-function-docstring,
+        missing-class-docstring,
+        missing-module-docstring,
+        too-many-statements,
+        too-many-instance-attributes,
+        multiple-statements,
+        unspecified-encoding,

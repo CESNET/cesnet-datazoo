@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cesnet-datazoo"
+version = "0.0.1"
+authors = [
+  { name="Jan Luxemburk", email="luxemburk@cesnet.cz" },
+]
+maintainers = [
+  { name="Jan Luxemburk", email="luxemburk@cesnet.cz" },
+]
+description = ""
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+keywords = [
+  "traffic-classification",
+  "datasets",
+]
+
+dependencies=[
+  'tables>=3.8.0',
+  'numpy>=1.23.5',
+  'pandas>=1.5.3',
+  'scikit-learn>=1.2.0',
+  'torch>=1.12.0',
+  'tqdm>=4.64.1',
+  'PyYAML>=6.0',
+  'pydantic>=1.10.4',
+]
+
+[project.urls]
+"Homepage" = "https://github.com/"
+"Documentation" = "https://github.com/"
+"Bug Tracker" = "https://github.com/"
+
+[tool.setuptools]
+packages = [
+  "cesnet_datazoo",
+  "cesnet_datazoo.datasets",
+  "cesnet_datazoo.metrics",
+  "cesnet_datazoo.pytables_data",
+  "cesnet_datazoo.utils",
+]

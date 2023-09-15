@@ -1,0 +1,32 @@
+site_name: CESNET DataZoo
+
+theme:
+  name: "material"
+  features:
+    - navigation.sections
+    # - toc.follow
+
+plugins:
+  - search
+  - autorefs
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [cesnet_datazoo]
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+nav:
+  - Introduction: index.md  
+  - Installation: installation.md
+  - Oveview of datasets: datasets_overview.md
+  - Tutorials:
+    - Getting started: getting_started.md
+  - Reference:
+    - CesnetDataset: reference_cesnet_dataset.md
+    - DatasetConfig: reference_dataset_config.md
+    - Datasets: reference_datasets.md
+    - DatasetMetadata: dataset_metadata.md
