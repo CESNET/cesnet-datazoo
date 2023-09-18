@@ -1,4 +1,6 @@
 site_name: CESNET DataZoo
+repo_name: CESNET/cesnet-datazoo
+repo_url: https://github.com/CESNET/cesnet-datazoo
 
 theme:
   name: "material"

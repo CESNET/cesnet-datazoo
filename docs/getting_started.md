@@ -1,4 +1,4 @@
-# Examples
+# Getting started
 More examples will be prepared as Jupyter notebooks.
 
 ### Download a dataset and compute statistics
