@@ -1,10 +1,12 @@
 <p align="center">
-    <img src="docs/images/datazoo.svg" width="450">
+    <img src="https://raw.githubusercontent.com/CESNET/cesnet-datazoo/main/docs/images/datazoo.svg" width="450">
 </p>
 
 [![](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/CESNET/cesnet-datazoo/blob/main/LICENCE)
 [![](https://img.shields.io/badge/docs-mkdocs_material-blue.svg)](https://cesnet.github.io/cesnet-datazoo/)
-[![](https://img.shields.io/pypi/pyversions/cesnet-datazoo)](https://pypi.org/project/cesnet-datazoo/)
+[![](https://img.shields.io/badge/python->=3.10-blue.svg)](https://pypi.org/project/cesnet-datazoo/)
+[![](https://img.shields.io/pypi/v/cesnet-datazoo)](https://pypi.org/project/cesnet-datazoo/)
+
 
 The goal of this project is to provide tools for working with large network traffic datasets and to facilitate research in the traffic classification area. The core functions of the `cesnet-datazoo` package are:
 
@@ -52,14 +54,14 @@ pip install -e git+https://github.com/CESNET/cesnet-datazoo
 
 ```py
 from cesnet_datazoo.datasets import CESNET_QUIC22
-from cesnet_datazoo.config DatasetConfig, AppsSelection
+from cesnet_datazoo.config import DatasetConfig, AppsSelection
 
 dataset = CESNET_QUIC22("/datasets/CESNET-QUIC22/", size="XS")
 dataset_config = DatasetConfig(
     dataset=dataset,
     apps_selection=AppsSelection.ALL_KNOWN,
     train_period="W-2022-44",
-    test_period="W-2022-44",
+    test_period="W-2022-45",
 )
 dataset.set_dataset_config_and_initialize(dataset_config)
 train_dataframe = dataset.get_train_df()

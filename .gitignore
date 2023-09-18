@@ -1,5 +1,6 @@
 venv/
 __pycache__/
 site/
+dist/
 .vscode/*
 *.egg-info

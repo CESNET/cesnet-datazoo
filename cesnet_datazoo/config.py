@@ -118,10 +118,10 @@ class DatasetConfig():
     """
     The main class for the configuration of:
 
-    - Train, validation, test sets (dates, sizes, validation approach)
-    - Application selection — either the standard closed-world setting (only *known* classes) or the open-world setting (*known* and *unknown* classes)
-    - Feature standardization
-    - Dataloader options like batch sizes, order of loading, or number of workers
+    - Train, validation, test sets (dates, sizes, validation approach).
+    - Application selection — either the standard closed-world setting (only *known* classes) or the open-world setting (*known* and *unknown* classes).
+    - Feature standardization.
+    - Dataloader options like batch sizes, order of loading, or number of workers.
 
     When initializing this class, pass a [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance to be configured and the desired configuration. Available options are [here][config.DatasetConfig--configuration-options].
 

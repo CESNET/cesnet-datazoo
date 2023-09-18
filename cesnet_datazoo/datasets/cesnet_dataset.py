@@ -43,8 +43,8 @@ class CesnetDataset():
     The main class for accessing CESNET datasets. It handles downloading, data preprocessing,
     train/validation/test splitting, and class selection. Access to data is provided through:
 
-    - Iterable PyTorch DataLoader for batch-based processing
-    - Pandas DataFrame for loading the entire train, validation, or test set at once
+    - Iterable PyTorch DataLoader for batch-based processing.
+    - Pandas DataFrame for loading the entire train, validation, or test set at once.
 
     The dataset is stored in a [PyTables](https://www.pytables.org/) database. The internal `PyTablesDataset` class is used as a wrapper
     that implements the PyTorch [`Dataset`](https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset) interface
