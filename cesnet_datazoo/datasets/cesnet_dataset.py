@@ -436,8 +436,8 @@ class CesnetDataset():
 
     def _download(self) -> None:
         print(f"Downloading {self.name} dataset")
-        database_url = f"{self.bucket_url}&key={self.database_filename}"
-        servicemap_url = f"{self.bucket_url}&key={SERVICEMAP_FILE}"
+        database_url = f"{self.bucket_url}&file={self.database_filename}"
+        servicemap_url = f"{self.bucket_url}&file={SERVICEMAP_FILE}"
         resumable_download(url=database_url, file_path=self.database_path)
         simple_download(url=servicemap_url, file_path=self.servicemap_path)
 
