@@ -11,7 +11,7 @@ class RandomizedSection(IntEnum):
     INIT_TEST_INDICES = auto()
     DATE_WEIGHT_SAMPLING = auto()
     TRAIN_VAL_SPLIT = auto()
-    FIT_STANDARDIZATION_SAMPLE = auto()
+    FIT_SCALERS_SAMPLE = auto()
 
 def get_fresh_random_generator(dataset_config: DatasetConfig, section: RandomizedSection) -> np.random.RandomState:
     return np.random.RandomState(seed=dataset_config.random_state + 1_000 * dataset_config.fold_id + section.value)

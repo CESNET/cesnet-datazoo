@@ -8,6 +8,6 @@ The goal of this project is to provide tools for working with large network traf
 - Extensive configuration options for:
     - Selection of train, validation, and test periods. The datasets span from two weeks to one year; therefore, it is possible to evaluate classification methods in a time-based fashion that is closer to practical deployment.
     - Selection of application classes and splitting classes between *known* and *unknown*. This enables research in the open-world setting, in which classification models need to handle new classes that were not seen during the training process.
-    - Feature standardization.
+    - Feature scaling.
 - Built on suitable data structures for experiments with large datasets. There are several caching mechanisms to make repeated runs faster, for example, when searching for the best model configuration.
 - Datasets are offered in multiple sizes to give users an option to start the experiments at a smaller scale (also faster dataset download, disk space, etc.). The default is the `S` size containing 25 million samples. 

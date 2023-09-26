@@ -28,7 +28,7 @@ from cesnet_datazoo.pytables_data.indices_setup import (IndicesTuple, compute_kn
                                                         init_or_load_val_indices,
                                                         subset_and_sort_indices)
 from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset,
-                                                           fit_or_load_standardization,
+                                                           fit_or_load_scalers,
                                                            pytables_collate_fn,
                                                            pytables_ip_collate_fn, worker_init_fn)
 from cesnet_datazoo.utils.class_info import ClassInfo, create_superclass_structures
@@ -43,7 +43,7 @@ class CesnetDataset():
     The main class for accessing CESNET datasets. It handles downloading, data preprocessing,
     train/validation/test splitting, and class selection. Access to data is provided through:
 
-    - Iterable PyTorch DataLoader for batch-based processing.
+    - Iterable PyTorch DataLoader for batch processing.
     - Pandas DataFrame for loading the entire train, validation, or test set at once.
 
     The dataset is stored in a [PyTables](https://www.pytables.org/) database. The internal `PyTablesDataset` class is used as a wrapper
@@ -55,7 +55,7 @@ class CesnetDataset():
 
     1. Create an instance of the dataset [class][dataset-classes] with the desired size and data root. This will download the dataset if it has not already been downloaded.
     2. Create an instance of [`DatasetConfig`][config.DatasetConfig] and set it with [`set_dataset_config_and_initialize`][datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize].
-    This will initialize the dataset — select classes, split data into train/validation/test sets, and fit standardization scalers. All is done according to the provided configuration and is cached for later use.
+    This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers. All is done according to the provided configuration and is cached for later use.
     3. Use [`get_train_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_train_dataloader] or [`get_train_df`][datasets.cesnet_dataset.CesnetDataset.get_train_df] to get training data for a classification model.
     4. Validate the model and perform the hyperparameter optimalization on [`get_val_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_val_dataloader] or [`get_val_df`][datasets.cesnet_dataset.CesnetDataset.get_val_df].
     5. Evaluate the model on [`get_test_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_test_dataloader] or [`get_test_df`][datasets.cesnet_dataset.CesnetDataset.get_test_df].
@@ -92,7 +92,7 @@ class CesnetDataset():
         unknown_app_counts: Unknown application counts in the validation and test sets.
         collate_fn: Collate function used for creating batches in dataloaders.
         encoder: Scikit-learn [`LabelEncoder`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html) used to encode class names into integers. It is fitted during the initialization of the dataset.
-        flowstats_scaler: Scaler for flow statistics. It is fitted during the initialization of the dataset and then used for standardization of the data.
+        flowstats_scaler: Scaler for flow statistics. It is fitted during the initialization of the dataset.
         psizes_scaler: Scaler for packet sizes.
         ipt_scaler: Scaler for inter-packet times.
         train_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for training.
@@ -515,8 +515,8 @@ class CesnetDataset():
 
         # Create class info
         class_info = create_superclass_structures(servicemap=servicemap, target_names=list(encoder.classes_))
-        # Load or fit standardization scalers
-        flowstats_scaler, flowstats_quantiles, ipt_scaler, psizes_scaler = fit_or_load_standardization(dataset_config=dataset_config, train_indices=train_indices)
+        # Load or fit data scalers
+        flowstats_scaler, flowstats_quantiles, ipt_scaler, psizes_scaler = fit_or_load_scalers(dataset_config=dataset_config, train_indices=train_indices)
         # Subset dataset indices based on the selected sizes and compute application counts
         dataset_indices = IndicesTuple(train_indices=train_indices, val_known_indices=val_known_indices, val_unknown_indices=val_unknown_indices, test_known_indices=test_known_indices, test_unknown_indices=test_unknown_indices)
         dataset_indices = subset_and_sort_indices(dataset_config=dataset_config, dataset_indices=dataset_indices)

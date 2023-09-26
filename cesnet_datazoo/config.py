@@ -120,7 +120,7 @@ class DatasetConfig():
 
     - Train, validation, test sets (dates, sizes, validation approach).
     - Application selection — either the standard closed-world setting (only *known* classes) or the open-world setting (*known* and *unknown* classes).
-    - Feature standardization.
+    - Feature scaling.
     - Dataloader options like batch sizes, order of loading, or number of workers.
 
     When initializing this class, pass a [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance to be configured and the desired configuration. Available options are [here][config.DatasetConfig--configuration-options].
@@ -176,14 +176,14 @@ class DatasetConfig():
         use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`
         use_push_flags: Whether to use push flags in packet sequences, if available in the dataset. `Default: False`
         zero_ppi_start: Zeroing out the first N packets of each packet sequence. `Default: 0`
-        standardization_samples: Fraction of train samples used for fitting feature standardization, if float. The absolute number of standardization samples otherwise. `Default: 0.25`
+        fit_scalers_samples: Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. `Default: 0.25`
         flowstats_scaler: Which scaler to use for flow statistics. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: ROBUST`
-        flowstats_clip: Quantile clip before the standardization of flow statistics. Should limit the influence of outliers. Set to `1` to disable. `Default: 0.99`
+        flowstats_clip: Quantile clip before the scaling of flow statistics. Should limit the influence of outliers. Set to `1` to disable. `Default: 0.99`
         psizes_scaler: Which scaler to use for packet sizes. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`
-        psizes_max: Max clip packet sizes before standardization. `Default: 1460`
+        psizes_max: Max clip packet sizes before scaling. `Default: 1460`
         ipt_scaler: Which scaler to use for inter-packet times. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`
-        ipt_min: Min clip inter-packet times before standardization. `Default: 0`
-        ipt_max: Max clip inter-packet times before standardization. `Default: 15000`
+        ipt_min: Min clip inter-packet times before scaling. `Default: 0`
+        ipt_max: Max clip inter-packet times before scaling. `Default: 15000`
 
     # How to configure train, validation, and test sets
     There are three options for how to define train/validation/test __time periods and dates__.
@@ -250,7 +250,7 @@ class DatasetConfig():
     use_tcp_features: bool = True
     use_push_flags: bool = False
     zero_ppi_start: int = 0
-    standardization_samples: int | float = 0.25
+    fit_scalers_samples: int | float = 0.25
     flowstats_scaler: ScalerEnum = ScalerEnum.ROBUST
     flowstats_clip: float = 0.99
     psizes_scaler: ScalerEnum = ScalerEnum.STANDARD
@@ -366,8 +366,8 @@ class DatasetConfig():
         # More asserts
         if self.zero_ppi_start > PPI_MAX_LEN:
             raise ValueError(f"zero_ppi_start has to be <= {PPI_MAX_LEN}")
-        if isinstance(self.standardization_samples, float) and (self.standardization_samples <= 0 or self.standardization_samples > 1):
-            raise ValueError("standardization_samples has to be either float between 0 and 1 (giving the fraction of training samples used for standardization) or an integer")
+        if isinstance(self.fit_scalers_samples, float) and (self.fit_scalers_samples <= 0 or self.fit_scalers_samples > 1):
+            raise ValueError("fit_scalers_samples has to be either float between 0 and 1 (giving the fraction of training samples used for fitting scalers) or an integer")
 
     def get_flowstats_features_len(self) -> int:
         """Gets the number of flow statistics features."""

@@ -269,7 +269,7 @@ def init_test_indices(test_data_params: TestDataParams, database_path: str, rng:
     log.info(f"Processing test indices took {time.time() - start_time:.2f} seconds"); start_time = time.time()
     return test_known_indices, test_unknown_indices
 
-def fit_or_load_standardization(dataset_config: DatasetConfig, train_indices: np.ndarray) -> tuple[Scaler, pd.Series, Scaler, Scaler]:
+def fit_or_load_scalers(dataset_config: DatasetConfig, train_indices: np.ndarray) -> tuple[Scaler, pd.Series, Scaler, Scaler]:
     train_data_path = dataset_config._get_train_data_path()
     flowstats_scaler_path = os.path.join(train_data_path, "stand", f"flowstats_scaler-{dataset_config.flowstats_scaler}-q{dataset_config.flowstats_clip}.pickle")
     flowstats_quantiles_path = os.path.join(train_data_path, "stand", f"flowstats_quantiles-q{dataset_config.flowstats_clip}.pickle")
@@ -311,19 +311,19 @@ def fit_or_load_standardization(dataset_config: DatasetConfig, train_indices: np
             psizes_scaler = None
         else: assert_never(dataset_config.psizes_scaler)
 
-        if isinstance(dataset_config.standardization_samples, int) and dataset_config.standardization_samples > len(train_indices):
-            warnings.warn(f"The number of samples for fitting standardizaion ({dataset_config.standardization_samples}) is larger than the number of train samples ({len(train_indices)}), using the number of train samples instead")
-            dataset_config.standardization_samples = len(train_indices)
-        fit_standardization_rng = get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.FIT_STANDARDIZATION_SAMPLE)
-        if isinstance(dataset_config.standardization_samples, float):
-            num_samples = int(dataset_config.standardization_samples * len(train_indices))
+        if isinstance(dataset_config.fit_scalers_samples, int) and dataset_config.fit_scalers_samples > len(train_indices):
+            warnings.warn(f"The number of samples for fitting scalers ({dataset_config.fit_scalers_samples}) is larger than the number of train samples ({len(train_indices)}), using the number of train samples instead")
+            dataset_config.fit_scalers_samples = len(train_indices)
+        fit_scalers_rng = get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.FIT_SCALERS_SAMPLE)
+        if isinstance(dataset_config.fit_scalers_samples, float):
+            num_samples = int(dataset_config.fit_scalers_samples * len(train_indices))
         else:
-            num_samples = dataset_config.standardization_samples
-        fit_standardization_indices = train_indices[fit_standardization_rng.choice(len(train_indices), size=num_samples, replace=False)]
-        flowstats_quantiles = fit_standardization(
+            num_samples = dataset_config.fit_scalers_samples
+        fit_scalers_indices = train_indices[fit_scalers_rng.choice(len(train_indices), size=num_samples, replace=False)]
+        flowstats_quantiles = fit_scalers(
             database_path=dataset_config.database_path,
             train_tables_paths=dataset_config._get_train_tables_paths(),
-            fit_standardization_indices=fit_standardization_indices,
+            fit_scalers_indices=fit_scalers_indices,
             flowstats_scaler=flowstats_scaler,
             flowstats_quantile_clip=dataset_config.flowstats_clip,
             ipt_scaler=ipt_scaler,
@@ -337,10 +337,10 @@ def fit_or_load_standardization(dataset_config: DatasetConfig, train_indices: np
         pickle_dump(psizes_scaler, psizes_sizes_scaler_path)
     return flowstats_scaler, flowstats_quantiles, ipt_scaler, psizes_scaler
 
-def fit_standardization(database_path: str, train_tables_paths: list[str], fit_standardization_indices: np.ndarray, flowstats_scaler, flowstats_quantile_clip: float, ipt_scaler, psizes_scaler, ipt_min: int, ipt_max: int, psizes_max: int) -> pd.Series:
+def fit_scalers(database_path: str, train_tables_paths: list[str], fit_scalers_indices: np.ndarray, flowstats_scaler, flowstats_quantile_clip: float, ipt_scaler, psizes_scaler, ipt_min: int, ipt_max: int, psizes_max: int) -> pd.Series:
     start_time = time.time()
     database, tables = load_database(database_path, tables_paths=train_tables_paths)
-    data = load_data_from_pytables(tables=tables, indices=fit_standardization_indices, data_dtype=tables[0].dtype)
+    data = load_data_from_pytables(tables=tables, indices=fit_scalers_indices, data_dtype=tables[0].dtype)
     database.close()
     # PPI
     data_ppi = data[PPI_COLUMN].astype("float32")
