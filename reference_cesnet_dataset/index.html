@@ -718,7 +718,7 @@
       <p>The main class for accessing CESNET datasets. It handles downloading, data preprocessing,
 train/validation/test splitting, and class selection. Access to data is provided through:</p>
 <ul>
-<li>Iterable PyTorch DataLoader for batch-based processing.</li>
+<li>Iterable PyTorch DataLoader for batch processing.</li>
 <li>Pandas DataFrame for loading the entire train, validation, or test set at once.</li>
 </ul>
 <p>The dataset is stored in a <a href="https://www.pytables.org/">PyTables</a> database. The internal <code>PyTablesDataset</code> class is used as a wrapper
@@ -729,7 +729,7 @@ which provides efficient parallel loading of the data. The dataset configuration
 <ol>
 <li>Create an instance of the dataset <a class="autorefs autorefs-internal" href="../reference_datasets/#dataset-classes">class</a> with the desired size and data root. This will download the dataset if it has not already been downloaded.</li>
 <li>Create an instance of <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> and set it with <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize"><code>set_dataset_config_and_initialize</code></a>.
-This will initialize the dataset — select classes, split data into train/validation/test sets, and fit standardization scalers. All is done according to the provided configuration and is cached for later use.</li>
+This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers. All is done according to the provided configuration and is cached for later use.</li>
 <li>Use <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_train_dataloader"><code>get_train_dataloader</code></a> or <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_train_df"><code>get_train_df</code></a> to get training data for a classification model.</li>
 <li>Validate the model and perform the hyperparameter optimalization on <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_val_dataloader"><code>get_val_dataloader</code></a> or <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_val_df"><code>get_val_df</code></a>.</li>
 <li>Evaluate the model on <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_test_dataloader"><code>get_test_dataloader</code></a> or <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_test_df"><code>get_test_df</code></a>.</li>
@@ -1067,7 +1067,7 @@ This will initialize the dataset — select classes, split data into train/valid
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Scaler for flow statistics. It is fitted during the initialization of the dataset and then used for standardization of the data.</p>
+              <p>Scaler for flow statistics. It is fitted during the initialization of the dataset.</p>
             </div>
           </td>
         </tr>
@@ -1695,7 +1695,7 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">    The main class for accessing CESNET datasets. It handles downloading, data preprocessing,</span>
 <span class="sd">    train/validation/test splitting, and class selection. Access to data is provided through:</span>
 
-<span class="sd">    - Iterable PyTorch DataLoader for batch-based processing.</span>
+<span class="sd">    - Iterable PyTorch DataLoader for batch processing.</span>
 <span class="sd">    - Pandas DataFrame for loading the entire train, validation, or test set at once.</span>
 
 <span class="sd">    The dataset is stored in a [PyTables](https://www.pytables.org/) database. The internal `PyTablesDataset` class is used as a wrapper</span>
@@ -1707,7 +1707,7 @@ This will initialize the dataset — select classes, split data into train/valid
 
 <span class="sd">    1. Create an instance of the dataset [class][dataset-classes] with the desired size and data root. This will download the dataset if it has not already been downloaded.</span>
 <span class="sd">    2. Create an instance of [`DatasetConfig`][config.DatasetConfig] and set it with [`set_dataset_config_and_initialize`][datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize].</span>
-<span class="sd">    This will initialize the dataset — select classes, split data into train/validation/test sets, and fit standardization scalers. All is done according to the provided configuration and is cached for later use.</span>
+<span class="sd">    This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers. All is done according to the provided configuration and is cached for later use.</span>
 <span class="sd">    3. Use [`get_train_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_train_dataloader] or [`get_train_df`][datasets.cesnet_dataset.CesnetDataset.get_train_df] to get training data for a classification model.</span>
 <span class="sd">    4. Validate the model and perform the hyperparameter optimalization on [`get_val_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_val_dataloader] or [`get_val_df`][datasets.cesnet_dataset.CesnetDataset.get_val_df].</span>
 <span class="sd">    5. Evaluate the model on [`get_test_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_test_dataloader] or [`get_test_df`][datasets.cesnet_dataset.CesnetDataset.get_test_df].</span>
@@ -1744,7 +1744,7 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        unknown_app_counts: Unknown application counts in the validation and test sets.</span>
 <span class="sd">        collate_fn: Collate function used for creating batches in dataloaders.</span>
 <span class="sd">        encoder: Scikit-learn [`LabelEncoder`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html) used to encode class names into integers. It is fitted during the initialization of the dataset.</span>
-<span class="sd">        flowstats_scaler: Scaler for flow statistics. It is fitted during the initialization of the dataset and then used for standardization of the data.</span>
+<span class="sd">        flowstats_scaler: Scaler for flow statistics. It is fitted during the initialization of the dataset.</span>
 <span class="sd">        psizes_scaler: Scaler for packet sizes.</span>
 <span class="sd">        ipt_scaler: Scaler for inter-packet times.</span>
 <span class="sd">        train_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for training.</span>
@@ -2167,8 +2167,8 @@ This will initialize the dataset — select classes, split data into train/valid
 
         <span class="c1"># Create class info</span>
         <span class="n">class_info</span> <span class="o">=</span> <span class="n">create_superclass_structures</span><span class="p">(</span><span class="n">servicemap</span><span class="o">=</span><span class="n">servicemap</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">classes_</span><span class="p">))</span>
-        <span class="c1"># Load or fit standardization scalers</span>
-        <span class="n">flowstats_scaler</span><span class="p">,</span> <span class="n">flowstats_quantiles</span><span class="p">,</span> <span class="n">ipt_scaler</span><span class="p">,</span> <span class="n">psizes_scaler</span> <span class="o">=</span> <span class="n">fit_or_load_standardization</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">train_indices</span><span class="o">=</span><span class="n">train_indices</span><span class="p">)</span>
+        <span class="c1"># Load or fit data scalers</span>
+        <span class="n">flowstats_scaler</span><span class="p">,</span> <span class="n">flowstats_quantiles</span><span class="p">,</span> <span class="n">ipt_scaler</span><span class="p">,</span> <span class="n">psizes_scaler</span> <span class="o">=</span> <span class="n">fit_or_load_scalers</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">train_indices</span><span class="o">=</span><span class="n">train_indices</span><span class="p">)</span>
         <span class="c1"># Subset dataset indices based on the selected sizes and compute application counts</span>
         <span class="n">dataset_indices</span> <span class="o">=</span> <span class="n">IndicesTuple</span><span class="p">(</span><span class="n">train_indices</span><span class="o">=</span><span class="n">train_indices</span><span class="p">,</span> <span class="n">val_known_indices</span><span class="o">=</span><span class="n">val_known_indices</span><span class="p">,</span> <span class="n">val_unknown_indices</span><span class="o">=</span><span class="n">val_unknown_indices</span><span class="p">,</span> <span class="n">test_known_indices</span><span class="o">=</span><span class="n">test_known_indices</span><span class="p">,</span> <span class="n">test_unknown_indices</span><span class="o">=</span><span class="n">test_unknown_indices</span><span class="p">)</span>
         <span class="n">dataset_indices</span> <span class="o">=</span> <span class="n">subset_and_sort_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">dataset_indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="p">)</span>

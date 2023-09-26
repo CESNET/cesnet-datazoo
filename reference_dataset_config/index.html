@@ -799,7 +799,7 @@
 <ul>
 <li>Train, validation, test sets (dates, sizes, validation approach).</li>
 <li>Application selection — either the standard closed-world setting (only <em>known</em> classes) or the open-world setting (<em>known</em> and <em>unknown</em> classes).</li>
-<li>Feature standardization.</li>
+<li>Feature scaling.</li>
 <li>Dataloader options like batch sizes, order of loading, or number of workers.</li>
 </ul>
 <p>When initializing this class, pass a <a class="autorefs autorefs-internal" href="../reference_cesnet_dataset/#datasets.cesnet_dataset.CesnetDataset"><code>CesnetDataset</code></a> instance to be configured and the desired configuration. Available options are <a class="autorefs autorefs-internal" href="#config.DatasetConfig--configuration-options">here</a>.</p>
@@ -1306,13 +1306,13 @@
           </td>
         </tr>
         <tr>
-          <td><code>standardization_samples</code></td>
+          <td><code>fit_scalers_samples</code></td>
           <td>
                 <code>int | float</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Fraction of train samples used for fitting feature standardization, if float. The absolute number of standardization samples otherwise. <code>Default: 0.25</code></p>
+              <p>Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. <code>Default: 0.25</code></p>
             </div>
           </td>
         </tr>
@@ -1334,7 +1334,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Quantile clip before the standardization of flow statistics. Should limit the influence of outliers. Set to <code>1</code> to disable. <code>Default: 0.99</code></p>
+              <p>Quantile clip before the scaling of flow statistics. Should limit the influence of outliers. Set to <code>1</code> to disable. <code>Default: 0.99</code></p>
             </div>
           </td>
         </tr>
@@ -1356,7 +1356,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Max clip packet sizes before standardization. <code>Default: 1460</code></p>
+              <p>Max clip packet sizes before scaling. <code>Default: 1460</code></p>
             </div>
           </td>
         </tr>
@@ -1378,7 +1378,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Min clip inter-packet times before standardization. <code>Default: 0</code></p>
+              <p>Min clip inter-packet times before scaling. <code>Default: 0</code></p>
             </div>
           </td>
         </tr>
@@ -1389,7 +1389,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Max clip inter-packet times before standardization. <code>Default: 15000</code></p>
+              <p>Max clip inter-packet times before scaling. <code>Default: 15000</code></p>
             </div>
           </td>
         </tr>
@@ -1808,7 +1808,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
 <span class="sd">    - Train, validation, test sets (dates, sizes, validation approach).</span>
 <span class="sd">    - Application selection — either the standard closed-world setting (only *known* classes) or the open-world setting (*known* and *unknown* classes).</span>
-<span class="sd">    - Feature standardization.</span>
+<span class="sd">    - Feature scaling.</span>
 <span class="sd">    - Dataloader options like batch sizes, order of loading, or number of workers.</span>
 
 <span class="sd">    When initializing this class, pass a [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance to be configured and the desired configuration. Available options are [here][config.DatasetConfig--configuration-options].</span>
@@ -1864,14 +1864,14 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`</span>
 <span class="sd">        use_push_flags: Whether to use push flags in packet sequences, if available in the dataset. `Default: False`</span>
 <span class="sd">        zero_ppi_start: Zeroing out the first N packets of each packet sequence. `Default: 0`</span>
-<span class="sd">        standardization_samples: Fraction of train samples used for fitting feature standardization, if float. The absolute number of standardization samples otherwise. `Default: 0.25`</span>
+<span class="sd">        fit_scalers_samples: Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. `Default: 0.25`</span>
 <span class="sd">        flowstats_scaler: Which scaler to use for flow statistics. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: ROBUST`</span>
-<span class="sd">        flowstats_clip: Quantile clip before the standardization of flow statistics. Should limit the influence of outliers. Set to `1` to disable. `Default: 0.99`</span>
+<span class="sd">        flowstats_clip: Quantile clip before the scaling of flow statistics. Should limit the influence of outliers. Set to `1` to disable. `Default: 0.99`</span>
 <span class="sd">        psizes_scaler: Which scaler to use for packet sizes. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`</span>
-<span class="sd">        psizes_max: Max clip packet sizes before standardization. `Default: 1460`</span>
+<span class="sd">        psizes_max: Max clip packet sizes before scaling. `Default: 1460`</span>
 <span class="sd">        ipt_scaler: Which scaler to use for inter-packet times. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`</span>
-<span class="sd">        ipt_min: Min clip inter-packet times before standardization. `Default: 0`</span>
-<span class="sd">        ipt_max: Max clip inter-packet times before standardization. `Default: 15000`</span>
+<span class="sd">        ipt_min: Min clip inter-packet times before scaling. `Default: 0`</span>
+<span class="sd">        ipt_max: Max clip inter-packet times before scaling. `Default: 15000`</span>
 
 <span class="sd">    # How to configure train, validation, and test sets</span>
 <span class="sd">    There are three options for how to define train/validation/test __time periods and dates__.</span>
@@ -1938,7 +1938,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">use_tcp_features</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">use_push_flags</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">zero_ppi_start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">standardization_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">fit_scalers_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span>
     <span class="n">flowstats_scaler</span><span class="p">:</span> <span class="n">ScalerEnum</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">ROBUST</span>
     <span class="n">flowstats_clip</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span>
     <span class="n">psizes_scaler</span><span class="p">:</span> <span class="n">ScalerEnum</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">STANDARD</span>
@@ -2054,8 +2054,8 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="c1"># More asserts</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_ppi_start</span> <span class="o">&gt;</span> <span class="n">PPI_MAX_LEN</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zero_ppi_start has to be &lt;= </span><span class="si">{</span><span class="n">PPI_MAX_LEN</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">standardization_samples</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">standardization_samples</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardization_samples</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;standardization_samples has to be either float between 0 and 1 (giving the fraction of training samples used for standardization) or an integer&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_scalers_samples</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_scalers_samples</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_scalers_samples</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fit_scalers_samples has to be either float between 0 and 1 (giving the fraction of training samples used for fitting scalers) or an integer&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_flowstats_features_len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the number of flow statistics features.&quot;&quot;&quot;</span>
