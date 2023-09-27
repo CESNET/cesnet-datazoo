@@ -149,18 +149,18 @@ def pytables_collate_fn(batch: tuple,
     orig_shape = x_ppi.shape
     ppi_channels = x_ppi.shape[-1]
     x_ppi = x_ppi.reshape(-1, ppi_channels)
-    x_ppi[:,IPT_POS] = x_ppi[:,IPT_POS].clip(max=ipt_max, min=ipt_min)
-    x_ppi[:,SIZE_POS] = x_ppi[:,SIZE_POS].clip(max=psizes_max, min=1)
-    padding_mask = x_ppi[:,DIR_POS] == 0 # mask of zero padding
+    x_ppi[:, IPT_POS] = x_ppi[:, IPT_POS].clip(max=ipt_max, min=ipt_min)
+    x_ppi[:, SIZE_POS] = x_ppi[:, SIZE_POS].clip(max=psizes_max, min=1)
+    padding_mask = x_ppi[:, DIR_POS] == 0 # mask of zero padding
     if ipt_scaler:
-        x_ppi[:,IPT_POS] = ipt_scaler.transform(x_ppi[:,IPT_POS].reshape(-1, 1)).reshape(-1)
-        x_ppi[padding_mask,IPT_POS] = 0
+        x_ppi[:, IPT_POS] = ipt_scaler.transform(x_ppi[:, IPT_POS].reshape(-1, 1)).reshape(-1)
     if psizes_scaler:
-        x_ppi[:,SIZE_POS] = psizes_scaler.transform(x_ppi[:,SIZE_POS].reshape(-1, 1)).reshape(-1)
-        x_ppi[padding_mask,SIZE_POS] = 0
+        x_ppi[:, SIZE_POS] = psizes_scaler.transform(x_ppi[:, SIZE_POS].reshape(-1, 1)).reshape(-1)
+    x_ppi[padding_mask, IPT_POS] = 0
+    x_ppi[padding_mask, SIZE_POS] = 0
     x_ppi = x_ppi.reshape(orig_shape).transpose(0, 2, 1)
     if not use_push_flags:
-        x_ppi = x_ppi[:,(IPT_POS, DIR_POS, SIZE_POS),:]
+        x_ppi = x_ppi[:, (IPT_POS, DIR_POS, SIZE_POS), :]
     if zero_ppi_start > 0:
         x_ppi[:,:,:zero_ppi_start] = 0
 
@@ -346,16 +346,16 @@ def fit_scalers(database_path: str, train_tables_paths: list[str], fit_scalers_i
     data_ppi = data[PPI_COLUMN].astype("float32")
     ppi_channels = data_ppi.shape[1]
     data_ppi = data_ppi.transpose(0, 2, 1).reshape(-1, ppi_channels)
-    padding_mask = data_ppi[:,DIR_POS] == 0 # mask of padded packets
+    padding_mask = data_ppi[:, DIR_POS] == 0 # mask of padded packets
     if ipt_scaler:
-        train_ipt = data_ppi[:,IPT_POS].clip(max=ipt_max, min=ipt_min)
+        train_ipt = data_ppi[:, IPT_POS].clip(max=ipt_max, min=ipt_min)
         train_ipt[padding_mask] = np.nan # nans are ignored in sklearn scalers
         if isinstance(ipt_scaler, MinMaxScaler):
             # let zero be the minimum for minmax scaling
             train_ipt = np.concatenate((train_ipt, [0]))
         ipt_scaler.fit(train_ipt.reshape(-1, 1))
     if psizes_scaler:
-        train_psizes = data_ppi[:,SIZE_POS].clip(max=psizes_max, min=1)
+        train_psizes = data_ppi[:, SIZE_POS].clip(max=psizes_max, min=1)
         train_psizes[padding_mask] = np.nan
         if isinstance(psizes_scaler, MinMaxScaler):
             train_psizes = np.concatenate((train_psizes, [0]))
