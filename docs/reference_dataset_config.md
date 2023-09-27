@@ -23,7 +23,7 @@ The following enums are used for dataset configuration.
         show_source: false
         members_order: source
 
-::: config.AppsSelection
+::: config.AppSelection
     options:
         heading_level: 6
         show_root_heading: true

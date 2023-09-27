@@ -25,12 +25,12 @@ For running on Windows, we recommend using the `spawn` method for creating datal
 
 ```python
 from cesnet_datazoo.datasets import CESNET_QUIC22
-from cesnet_datazoo.config import DatasetConfig, AppsSelection
+from cesnet_datazoo.config import DatasetConfig, AppSelection
 
 dataset = CESNET_QUIC22("/datasets/CESNET-QUIC22/", size="XS")
 dataset_config = DatasetConfig(
     dataset=dataset,
-    apps_selection=AppsSelection.ALL_KNOWN,
+    apps_selection=AppSelection.ALL_KNOWN,
     train_period="W-2022-44",
     test_period="W-2022-45",
 )

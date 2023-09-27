@@ -45,7 +45,7 @@ class ValidationApproach(Enum):
     """Do not use validation. The validation dataloader and dataframe will not be available."""
     def __str__(self): return self.value
 
-class AppsSelection(Enum):
+class AppSelection(Enum):
     """
     Applications can be divided into *known* and *unknown* classes. To use a dataset in the standard closed-world setting, use `ALL_KNOWN ` to select all the applications as *known*.
     Use `TOPX_KNOWN` or `EXPLICIT_UNKNOWN` for the open-world setting and evaluation of out-of-distribution or open-set recognition methods.
@@ -93,7 +93,7 @@ class TrainDataParams():
     database_filename: str
     train_period: str
     train_tables_paths: list[str]
-    apps_selection: AppsSelection
+    apps_selection: AppSelection
     apps_selection_topx: int
     apps_selection_explicit_unknown: list[str]
     apps_selection_fixed_longterm: Optional[tuple[dict[int, str], dict[int, str]]]
@@ -220,7 +220,7 @@ class DatasetConfig():
     test_period: str = ""
     test_dates: list[str] = field(default_factory=list)
 
-    apps_selection: AppsSelection = AppsSelection.ALL_KNOWN
+    apps_selection: AppSelection = AppSelection.ALL_KNOWN
     apps_selection_topx: int = 0
     apps_selection_explicit_unknown: list[str] = field(default_factory=list)
     apps_selection_fixed_longterm: Optional[tuple[dict[int, str], dict[int, str]]] = None
@@ -345,16 +345,16 @@ class DatasetConfig():
             if self.val_approach == ValidationApproach.SPLIT_FROM_TRAIN and self.val_known_size == "all":
                 raise ValueError("val_known_size cannot be 'all' when train_dates_weigths are speficied and validation_approach is split-from-train")
         # App selection
-        if self.apps_selection == AppsSelection.ALL_KNOWN:
+        if self.apps_selection == AppSelection.ALL_KNOWN:
             self.val_unknown_size = 0
             self.test_unknown_size = 0
             if self.apps_selection_topx != 0 or len(self.apps_selection_explicit_unknown) > 0 or self.apps_selection_fixed_longterm is not None:
                 raise ValueError("apps_selection_topx, apps_selection_explicit_unknown, and apps_selection_fixed_longterm cannot be specified when apps_selection is all-known")
-        if self.apps_selection == AppsSelection.TOPX_KNOWN and self.apps_selection_topx == 0:
+        if self.apps_selection == AppSelection.TOPX_KNOWN and self.apps_selection_topx == 0:
             raise ValueError("apps_selection_topx has to be greater than 0 when apps_selection is top-x-known")
-        if self.apps_selection == AppsSelection.EXPLICIT_UNKNOWN and len(self.apps_selection_explicit_unknown) == 0:
+        if self.apps_selection == AppSelection.EXPLICIT_UNKNOWN and len(self.apps_selection_explicit_unknown) == 0:
             raise ValueError("apps_selection_explicit_unknown has to be specified when apps_selection is explicit-unknown")
-        if self.apps_selection == AppsSelection.LONGTERM_FIXED:
+        if self.apps_selection == AppSelection.LONGTERM_FIXED:
             if self.apps_selection_fixed_longterm is None:
                 raise ValueError("apps_selection_fixed_longterm, a tuple of (known_apps_database_enum, unknown_apps_database_enum), has to be specified when apps_selection is longterm-fixed")
             if len(self.disabled_apps) > 0:

@@ -1,6 +1,6 @@
 # CESNET DataZoo
 
-This is the documentation of the CESNET DataZoo project. 
+This is the documentation of the [CESNET DataZoo](https://github.com/CESNET/cesnet-datazoo) project. 
 
 The goal of this project is to provide tools for working with large network traffic datasets and to facilitate research in the traffic classification area. The core functions of the `cesnet-datazoo` package are:
 

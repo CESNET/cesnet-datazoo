@@ -14,7 +14,7 @@ from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler, La
 from torch.utils.data import Dataset
 from typing_extensions import assert_never
 
-from cesnet_datazoo.config import (AppsSelection, DatasetConfig, MinTrainSamplesCheck, ScalerEnum,
+from cesnet_datazoo.config import (AppSelection, DatasetConfig, MinTrainSamplesCheck, ScalerEnum,
                                    TestDataParams, TrainDataParams, Scaler)
 from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, DIR_POS, FLOWSTATS_NO_CLIP,
                                       FLOWSTATS_TO_SCALE, IPT_POS, INDICES_INDEX_POS,
@@ -216,19 +216,19 @@ def init_train_indices(train_data_params: TrainDataParams, servicemap: pd.DataFr
         base_indices[i] = np.nonzero(np.isin(all_app_labels[i], disabled_apps_ids, invert=True))[0]
     base_labels = {table_id: arr[base_indices[table_id]] for table_id, arr in all_app_labels.items()}
     # Apps selection
-    if train_data_params.apps_selection != AppsSelection.LONGTERM_FIXED:
+    if train_data_params.apps_selection != AppSelection.LONGTERM_FIXED:
         app_counts = app_counts[[app for app in app_counts.index.tolist() if app not in disabled_apps_ids]]
         app_counts.index = app_counts.index.map(app_enum)
         app_counts = app_counts.sort_values(ascending=False).astype("int64")
         sorted_apps = app_counts.index.to_list()
-        if train_data_params.apps_selection == AppsSelection.ALL_KNOWN:
+        if train_data_params.apps_selection == AppSelection.ALL_KNOWN:
             known_apps = [app for app in sorted_apps if not is_background_app(app)]
             unknown_apps = []
-        elif train_data_params.apps_selection == AppsSelection.TOPX_KNOWN:
+        elif train_data_params.apps_selection == AppSelection.TOPX_KNOWN:
             known_apps, unknown_apps = split_apps_topx_with_provider_groups(sorted_apps=sorted_apps, known_count=train_data_params.apps_selection_topx, servicemap=servicemap)
             if len(known_apps) < train_data_params.apps_selection_topx:
                 warnings.warn(f"The number of known applications ({len(known_apps)}) is lower than requested in config.apps_selection_topx ({train_data_params.apps_selection_topx}).")
-        elif train_data_params.apps_selection == AppsSelection.EXPLICIT_UNKNOWN:
+        elif train_data_params.apps_selection == AppSelection.EXPLICIT_UNKNOWN:
                 unknown_apps = train_data_params.apps_selection_explicit_unknown
                 missing_unknown_apps = [app for app in unknown_apps if app not in sorted_apps]
                 if len(missing_unknown_apps) > 0:
