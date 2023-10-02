@@ -1,5 +1,13 @@
 # Getting started
-More examples will be prepared as Jupyter notebooks.
+
+## Jupyter notebooks
+
+* Explore the CESNET-QUIC22 dataset - [https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/explore_data.ipynb](https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/explore_data.ipynb)
+* Train a LightGBM model and evaluate it on each week of CESNET-QUIC22 - [https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/example_evaluation.ipynb](https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/example_evaluation.ipynb)
+
+More example notebooks will be published in the future.
+
+## Code snippets
 
 ### Download a dataset and compute statistics
 ```python
