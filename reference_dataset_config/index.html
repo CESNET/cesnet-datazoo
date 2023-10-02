@@ -536,8 +536,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#config.AppsSelection" class="md-nav__link">
-    AppsSelection
+  <a href="#config.AppSelection" class="md-nav__link">
+    AppSelection
   </a>
   
 </li>
@@ -734,8 +734,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#config.AppsSelection" class="md-nav__link">
-    AppsSelection
+  <a href="#config.AppSelection" class="md-nav__link">
+    AppSelection
   </a>
   
 </li>
@@ -1000,7 +1000,7 @@
         <tr>
           <td><code>apps_selection</code></td>
           <td>
-                <code><a class="autorefs autorefs-internal" title="config.AppsSelection" href="#config.AppsSelection">AppsSelection</a></code>
+                <code><a class="autorefs autorefs-internal" title="config.AppSelection" href="#config.AppSelection">AppSelection</a></code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1908,7 +1908,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">test_period</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">test_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 
-    <span class="n">apps_selection</span><span class="p">:</span> <span class="n">AppsSelection</span> <span class="o">=</span> <span class="n">AppsSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span>
+    <span class="n">apps_selection</span><span class="p">:</span> <span class="n">AppSelection</span> <span class="o">=</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span>
     <span class="n">apps_selection_topx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">apps_selection_explicit_unknown</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="n">apps_selection_fixed_longterm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2033,16 +2033,16 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_known_size cannot be &#39;all&#39; when train_dates_weigths are speficied and validation_approach is split-from-train&quot;</span><span class="p">)</span>
         <span class="c1"># App selection</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppsSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">val_unknown_size</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_unknown_size</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_explicit_unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_longterm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_topx, apps_selection_explicit_unknown, and apps_selection_fixed_longterm cannot be specified when apps_selection is all-known&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppsSelection</span><span class="o">.</span><span class="n">TOPX_KNOWN</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">TOPX_KNOWN</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_topx has to be greater than 0 when apps_selection is top-x-known&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppsSelection</span><span class="o">.</span><span class="n">EXPLICIT_UNKNOWN</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_explicit_unknown</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">EXPLICIT_UNKNOWN</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_explicit_unknown</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_explicit_unknown has to be specified when apps_selection is explicit-unknown&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppsSelection</span><span class="o">.</span><span class="n">LONGTERM_FIXED</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">LONGTERM_FIXED</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_longterm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_fixed_longterm, a tuple of (known_apps_database_enum, unknown_apps_database_enum), has to be specified when apps_selection is longterm-fixed&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disabled_apps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -2601,8 +2601,8 @@ is used to create a random stratified validation set. The fraction of validation
 
 
 
-<h6 id="config.AppsSelection" class="doc doc-heading">
-          <span class="doc doc-object-name doc-class-name">config.AppsSelection</span>
+<h6 id="config.AppSelection" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">config.AppSelection</span>
 
 
 </h6>
@@ -2631,7 +2631,7 @@ The <code>LONGTERM_FIXED</code> is for long-term measurements when it is desired
 
 
 
-<h7 id="config.AppsSelection.ALL_KNOWN" class="doc doc-heading">
+<h7 id="config.AppSelection.ALL_KNOWN" class="doc doc-heading">
           <span class="doc doc-object-name doc-attribute-name">ALL_KNOWN</span>
 
   
@@ -2656,7 +2656,7 @@ The <code>LONGTERM_FIXED</code> is for long-term measurements when it is desired
 
 
 
-<h7 id="config.AppsSelection.TOPX_KNOWN" class="doc doc-heading">
+<h7 id="config.AppSelection.TOPX_KNOWN" class="doc doc-heading">
           <span class="doc doc-object-name doc-attribute-name">TOPX_KNOWN</span>
 
   
@@ -2681,7 +2681,7 @@ The <code>LONGTERM_FIXED</code> is for long-term measurements when it is desired
 
 
 
-<h7 id="config.AppsSelection.EXPLICIT_UNKNOWN" class="doc doc-heading">
+<h7 id="config.AppSelection.EXPLICIT_UNKNOWN" class="doc doc-heading">
           <span class="doc doc-object-name doc-attribute-name">EXPLICIT_UNKNOWN</span>
 
   
@@ -2706,7 +2706,7 @@ The <code>LONGTERM_FIXED</code> is for long-term measurements when it is desired
 
 
 
-<h7 id="config.AppsSelection.LONGTERM_FIXED" class="doc doc-heading">
+<h7 id="config.AppSelection.LONGTERM_FIXED" class="doc doc-heading">
           <span class="doc doc-object-name doc-attribute-name">LONGTERM_FIXED</span>
 
   

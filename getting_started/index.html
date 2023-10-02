@@ -363,23 +363,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#jupyter-notebooks" class="md-nav__link">
+    Jupyter notebooks
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-snippets" class="md-nav__link">
+    Code snippets
+  </a>
+  
+    <nav class="md-nav" aria-label="Code snippets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#download-a-dataset-and-compute-statistics" class="md-nav__link">
     Download a dataset and compute statistics
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#enable-logging-and-set-the-spawn-method-on-windows" class="md-nav__link">
     Enable logging and set the spawn method on Windows
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#initialize-dataset-to-create-train-validation-and-test-dataframes" class="md-nav__link">
     Initialize dataset to create train, validation, and test dataframes
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -549,23 +569,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#jupyter-notebooks" class="md-nav__link">
+    Jupyter notebooks
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-snippets" class="md-nav__link">
+    Code snippets
+  </a>
+  
+    <nav class="md-nav" aria-label="Code snippets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#download-a-dataset-and-compute-statistics" class="md-nav__link">
     Download a dataset and compute statistics
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#enable-logging-and-set-the-spawn-method-on-windows" class="md-nav__link">
     Enable logging and set the spawn method on Windows
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#initialize-dataset-to-create-train-validation-and-test-dataframes" class="md-nav__link">
     Initialize dataset to create train, validation, and test dataframes
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -588,7 +628,13 @@
 
 
 <h1 id="getting-started">Getting started</h1>
-<p>More examples will be prepared as Jupyter notebooks.</p>
+<h2 id="jupyter-notebooks">Jupyter notebooks</h2>
+<ul>
+<li>Explore the CESNET-QUIC22 dataset - <a href="https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/explore_data.ipynb">https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/explore_data.ipynb</a></li>
+<li>Train a LightGBM model and evaluate it on each week of CESNET-QUIC22 - <a href="https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/example_evaluation.ipynb">https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/example_evaluation.ipynb</a></li>
+</ul>
+<p>More example notebooks will be published in the future.</p>
+<h2 id="code-snippets">Code snippets</h2>
 <h3 id="download-a-dataset-and-compute-statistics">Download a dataset and compute statistics</h3>
 <p><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">cesnet_datazoo.datasets</span> <span class="kn">import</span> <span class="n">CESNET_QUIC22</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">CESNET_QUIC22</span><span class="p">(</span><span class="s2">&quot;/datasets/CESNET-QUIC22/&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;XS&quot;</span><span class="p">)</span>
@@ -607,12 +653,12 @@ This will download the dataset, compute dataset statistics, and save them into <
 For running on Windows, we recommend using the <code>spawn</code> method for creating dataloader worker processes. Set up logging to get more information from the package.</p>
 <h3 id="initialize-dataset-to-create-train-validation-and-test-dataframes">Initialize dataset to create train, validation, and test dataframes</h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">cesnet_datazoo.datasets</span> <span class="kn">import</span> <span class="n">CESNET_QUIC22</span>
-<span class="kn">from</span> <span class="nn">cesnet_datazoo.config</span> <span class="kn">import</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">AppsSelection</span>
+<span class="kn">from</span> <span class="nn">cesnet_datazoo.config</span> <span class="kn">import</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">AppSelection</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">CESNET_QUIC22</span><span class="p">(</span><span class="s2">&quot;/datasets/CESNET-QUIC22/&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;XS&quot;</span><span class="p">)</span>
 <span class="n">dataset_config</span> <span class="o">=</span> <span class="n">DatasetConfig</span><span class="p">(</span>
     <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-    <span class="n">apps_selection</span><span class="o">=</span><span class="n">AppsSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span><span class="p">,</span>
+    <span class="n">apps_selection</span><span class="o">=</span><span class="n">AppSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span><span class="p">,</span>
     <span class="n">train_period</span><span class="o">=</span><span class="s2">&quot;W-2022-44&quot;</span><span class="p">,</span>
     <span class="n">test_period</span><span class="o">=</span><span class="s2">&quot;W-2022-45&quot;</span><span class="p">,</span>
 <span class="p">)</span>
