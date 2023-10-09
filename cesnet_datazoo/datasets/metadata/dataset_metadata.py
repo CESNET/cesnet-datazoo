@@ -1,17 +1,13 @@
 import os
-from dataclasses import fields
 
 import pandas as pd
-from pydantic.config import Extra
+from pydantic import ValidationInfo, field_validator
 from pydantic.dataclasses import dataclass
 
 from cesnet_datazoo.config import Protocol
 
 
-class C:
-    extra = Extra.forbid
-
-@dataclass(config=C)
+@dataclass()
 class DatasetMetadata():
     protocol: Protocol
     published_in: int
@@ -32,11 +28,12 @@ class DatasetMetadata():
     zenodo_url: str
     related_papers: list[str]
 
-    def __post_init__(self):
-        for f in fields(DatasetMetadata):
-            if f.type == list[str]:
-                value =  getattr(self, f.name)
-                setattr(self, f.name, list(map(str.strip, value.split(","))) if value else [])
+    @field_validator("available_dataset_sizes", "missing_dates_in_collection_period", "background_traffic", "features_in_packet_sequences",
+                     "packet_histogram_features", "flowstats_features", "tcp_features", "other_fields", "related_papers", mode="before")
+    @classmethod
+    def parse_string_to_list(cls, v: str, info: ValidationInfo) -> list[str]:
+        l = list(map(str.strip, v.split(","))) if v else []
+        return l
 
 metadata_df = pd.read_csv(os.path.join(os.path.dirname(__file__), "metadata.csv"), index_col="Name", keep_default_na=False)
 def load_metadata(dataset_name: str) -> DatasetMetadata:

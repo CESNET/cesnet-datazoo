@@ -9,7 +9,6 @@ from enum import Enum
 from typing import TYPE_CHECKING, Literal, Optional
 
 import yaml
-from pydantic.config import Extra
 from pydantic.dataclasses import dataclass
 from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
@@ -110,8 +109,7 @@ class TestDataParams():
     unknown_apps_database_enum: dict[int, str]
 
 class C:
-    extra = Extra.forbid
-    smart_union = True
+    arbitrary_types_allowed = True
 
 @dataclass(config=C)
 class DatasetConfig():
@@ -193,7 +191,7 @@ class DatasetConfig():
     3. Leave everything empty and use the dataset's defaults `dataset.default_train_period` and `dataset.default_test_period`.
 
     There are two options for configuring __sizes__ of train/validation/test sets.
-    
+
     1. Select an appropriate dataset size (default is `S`) when creating the [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance and leave `train_size`, `val_known_size`, and `test_known_size` with their default `all` value.
     This will create train/validation/test sets with all samples available in the selected dataset size (of course, depending on the selected dates and validation approach).
     2. Provide exact sizes in `train_size`, `val_known_size`, and `test_known_size`. This will create train/validation/test sets of the given sizes by doing a random subset.
@@ -261,10 +259,7 @@ class DatasetConfig():
 
     def __post_init__(self, dataset: CesnetDataset):
         """
-        Executed after `__init__` and before pydantic validation.
-        Saves attributes from the dataset instance.
-        !!! warning
-            Enums are not converted in this method, use `__post_init_post_parse__`.
+        Ensures valid configuration. Catches all incompatible options and raise exceptions as soon as possible.
         """
         self.data_root = dataset.data_root
         self.servicemap_path = dataset.servicemap_path
@@ -272,11 +267,6 @@ class DatasetConfig():
         self.database_path = dataset.database_path
         self.flowstats_features = dataset.metadata.flowstats_features
 
-    def __post_init_post_parse__(self, dataset: CesnetDataset):
-        """
-        Executed after pydantic validation.
-        Ensures valid configuration. Catches all incompatible options and raise exceptions as soon as possible.
-        """
         # Configure train dates and period
         if len(self.train_dates) > 0 and self.train_period == "":
             raise ValueError("train_period has to be specified when train_dates are set")

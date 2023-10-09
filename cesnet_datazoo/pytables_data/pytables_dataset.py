@@ -153,9 +153,9 @@ def pytables_collate_fn(batch: tuple,
     x_ppi[:, SIZE_POS] = x_ppi[:, SIZE_POS].clip(max=psizes_max, min=1)
     padding_mask = x_ppi[:, DIR_POS] == 0 # mask of zero padding
     if ipt_scaler:
-        x_ppi[:, IPT_POS] = ipt_scaler.transform(x_ppi[:, IPT_POS].reshape(-1, 1)).reshape(-1)
+        x_ppi[:, IPT_POS] = ipt_scaler.transform(x_ppi[:, IPT_POS].reshape(-1, 1)).reshape(-1) # type: ignore
     if psizes_scaler:
-        x_ppi[:, SIZE_POS] = psizes_scaler.transform(x_ppi[:, SIZE_POS].reshape(-1, 1)).reshape(-1)
+        x_ppi[:, SIZE_POS] = psizes_scaler.transform(x_ppi[:, SIZE_POS].reshape(-1, 1)).reshape(-1) # type: ignore
     x_ppi[padding_mask, IPT_POS] = 0
     x_ppi[padding_mask, SIZE_POS] = 0
     x_ppi = x_ppi.reshape(orig_shape).transpose(0, 2, 1)
