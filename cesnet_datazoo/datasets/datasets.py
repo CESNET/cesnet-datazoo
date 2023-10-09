@@ -35,10 +35,7 @@ class CESNET_TLS_Year22(CesnetDataset):
     name = "CESNET-TLS-Year22"
     database_filename = "CESNET-TLS-Year22.h5"
     bucket_url = "https://liberouter.org/datazoo/download?bucket=cesnet-tls-year22"
-    time_periods = {}
-    time_periods_gen = {
-        "M": list(range(1, 13)),
-        "W": list(range(1, 53)),
-    }
-    default_train_period = "W-2022-1"
-    default_test_period = "W-2022-2"
+    time_periods = {f"W-2022-{week}": [] for week in range(1, 53)} | {f"M-2022-{month}": [] for month in range(1, 13)}
+    time_periods_gen = True
+    default_train_period = "M-2022-9"
+    default_test_period = "M-2022-10"

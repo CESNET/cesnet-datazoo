@@ -27,8 +27,7 @@ from cesnet_datazoo.pytables_data.indices_setup import (IndicesTuple, compute_kn
                                                         init_or_load_train_indices,
                                                         init_or_load_val_indices,
                                                         subset_and_sort_indices)
-from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset,
-                                                           fit_or_load_scalers,
+from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, fit_or_load_scalers,
                                                            pytables_collate_fn,
                                                            pytables_ip_collate_fn, worker_init_fn)
 from cesnet_datazoo.utils.class_info import ClassInfo, create_superclass_structures
@@ -111,7 +110,7 @@ class CesnetDataset():
     metadata: DatasetMetadata
     available_dates: list[str]
     time_periods: dict[str, list[str]]
-    time_periods_gen: Optional[dict[str, list[int]]] = None
+    time_periods_gen: bool = False
     default_train_period: str
     default_test_period: str
 
@@ -165,7 +164,7 @@ class CesnetDataset():
             else:
                 assert num_samples == DATASET_SIZES[self.size]; f"Expected {DATASET_SIZES[self.size]} samples, got {num_samples} in the database"
             self.available_dates = list(map(lambda x: x.removeprefix("/flows/D"), tables_paths))
-        if self.time_periods_gen is not None:
+        if self.time_periods_gen:
             self._generate_time_periods()
 
     def set_dataset_config_and_initialize(self, dataset_config: DatasetConfig) -> None:
@@ -367,7 +366,7 @@ class CesnetDataset():
 
         When the dataset is used in the open-world setting, and unknown classes are defined,
         the returned test dataframe is composed of `test_known_size` samples of known classes followed by `test_unknown_size` samples of unknown classes.
-         
+
 
         !!! warning "Memory usage"
 
@@ -411,24 +410,21 @@ class CesnetDataset():
                                    batch_size=batch_size)
 
     def _generate_time_periods(self) -> None:
-        assert not self.time_periods and self.time_periods_gen is not None
-        collection_year = self.metadata.collected_in
-        if "W" in self.time_periods_gen:
-            for week in self.time_periods_gen["W"]:
-                week_str = f"W-{collection_year}-{week}"
-                self.time_periods[week_str] = []
+        for period in self.time_periods:
+            if period.startswith("W"):
+                split = period.split("-")
+                collection_year, week = int(split[1]), int(split[2])
                 for d in range(1, 8):
                     s = datetime.date.fromisocalendar(collection_year, week, d).strftime("%Y%m%d")
                     if s not in self.metadata.missing_dates_in_collection_period:
-                        self.time_periods[week_str].append(s)
-        if "M" in self.time_periods_gen:
-            for month in self.time_periods_gen["M"]:
-                month_str = f"M-{collection_year}-{month}"
-                self.time_periods[month_str] = []
+                        self.time_periods[period].append(s)
+            if period.startswith("M"):
+                split = period.split("-")
+                collection_year, month = int(split[1]), int(split[2])
                 for d in range(1, calendar.monthrange(collection_year, month)[1]):
                     s = datetime.date(collection_year, month, d).strftime("%Y%m%d")
                     if s not in self.metadata.missing_dates_in_collection_period:
-                        self.time_periods[month_str].append(s)
+                        self.time_periods[period].append(s)
 
     def _is_downloaded(self) -> bool:
         """Servicemap is downloaded after the database; thus if it exists, the database is also downloaded"""
