@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../images/datazoo_logo.svg">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.7">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.4">
     
     
       
@@ -24,10 +24,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.046329b4.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.bd3936ea.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.85d0ee34.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
       
       
 
@@ -281,6 +281,9 @@
     
     
     
+    
+    
+      
       
     
     <li class="md-nav__item md-nav__item--section md-nav__item--nested">
@@ -288,10 +291,10 @@
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -346,6 +349,9 @@
     
     
     
+    
+    
+      
       
     
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
@@ -353,10 +359,10 @@
         
         
         
-        
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -760,21 +766,15 @@
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CESNET_TLS_Year22</span><span class="p">(</span><span class="n">CesnetDataset</span><span class="p">):</span>
+<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CESNET_TLS_Year22</span><span class="p">(</span><span class="n">CesnetDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset class for [CESNET-TLS-Year22][cesnet-tls-year22].&quot;&quot;&quot;</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;CESNET-TLS-Year22&quot;</span>
     <span class="n">database_filename</span> <span class="o">=</span> <span class="s2">&quot;CESNET-TLS-Year22.h5&quot;</span>
     <span class="n">bucket_url</span> <span class="o">=</span> <span class="s2">&quot;https://liberouter.org/datazoo/download?bucket=cesnet-tls-year22&quot;</span>
-    <span class="n">time_periods</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">time_periods_gen</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">)),</span>
-        <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)),</span>
-    <span class="p">}</span>
-    <span class="n">default_train_period</span> <span class="o">=</span> <span class="s2">&quot;W-2022-1&quot;</span>
-    <span class="n">default_test_period</span> <span class="o">=</span> <span class="s2">&quot;W-2022-2&quot;</span>
+    <span class="n">time_periods</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;W-2022-</span><span class="si">{</span><span class="n">week</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">week</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)}</span> <span class="o">|</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;M-2022-</span><span class="si">{</span><span class="n">month</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">month</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">)}</span>
+    <span class="n">time_periods_gen</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">default_train_period</span> <span class="o">=</span> <span class="s2">&quot;M-2022-9&quot;</span>
+    <span class="n">default_test_period</span> <span class="o">=</span> <span class="s2">&quot;M-2022-10&quot;</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -834,10 +834,11 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.sections"], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.sections"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      <script src="../assets/javascripts/bundle.94c44541.min.js"></script>
       
     
   </body>
