@@ -12,11 +12,10 @@ def load_from_dataloader(dataloader: DataLoader) -> tuple[np.ndarray, np.ndarray
     data_flowstats = []
     labels = []
     print("Loading data from dataloader")
-    for *x_batch, y_batch in tqdm(dataloader, total=len(dataloader)):
-        ppi, flowstats  = x_batch
-        data_ppi.append(ppi)
-        data_flowstats.append(flowstats)
-        labels.append(y_batch)
+    for batch_ppi, batch_flowstats, batch_labels in tqdm(dataloader, total=len(dataloader)):
+        data_ppi.append(batch_ppi)
+        data_flowstats.append(batch_flowstats)
+        labels.append(batch_labels)
     data_ppi = np.concatenate(data_ppi)
     data_flowstats = np.concatenate(data_flowstats)
     labels = np.concatenate(labels)
@@ -24,7 +23,6 @@ def load_from_dataloader(dataloader: DataLoader) -> tuple[np.ndarray, np.ndarray
 
 def create_df_from_dataloader(dataloader: DataLoader, feature_names: list[str], flatten_ppi: bool = False) -> pd.DataFrame:
     data_ppi, data_flowstats, labels = load_from_dataloader(dataloader)
-
     if flatten_ppi:
         data_ppi = data_ppi.reshape(data_ppi.shape[0], -1)
         data = np.column_stack((data_ppi, data_flowstats))

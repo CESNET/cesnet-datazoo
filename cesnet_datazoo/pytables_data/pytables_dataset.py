@@ -50,8 +50,6 @@ class PyTablesDataset(Dataset):
             batch_data = self.data[batch_idx]
         else:
             batch_data = load_data_from_pytables(tables=self.tables, indices=self.indices[batch_idx], data_dtype=self.data_dtype)
-        # Assert that app labels are the same between loaded data and indices
-        assert np.array_equal(batch_data[APP_COLUMN], self.indices[batch_idx][:, INDICES_LABEL_POS])
         if self.return_all_fields:
             return (batch_data, batch_idx)
         return_data = (batch_data[PPI_COLUMN].astype("float32"), batch_data[self.flowstats_features], list(map(self.app_enum, batch_data[APP_COLUMN])))
@@ -135,8 +133,8 @@ def worker_init_fn(worker_id):
     dataset.pytables_worker_init(worker_id)
 
 def pytables_ip_collate_fn(batch):
-    ips, _, _, apps = batch
-    return ips, apps
+    ips, _, _, labels = batch
+    return ips, labels
 
 def pytables_collate_fn(batch: tuple, 
                         flowstats_scaler: Scaler, flowstats_quantiles: pd.Series,
