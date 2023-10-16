@@ -300,18 +300,19 @@ class DatasetConfig():
             if len(self.val_dates) == 0 and self.val_period == "":
                 raise ValueError("val_period and val_dates (or val_period from dataset.time_periods) have to be specified when val_approach is validation-dates")
         # Check if train, val, and test dates are available in the dataset
-        unknown_train_dates = [t for t in self.train_dates if t not in dataset.available_dates]
-        unknown_val_dates = [t for t in self.val_dates if t not in dataset.available_dates]
-        unknown_test_dates = [t for t in self.test_dates if t not in dataset.available_dates]
-        if len(unknown_train_dates) > 0:
-            raise ValueError(f"Unknown train dates {unknown_train_dates}. Use dates available in dataset.available_dates" \
-                            + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
-        if len(unknown_val_dates) > 0:
-            raise ValueError(f"Unknown validation dates {unknown_val_dates}. Use dates available in dataset.available_dates" \
-                            + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
-        if len(unknown_test_dates) > 0:
-            raise ValueError(f"Unknown test dates {unknown_test_dates}. Use dates available in dataset.available_dates" \
-                            + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
+        if dataset.available_dates:
+            unknown_train_dates = [t for t in self.train_dates if t not in dataset.available_dates]
+            unknown_val_dates = [t for t in self.val_dates if t not in dataset.available_dates]
+            unknown_test_dates = [t for t in self.test_dates if t not in dataset.available_dates]
+            if len(unknown_train_dates) > 0:
+                raise ValueError(f"Unknown train dates {unknown_train_dates}. Use dates available in dataset.available_dates" \
+                                + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
+            if len(unknown_val_dates) > 0:
+                raise ValueError(f"Unknown validation dates {unknown_val_dates}. Use dates available in dataset.available_dates" \
+                                + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
+            if len(unknown_test_dates) > 0:
+                raise ValueError(f"Unknown test dates {unknown_test_dates}. Use dates available in dataset.available_dates" \
+                                + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
         # Configure features
         if self.use_packet_histograms:
             if len(dataset.metadata.packet_histogram_features) > 0:

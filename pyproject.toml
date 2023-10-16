@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cesnet-datazoo"
-version = "0.0.6"
+version = "0.0.7"
 authors = [
   {name = "Jan Luxemburk", email = "luxemburk@cesnet.cz"},
   {name = "Karel Hynek", email = "hynekkar@cesnet.cz"},
@@ -45,6 +45,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "black",
+  "build",
   "jupyterlab",
   "lightgbm",
   "mkdocs-autorefs",
@@ -53,6 +54,7 @@ dev = [
   "mkdocs",                       
   "mkdocstrings-python",
   "mkdocstrings",
+  "twine",
 ]
 
 [project.urls]

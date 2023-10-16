@@ -137,7 +137,7 @@ class CesnetDataset():
     val_dataloader: Optional[DataLoader] = None
     test_dataloader: Optional[DataLoader] = None
 
-    def __init__(self, data_root: str, size: str = "S") -> None:
+    def __init__(self, data_root: str, size: str = "S", skip_dataset_read_at_init: bool = False) -> None:
         self.metadata = load_metadata(self.name)
         self.size = size
         if self.size != "ORIG":
@@ -154,16 +154,19 @@ class CesnetDataset():
             os.makedirs(self.data_root)
         if not self._is_downloaded():
             self._download()
-        with tb.open_file(self.database_path, mode="r") as database:
-            tables_paths = list(map(lambda x: x._v_pathname, iter(database.get_node(f"/flows"))))
-            num_samples = 0
-            for p in tables_paths:
-                num_samples += len(database.get_node(p))
-            if self.size == "ORIG":
-                assert num_samples == self.metadata.available_samples; f"Expected {self.metadata.available_samples} samples, got {num_samples} in the database"
-            else:
-                assert num_samples == DATASET_SIZES[self.size]; f"Expected {DATASET_SIZES[self.size]} samples, got {num_samples} in the database"
-            self.available_dates = list(map(lambda x: x.removeprefix("/flows/D"), tables_paths))
+        if not skip_dataset_read_at_init:
+            with tb.open_file(self.database_path, mode="r") as database:
+                tables_paths = list(map(lambda x: x._v_pathname, iter(database.get_node(f"/flows"))))
+                num_samples = 0
+                for p in tables_paths:
+                    num_samples += len(database.get_node(p))
+                if self.size == "ORIG":
+                    assert num_samples == self.metadata.available_samples; f"Expected {self.metadata.available_samples} samples, got {num_samples} in the database"
+                else:
+                    assert num_samples == DATASET_SIZES[self.size]; f"Expected {DATASET_SIZES[self.size]} samples, got {num_samples} in the database"
+                self.available_dates = list(map(lambda x: x.removeprefix("/flows/D"), tables_paths))
+        else:
+            self.available_dates = []
         if self.time_periods_gen:
             self._generate_time_periods()
 
