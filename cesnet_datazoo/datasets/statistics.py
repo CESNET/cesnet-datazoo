@@ -124,6 +124,7 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
     df_flowstats = pd.DataFrame(data={"FLOW DURATION": feature_duration, "FLOW BYTE VOLUME": feature_bytes_total, "FLOW LENGTH": feature_packets_total}).describe()
     df_flowstats.to_csv(stats_csv_path)
     # Categories tikzpicture and csv output
+    stats_dataset.pytables_worker_init() # to get access to cat enum; TODO implement better
     df_categories.index = df_categories.index.map(stats_dataset.get_cat_enum())
     df_categories = df_categories.drop("default", errors="ignore")
     df_categories["FLOW_PERC"] = df_categories["FLOW_COUNT"] / sum(df_categories["FLOW_COUNT"]) * 100
