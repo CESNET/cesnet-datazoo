@@ -490,6 +490,8 @@ class CesnetDataset():
                 num_samples = dataset_config.train_size + dataset_config.val_known_size
             else:
                 num_samples = dataset_config.train_size
+            if num_samples > len(train_indices):
+                raise ValueError(f"Requested number of samples for weight sampling ({num_samples}) is larger than the number of available train samples ({len(train_indices)})")
             train_indices = date_weight_sample_train_indices(dataset_config=dataset_config, train_indices=train_indices, num_samples=num_samples)
         # Obtain validation indices based on the selected approach
         if dataset_config.val_approach == ValidationApproach.VALIDATION_DATES:
@@ -502,11 +504,19 @@ class CesnetDataset():
             if dataset_config.train_dates_weigths is not None:
                 assert dataset_config.val_known_size != "all"
                 # When weight sampling is used, val_known_size is kept but the resulting train size can be smaller due to no enough samples in some train dates
+                if dataset_config.val_known_size > len(train_indices):
+                    raise ValueError(f"Requested validation size ({dataset_config.val_known_size}) is larger than the number of available train samples after weight sampling ({len(train_indices)})")
                 train_indices, val_known_indices = train_test_split(train_indices, test_size=dataset_config.val_known_size, stratify=train_labels, shuffle=True, random_state=train_val_rng)
                 dataset_config.train_size = len(train_indices)
             elif dataset_config.train_size == "all" and dataset_config.val_known_size == "all":
                 train_indices, val_known_indices = train_test_split(train_indices, test_size=dataset_config.train_val_split_fraction, stratify=train_labels, shuffle=True, random_state=train_val_rng)
             else:
+                if dataset_config.val_known_size != "all" and  dataset_config.train_size != "all" and dataset_config.train_size + dataset_config.val_known_size > len(train_indices):
+                    raise ValueError(f"Requested train size + validation size ({dataset_config.train_size + dataset_config.val_known_size}) is larger than the number of available train samples ({len(train_indices)})")
+                if dataset_config.train_size != "all" and dataset_config.train_size > len(train_indices):
+                    raise ValueError(f"Requested train size ({dataset_config.train_size}) is larger than the number of available train samples ({len(train_indices)})")
+                if dataset_config.val_known_size != "all" and dataset_config.val_known_size > len(train_indices):
+                    raise ValueError(f"Requested validation size ({dataset_config.val_known_size}) is larger than the number of available train samples ({len(train_indices)})")
                 train_indices, val_known_indices = train_test_split(train_indices,
                                                                           train_size=dataset_config.train_size if dataset_config.train_size != "all" else None,
                                                                           test_size=dataset_config.val_known_size if dataset_config.val_known_size != "all" else None,
