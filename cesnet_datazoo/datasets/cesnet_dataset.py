@@ -62,6 +62,7 @@ class CesnetDataset():
     Parameters:
         data_root: Path to the folder where the dataset will be stored. Each dataset size has its own subfolder `data_root/size`
         size: Size of the dataset. Options are `XS`, `S`, `M`, `L`, `ORIG`.
+        silent: Whether to suppress print and tqdm output.
 
     Attributes:
         name: Name of the dataset.
@@ -110,9 +111,10 @@ class CesnetDataset():
     metadata: DatasetMetadata
     available_dates: list[str]
     time_periods: dict[str, list[str]]
-    time_periods_gen: bool = False
     default_train_period: str
     default_test_period: str
+    time_periods_gen: bool = False
+    silent: bool = False
 
     dataset_config: Optional[DatasetConfig] = None
     class_info: Optional[ClassInfo] = None
@@ -137,7 +139,8 @@ class CesnetDataset():
     val_dataloader: Optional[DataLoader] = None
     test_dataloader: Optional[DataLoader] = None
 
-    def __init__(self, data_root: str, size: str = "S", skip_dataset_read_at_init: bool = False) -> None:
+    def __init__(self, data_root: str, size: str = "S", skip_dataset_read_at_init: bool = False, silent: bool = False) -> None:
+        self.silent = silent
         self.metadata = load_metadata(self.name)
         self.size = size
         if self.size != "ORIG":
@@ -335,7 +338,7 @@ class CesnetDataset():
         train_dataloader.sampler.sampler = SequentialSampler(self.train_dataset)
         train_dataloader.sampler.drop_last = False
         feature_names = self.dataset_config.get_feature_names(flatten_ppi=flatten_ppi)
-        df = create_df_from_dataloader(dataloader=train_dataloader, feature_names=feature_names, flatten_ppi=flatten_ppi)
+        df = create_df_from_dataloader(dataloader=train_dataloader, feature_names=feature_names, flatten_ppi=flatten_ppi, silent=self.silent)
         # Restore the original dataloader sampler and drop_last
         train_dataloader.sampler.sampler = self.train_dataloader_sampler
         train_dataloader.sampler.drop_last = self.train_dataloader_drop_last
@@ -360,7 +363,7 @@ class CesnetDataset():
         if len(self.val_dataset) > DATAFRAME_SAMPLES_WARNING_THRESHOLD:
             warnings.warn(f"Validation set has ({len(self.val_dataset)} samples), consider using get_val_dataloader() instead")
         feature_names = self.dataset_config.get_feature_names(flatten_ppi=flatten_ppi)
-        return create_df_from_dataloader(dataloader=self.get_val_dataloader(), feature_names=feature_names, flatten_ppi=flatten_ppi)
+        return create_df_from_dataloader(dataloader=self.get_val_dataloader(), feature_names=feature_names, flatten_ppi=flatten_ppi, silent=self.silent)
 
     def get_test_df(self, flatten_ppi: bool = False) -> pd.DataFrame:
         """
@@ -386,7 +389,7 @@ class CesnetDataset():
         if len(self.test_dataset) > DATAFRAME_SAMPLES_WARNING_THRESHOLD:
             warnings.warn(f"Test set has ({len(self.test_dataset)} samples), consider using get_test_dataloader() instead")
         feature_names = self.dataset_config.get_feature_names(flatten_ppi=flatten_ppi)
-        return create_df_from_dataloader(dataloader=self.get_test_dataloader(), feature_names=feature_names, flatten_ppi=flatten_ppi)
+        return create_df_from_dataloader(dataloader=self.get_test_dataloader(), feature_names=feature_names, flatten_ppi=flatten_ppi, silent=self.silent)
 
     def compute_dataset_statistics(self, num_samples: int | Literal["all"] = 10_000_000, num_workers: int = 4, batch_size: int = 4096, disabled_apps: Optional[list[str]] = None)-> None:
         """
@@ -410,7 +413,8 @@ class CesnetDataset():
                                    disabled_apps=disabled_apps if disabled_apps is not None else [],
                                    num_samples=num_samples,
                                    num_workers=num_workers,
-                                   batch_size=batch_size)
+                                   batch_size=batch_size,
+                                   silent=self.silent)
 
     def _generate_time_periods(self) -> None:
         time_periods = {}
@@ -437,10 +441,11 @@ class CesnetDataset():
         return os.path.exists(self.servicemap_path) and os.path.exists(self.database_path)
 
     def _download(self) -> None:
-        print(f"Downloading {self.name} dataset")
+        if not self.silent:
+            print(f"Downloading {self.name} dataset")
         database_url = f"{self.bucket_url}&file={self.database_filename}"
         servicemap_url = f"{self.bucket_url}&file={SERVICEMAP_FILE}"
-        resumable_download(url=database_url, file_path=self.database_path)
+        resumable_download(url=database_url, file_path=self.database_path, silent=self.silent)
         simple_download(url=servicemap_url, file_path=self.servicemap_path)
 
     def _clear(self) -> None:

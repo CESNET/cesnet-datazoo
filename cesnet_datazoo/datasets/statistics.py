@@ -12,15 +12,11 @@ from torch.utils.data import BatchSampler, DataLoader, SequentialSampler
 from tqdm import tqdm
 
 from cesnet_datazoo.config import Protocol
-from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN,
-                                      FLOWEND_REASON_FEATURES, PHISTS_FEATURES,
-                                      PPI_COLUMN, SIZE_POS)
+from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, FLOWEND_REASON_FEATURES,
+                                      PHISTS_FEATURES, PPI_COLUMN, SIZE_POS)
 from cesnet_datazoo.pytables_data.indices_setup import sort_indices
-from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset,
-                                                           list_all_tables,
+from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, list_all_tables,
                                                            worker_init_fn)
-
-log = logging.getLogger(__name__)
 
 
 def pick_quic_fields(batch):
@@ -46,7 +42,7 @@ def pick_stats_fields(batch, flowstats_features: list[str]):
 def simple_collate_fn(batch):
     return batch
 
-def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_features: list[str], protocol: Protocol, disabled_apps: list[str], num_samples: int | Literal["all"] = 10_000_000, num_workers: int = 4, batch_size: int = 4096):
+def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_features: list[str], protocol: Protocol, disabled_apps: list[str], num_samples: int | Literal["all"] = 10_000_000, num_workers: int = 4, batch_size: int = 4096, silent: bool = False):
     stats_pdf_path = os.path.join(output_dir, "dataset-statistics.pdf")
     stats_csv_path = os.path.join(output_dir, "dataset-statistics.csv")
     categories_csv_path = os.path.join(output_dir, "categories.csv")
@@ -72,7 +68,8 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
     feature_packets_total = []
     feature_bytes_total = []
     packet_sizes_counter = Counter()
-    log.info(f"Reading data from {database_path} for statistics")
+    if not silent:
+        print(f"Reading data from {database_path} for statistics")
     table_names = list_all_tables(database_path)
     stats_dataset = PyTablesDataset(database_path=database_path, tables_paths=table_names, flowstats_features=flowstats_features, disabled_apps=disabled_apps, indices=None, return_all_fields=True)
     if num_samples != "all":
@@ -91,7 +88,7 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
     if num_workers == 0:
         stats_dataset.pytables_worker_init()
 
-    for batch, batch_idx in tqdm(stats_dloader, total=len(stats_dloader)):
+    for batch, batch_idx in tqdm(stats_dloader, total=len(stats_dloader), disable=silent):
         ppi, duration, packets_total, bytes_total, asn, phist, flowend_reason, app, cat = pick_stats_fields(batch, flowstats_features=flowstats_features)
         # Saving feature values for distribution plots
         feature_duration.append(duration)
@@ -236,6 +233,3 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
     plt.tight_layout()
     fig.show()
     fig.savefig(stats_pdf_path, bbox_inches="tight")
-
-def compute_known_unknown_statistics():
-    raise NotImplementedError

@@ -7,12 +7,13 @@ from tqdm import tqdm
 from cesnet_datazoo.constants import APP_COLUMN
 
 
-def load_from_dataloader(dataloader: DataLoader) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def load_from_dataloader(dataloader: DataLoader, silent: bool = False) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     data_ppi = []
     data_flowstats = []
     labels = []
-    print("Loading data from dataloader")
-    for batch_ppi, batch_flowstats, batch_labels in tqdm(dataloader, total=len(dataloader)):
+    if not silent:
+        print("Loading data from dataloader")
+    for batch_ppi, batch_flowstats, batch_labels in tqdm(dataloader, total=len(dataloader), disable=silent):
         data_ppi.append(batch_ppi)
         data_flowstats.append(batch_flowstats)
         labels.append(batch_labels)
@@ -21,8 +22,8 @@ def load_from_dataloader(dataloader: DataLoader) -> tuple[np.ndarray, np.ndarray
     labels = np.concatenate(labels)
     return data_ppi, data_flowstats, labels
 
-def create_df_from_dataloader(dataloader: DataLoader, feature_names: list[str], flatten_ppi: bool = False) -> pd.DataFrame:
-    data_ppi, data_flowstats, labels = load_from_dataloader(dataloader)
+def create_df_from_dataloader(dataloader: DataLoader, feature_names: list[str], flatten_ppi: bool = False, silent: bool = False) -> pd.DataFrame:
+    data_ppi, data_flowstats, labels = load_from_dataloader(dataloader, silent=silent)
     if flatten_ppi:
         data_ppi = data_ppi.reshape(data_ppi.shape[0], -1)
         data = np.column_stack((data_ppi, data_flowstats))

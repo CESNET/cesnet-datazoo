@@ -9,7 +9,7 @@ def simple_download(url: str, file_path: str):
     with open(file_path, "wb") as file:
         file.write(r.content)
 
-def resumable_download(url: str, file_path: str, chunk_size: int = 1024**2):
+def resumable_download(url: str, file_path: str, chunk_size: int = 1024**2, silent: bool = False):
     r1 = requests.get(url, stream=True)
     redirected_url = r1.url
     content_size = int(r1.headers["Content-Length"])
@@ -23,10 +23,11 @@ def resumable_download(url: str, file_path: str, chunk_size: int = 1024**2):
 
     headers = {"Range": f"bytes={temp_size}-"}
     r2 = requests.get(redirected_url, stream=True, headers=headers)
-    print(f"File size: {content_size / (1024**3):0.2f}GB")
-    print(f"Remaining: {(content_size - temp_size) / (1024**3):0.2f}GB")
+    if not silent:
+        print(f"File size: {content_size / (1024**3):0.2f}GB")
+        print(f"Remaining: {(content_size - temp_size) / (1024**3):0.2f}GB")
 
-    progress_bar = tqdm(total=content_size - temp_size, unit="B", unit_scale=True, unit_divisor=1024)
+    progress_bar = tqdm(total=content_size - temp_size, unit="B", unit_scale=True, unit_divisor=1024, disable=silent)
     with open(file_path, "ab") as file:
         for data in r2.iter_content(chunk_size=chunk_size):
             file.write(data)
