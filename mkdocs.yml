@@ -24,6 +24,11 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.superfences
 
+extra:
+  analytics:
+    provider: google
+    property: G-788ETHG59K
+
 nav:
   - Introduction: index.md
   - Installation: installation.md
