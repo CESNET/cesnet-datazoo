@@ -282,7 +282,7 @@ class DatasetConfig():
             raise ValueError("test_period has to be specified when test_dates are set")
         if len(self.test_dates) == 0 and self.test_period != "":
             if self.test_period not in dataset.time_periods:
-                raise ValueError(f"Unknown test_period {self.train_period}. Use time period available in dataset.time_periods")
+                raise ValueError(f"Unknown test_period {self.test_period}. Use time period available in dataset.time_periods")
             self.test_dates = dataset.time_periods[self.test_period]
         if len(self.test_dates) == 0 and self.test_period == "":
             self.test_period = dataset.default_test_period

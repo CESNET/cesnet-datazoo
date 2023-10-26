@@ -527,7 +527,9 @@ class CesnetDataset():
                                                                           test_size=dataset_config.val_known_size if dataset_config.val_known_size != "all" else None,
                                                                           stratify=train_labels, shuffle=True, random_state=train_val_rng)
         elif dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
-            val_known_indices = val_unknown_indices = val_data_path = None
+            val_data_path = None
+            val_known_indices = np.empty((0,3), dtype=np.int64)
+            val_unknown_indices = np.empty((0,3), dtype=np.int64)
         else: assert_never(dataset_config.val_approach)
 
         # Create class info
