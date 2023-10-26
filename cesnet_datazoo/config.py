@@ -314,15 +314,15 @@ class DatasetConfig():
                 raise ValueError(f"Unknown test dates {unknown_test_dates}. Use dates available in dataset.available_dates" \
                                 + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
         # Configure features
+        if dataset.metadata.protocol == Protocol.TLS and self.use_tcp_features:
+            self.flowstats_features = self.flowstats_features + SELECTED_TCP_FLAGS
+            if self.use_push_flags and "PUSH_FLAG" not in dataset.metadata.features_in_packet_sequences:
+                raise ValueError("This TLS dataset does not support use_push_flags")
         if self.use_packet_histograms:
             if len(dataset.metadata.packet_histogram_features) > 0:
                 self.flowstats_features = self.flowstats_features + dataset.metadata.packet_histogram_features
             else:
                 self.use_packet_histograms = False
-        if dataset.metadata.protocol == Protocol.TLS and self.use_tcp_features:
-            self.flowstats_features = self.flowstats_features + SELECTED_TCP_FLAGS
-            if self.use_push_flags and "PUSH_FLAG" not in dataset.metadata.features_in_packet_sequences:
-                raise ValueError("This TLS dataset does not support use_push_flags")
         if dataset.metadata.protocol == Protocol.QUIC:
             self.use_tcp_features = False
             if self.use_push_flags:
