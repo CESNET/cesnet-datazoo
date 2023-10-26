@@ -43,11 +43,21 @@ def subset_and_sort_indices(dataset_config: DatasetConfig, dataset_indices: Indi
     val_unknown_indices = sort_indices(dataset_indices.val_unknown_indices[:dataset_config.val_unknown_size])
     test_known_indices = sort_indices(dataset_indices.test_known_indices[:dataset_config.test_known_size])
     test_unknown_indices = sort_indices(dataset_indices.test_unknown_indices[:dataset_config.test_unknown_size])
-    assert dataset_config.train_size == len(train_indices) and \
-           dataset_config.val_known_size == len(val_known_indices) and \
-           dataset_config.val_unknown_size == len(val_unknown_indices) and \
-           dataset_config.test_known_size == len(test_known_indices) and \
-           dataset_config.test_unknown_size == len(test_unknown_indices)
+    if dataset_config.train_size != len(train_indices):
+        warnings.warn(f"Requested train size {dataset_config.train_size} is larger than the number of available samples {len(train_indices)}.")
+        dataset_config.train_size = len(train_indices)
+    if dataset_config.val_known_size != len(val_known_indices):
+        warnings.warn(f"Requested validation known size {dataset_config.val_known_size} is larger than the number of available samples {len(val_known_indices)}.")
+        dataset_config.val_known_size = len(val_known_indices)
+    if dataset_config.val_unknown_size != len(val_unknown_indices):
+        warnings.warn(f"Requested validation unknown size {dataset_config.val_unknown_size} is larger than the number of available samples {len(val_unknown_indices)}.")
+        dataset_config.val_unknown_size = len(val_unknown_indices)
+    if dataset_config.test_known_size != len(test_known_indices):
+        warnings.warn(f"Requested test known size {dataset_config.test_known_size} is larger than the number of available samples {len(test_known_indices)}.")
+        dataset_config.test_known_size = len(test_known_indices)
+    if dataset_config.test_unknown_size != len(test_unknown_indices):
+        warnings.warn(f"Requested test unknown size {dataset_config.test_unknown_size} is larger than the number of available samples {len(test_unknown_indices)}.")
+        dataset_config.test_unknown_size = len(test_unknown_indices)
     dataset_indices = IndicesTuple(train_indices=train_indices, val_known_indices=val_known_indices, val_unknown_indices=val_unknown_indices, test_known_indices=test_known_indices, test_unknown_indices=test_unknown_indices)
     return dataset_indices
 
@@ -56,7 +66,7 @@ def date_weight_sample_train_indices(dataset_config: DatasetConfig, train_indice
     indices_per_date = [train_indices[train_indices[:, INDICES_TABLE_POS] == i] for i in np.unique(train_indices[:, INDICES_TABLE_POS])]
     weights = np.array(dataset_config.train_dates_weigths)
     weights = weights / weights.sum()
-    samples_per_date = (weights * (num_samples)).astype(int)
+    samples_per_date = np.ceil((weights * (num_samples))).astype(int)
     samples_per_date_clipped = np.clip(samples_per_date, a_max=list(map(len, indices_per_date)), a_min=0)
     df = pd.DataFrame(data={"Dates": dataset_config.train_dates, "Weights": dataset_config.train_dates_weigths, "Requested Samples": samples_per_date, "Available Samples": samples_per_date_clipped})
     log.info(f"Weight sampling per date with requsted total number of samples {num_samples} (train_size + val_known_size when using the split-from-train validation approach; train_size otherwise)")
