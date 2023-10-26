@@ -165,7 +165,7 @@ class CesnetDataset():
                     num_samples += len(database.get_node(p))
                 if self.size == "ORIG" and num_samples != self.metadata.available_samples:
                     raise ValueError(f"Expected {self.metadata.available_samples} samples, but got {num_samples} in the database. Please delete the data root folder, update cesnet-datazoo, and redownload the dataset.")
-                elif num_samples != DATASET_SIZES[self.size]:
+                if self.size != "ORIG" and num_samples != DATASET_SIZES[self.size]:
                     raise ValueError(f"Expected {DATASET_SIZES[self.size]} samples, but got {num_samples} in the database. Please delete the data root folder, update cesnet-datazoo, and redownload the dataset.")
                 self.available_dates = list(map(lambda x: x.removeprefix("/flows/D"), tables_paths))
         else:
