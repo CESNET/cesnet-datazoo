@@ -140,7 +140,7 @@ def pytables_collate_fn(batch: tuple,
                         flowstats_scaler: Scaler, flowstats_quantiles: pd.Series,
                         psizes_scaler: Scaler, psizes_max: int,
                         ipt_scaler: Scaler, ipt_min: int, ipt_max: int,
-                        use_push_flags: bool, use_packet_histograms: bool, zero_ppi_start: int,
+                        use_push_flags: bool, use_packet_histograms: bool, normalize_packet_histograms: bool, zero_ppi_start: int,
                         encoder: LabelEncoder, known_apps: list[str], return_torch: bool = False):
     x_ppi, x_flowstats, labels = batch
     x_ppi = x_ppi.transpose(0, 2, 1)
@@ -164,12 +164,13 @@ def pytables_collate_fn(batch: tuple,
 
     if use_packet_histograms:
         x_phist = structured_to_unstructured(x_flowstats[PHISTS_FEATURES], dtype="float32")
-        src_sizes_pkt_count = x_phist[:, :PHIST_BIN_COUNT].sum(axis=1)[:, np.newaxis]
-        dst_sizes_pkt_count = x_phist[:, PHIST_BIN_COUNT:(2*PHIST_BIN_COUNT)].sum(axis=1)[:, np.newaxis]
-        np.divide(x_phist[:, :PHIST_BIN_COUNT], src_sizes_pkt_count, out=x_phist[:, :PHIST_BIN_COUNT], where=src_sizes_pkt_count != 0)
-        np.divide(x_phist[:, PHIST_BIN_COUNT:(2*PHIST_BIN_COUNT)], dst_sizes_pkt_count, out=x_phist[:, PHIST_BIN_COUNT:(2*PHIST_BIN_COUNT)], where=dst_sizes_pkt_count != 0)
-        np.divide(x_phist[:, (2*PHIST_BIN_COUNT):(3*PHIST_BIN_COUNT)], src_sizes_pkt_count - 1, out=x_phist[:, (2*PHIST_BIN_COUNT):(3*PHIST_BIN_COUNT)], where=src_sizes_pkt_count > 1)
-        np.divide(x_phist[:, (3*PHIST_BIN_COUNT):(4*PHIST_BIN_COUNT)], dst_sizes_pkt_count - 1, out=x_phist[:, (3*PHIST_BIN_COUNT):(4*PHIST_BIN_COUNT)], where=dst_sizes_pkt_count > 1)
+        if normalize_packet_histograms:
+            src_sizes_pkt_count = x_phist[:, :PHIST_BIN_COUNT].sum(axis=1)[:, np.newaxis]
+            dst_sizes_pkt_count = x_phist[:, PHIST_BIN_COUNT:(2*PHIST_BIN_COUNT)].sum(axis=1)[:, np.newaxis]
+            np.divide(x_phist[:, :PHIST_BIN_COUNT], src_sizes_pkt_count, out=x_phist[:, :PHIST_BIN_COUNT], where=src_sizes_pkt_count != 0)
+            np.divide(x_phist[:, PHIST_BIN_COUNT:(2*PHIST_BIN_COUNT)], dst_sizes_pkt_count, out=x_phist[:, PHIST_BIN_COUNT:(2*PHIST_BIN_COUNT)], where=dst_sizes_pkt_count != 0)
+            np.divide(x_phist[:, (2*PHIST_BIN_COUNT):(3*PHIST_BIN_COUNT)], src_sizes_pkt_count - 1, out=x_phist[:, (2*PHIST_BIN_COUNT):(3*PHIST_BIN_COUNT)], where=src_sizes_pkt_count > 1)
+            np.divide(x_phist[:, (3*PHIST_BIN_COUNT):(4*PHIST_BIN_COUNT)], dst_sizes_pkt_count - 1, out=x_phist[:, (3*PHIST_BIN_COUNT):(4*PHIST_BIN_COUNT)], where=dst_sizes_pkt_count > 1)
         x_flowstats = structured_to_unstructured(drop_fields(x_flowstats, PHISTS_FEATURES), dtype="float32")
         x_flowstats = np.concatenate([x_flowstats, x_phist], axis=1)
     else:

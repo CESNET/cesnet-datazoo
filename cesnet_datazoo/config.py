@@ -171,6 +171,7 @@ class DatasetConfig():
         return_ips: Use for IP-based classification. Dataloaders will return data in this tuple format `((SRC_IP, DST_IP, SRC_PORT, DST_PORT), LABELS)`. Dataframes are not available when this option is used. `Default: False`
         return_torch: Use for returning `torch.Tensor` from dataloaders. Dataframes are not available when this option is used. `Default: False`
         use_packet_histograms: Whether to use packet histogram features, if available in the dataset. `Default: True`
+        normalize_packet_histograms: Whether to normalize packet histograms. If true, bins contain fractions instead of absolute numbers. `Default: True`
         use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`
         use_push_flags: Whether to use push flags in packet sequences, if available in the dataset. `Default: False`
         zero_ppi_start: Zeroing out the first N packets of each packet sequence. `Default: 0`
@@ -245,6 +246,7 @@ class DatasetConfig():
     return_ips: bool = False
     return_torch: bool = False
     use_packet_histograms: bool = True
+    normalize_packet_histograms: bool = True
     use_tcp_features: bool = True
     use_push_flags: bool = False
     zero_ppi_start: int = 0

@@ -579,7 +579,6 @@ class CesnetDataset():
             collate_fn = pytables_ip_collate_fn
         else:
             collate_fn = partial(pytables_collate_fn, # type: ignore
-                use_packet_histograms=dataset_config.use_packet_histograms,
                 flowstats_scaler=flowstats_scaler,
                 flowstats_quantiles=flowstats_quantiles,
                 psizes_scaler=psizes_scaler,
@@ -588,6 +587,8 @@ class CesnetDataset():
                 ipt_min=dataset_config.ipt_min,
                 ipt_max=dataset_config.ipt_max,
                 use_push_flags=dataset_config.use_push_flags,
+                use_packet_histograms=dataset_config.use_packet_histograms,
+                normalize_packet_histograms=dataset_config.normalize_packet_histograms,
                 zero_ppi_start=dataset_config.zero_ppi_start,
                 encoder=encoder,
                 known_apps=class_info.known_apps,
