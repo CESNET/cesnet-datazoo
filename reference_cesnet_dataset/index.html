@@ -288,6 +288,25 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../features/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Features
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
     
     
     
@@ -301,10 +320,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -315,8 +334,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Tutorials
           </label>
@@ -369,10 +388,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -383,8 +402,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Reference
           </label>
@@ -1738,7 +1757,10 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="normal">603</span>
 <span class="normal">604</span>
 <span class="normal">605</span>
-<span class="normal">606</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CesnetDataset</span><span class="p">():</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CesnetDataset</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The main class for accessing CESNET datasets. It handles downloading, data preprocessing,</span>
 <span class="sd">    train/validation/test splitting, and class selection. Access to data is provided through:</span>
@@ -1866,7 +1888,7 @@ This will initialize the dataset — select classes, split data into train/valid
                     <span class="n">num_samples</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">database</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="s2">&quot;ORIG&quot;</span> <span class="ow">and</span> <span class="n">num_samples</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">available_samples</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">available_samples</span><span class="si">}</span><span class="s2"> samples, but got </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2"> in the database. Please delete the data root folder, update cesnet-datazoo, and redownload the dataset.&quot;</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">num_samples</span> <span class="o">!=</span> <span class="n">DATASET_SIZES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="s2">&quot;ORIG&quot;</span> <span class="ow">and</span> <span class="n">num_samples</span> <span class="o">!=</span> <span class="n">DATASET_SIZES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">DATASET_SIZES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]</span><span class="si">}</span><span class="s2"> samples, but got </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2"> in the database. Please delete the data root folder, update cesnet-datazoo, and redownload the dataset.&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">available_dates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;/flows/D&quot;</span><span class="p">),</span> <span class="n">tables_paths</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2228,7 +2250,9 @@ This will initialize the dataset — select classes, split data into train/valid
                                                                           <span class="n">test_size</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
                                                                           <span class="n">stratify</span><span class="o">=</span><span class="n">train_labels</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">train_val_rng</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">NO_VALIDATION</span><span class="p">:</span>
-            <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">val_unknown_indices</span> <span class="o">=</span> <span class="n">val_data_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">val_data_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">val_unknown_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span> <span class="n">assert_never</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span><span class="p">)</span>
 
         <span class="c1"># Create class info</span>
@@ -2278,7 +2302,6 @@ This will initialize the dataset — select classes, split data into train/valid
             <span class="n">collate_fn</span> <span class="o">=</span> <span class="n">pytables_ip_collate_fn</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">collate_fn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">pytables_collate_fn</span><span class="p">,</span> <span class="c1"># type: ignore</span>
-                <span class="n">use_packet_histograms</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">use_packet_histograms</span><span class="p">,</span>
                 <span class="n">flowstats_scaler</span><span class="o">=</span><span class="n">flowstats_scaler</span><span class="p">,</span>
                 <span class="n">flowstats_quantiles</span><span class="o">=</span><span class="n">flowstats_quantiles</span><span class="p">,</span>
                 <span class="n">psizes_scaler</span><span class="o">=</span><span class="n">psizes_scaler</span><span class="p">,</span>
@@ -2287,6 +2310,8 @@ This will initialize the dataset — select classes, split data into train/valid
                 <span class="n">ipt_min</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ipt_min</span><span class="p">,</span>
                 <span class="n">ipt_max</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ipt_max</span><span class="p">,</span>
                 <span class="n">use_push_flags</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">,</span>
+                <span class="n">use_packet_histograms</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">use_packet_histograms</span><span class="p">,</span>
+                <span class="n">normalize_packet_histograms</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">normalize_packet_histograms</span><span class="p">,</span>
                 <span class="n">zero_ppi_start</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">zero_ppi_start</span><span class="p">,</span>
                 <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
                 <span class="n">known_apps</span><span class="o">=</span><span class="n">class_info</span><span class="o">.</span><span class="n">known_apps</span><span class="p">,</span>
