@@ -595,7 +595,7 @@
 <h1 id="features">Features</h1>
 <h2 id="details-about-packet-histograms-and-packet-sequences">Details about packet histograms and packet sequences</h2>
 <p>Due to differences in implementation between packet sequences (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/pstats.cpp">pstats.cpp</a>) and packet histogram (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/phists.cpp">phist.cpp</a>) plugins of the ipfixprobe exporter, the number of packets in those features can differ. The differences are summarized in the following table.
-Note that this is related to TLS over TCP datasets. For QUIC, there is no detection of retransmissions or out-of-order packets. Also, QUIC acknowledgment packets are included.</p>
+Note that this is related to TLS over TCP datasets. For QUIC, there is no detection of retransmissions or out-of-order packets. Also, QUIC acknowledgment packets are included in both packet sequences and packet histograms.</p>
 <table>
 <thead>
 <tr>
