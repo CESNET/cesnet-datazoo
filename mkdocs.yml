@@ -33,6 +33,7 @@ nav:
   - Introduction: index.md
   - Installation: installation.md
   - Oveview of datasets: datasets_overview.md
+  - Features: features.md
   - Tutorials:
     - Getting started: getting_started.md
   - Reference:
