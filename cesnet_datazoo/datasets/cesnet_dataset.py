@@ -30,7 +30,7 @@ from cesnet_datazoo.pytables_data.indices_setup import (IndicesTuple, compute_kn
 from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, fit_or_load_scalers,
                                                            pytables_collate_fn,
                                                            pytables_ip_collate_fn, worker_init_fn)
-from cesnet_datazoo.utils.class_info import ClassInfo, create_superclass_structures
+from cesnet_datazoo.utils.class_info import ClassInfo, create_class_info
 from cesnet_datazoo.utils.download import resumable_download, simple_download
 from cesnet_datazoo.utils.random import RandomizedSection, get_fresh_random_generator
 
@@ -391,6 +391,24 @@ class CesnetDataset():
         feature_names = self.dataset_config.get_feature_names(flatten_ppi=flatten_ppi)
         return create_df_from_dataloader(dataloader=self.get_test_dataloader(), feature_names=feature_names, flatten_ppi=flatten_ppi, silent=self.silent)
 
+    def get_num_classes(self) -> int:
+        """Returns the number of classes in the datasets with the current configuration."""
+        if self.class_info is None:
+            raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting the number of classes")
+        return self.class_info.num_classes
+
+    def get_known_apps(self) -> list[str]:
+        """Returns the list of known applications in the datasets with the current configuration."""
+        if self.class_info is None:
+            raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting known apps")
+        return self.class_info.known_apps
+
+    def get_unknown_apps(self) -> list[str]:
+        """Returns the list of unknown applications in the datasets with the current configuration."""
+        if self.class_info is None:
+            raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting unknown apps")
+        return self.class_info.unknown_apps
+
     def compute_dataset_statistics(self, num_samples: int | Literal["all"] = 10_000_000, num_workers: int = 4, batch_size: int = 4096, disabled_apps: Optional[list[str]] = None)-> None:
         """
         Computes dataset statistics and saves them to the `statistics_path` folder.
@@ -533,7 +551,7 @@ class CesnetDataset():
         else: assert_never(dataset_config.val_approach)
 
         # Create class info
-        class_info = create_superclass_structures(servicemap=servicemap, target_names=list(encoder.classes_))
+        class_info = create_class_info(servicemap=servicemap, encoder=encoder, known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
         # Load or fit data scalers
         flowstats_scaler, flowstats_quantiles, ipt_scaler, psizes_scaler = fit_or_load_scalers(dataset_config=dataset_config, train_indices=train_indices)
         # Subset dataset indices based on the selected sizes and compute application counts
