@@ -419,8 +419,6 @@ class CesnetDataset():
             batch_size: Number of samples per batch for loading data.
             disabled_apps: List of applications to exclude from the statistics.
         """
-        if self.name.startswith("CESNET-TLS22"):
-            raise NotImplementedError("Dataset statistics are not supported for CESNET_TLS22")
         flowstats_features = self.metadata.flowstats_features + self.metadata.packet_histogram_features + self.metadata.tcp_features
         if not os.path.exists(self.statistics_path):
             os.mkdir(self.statistics_path)
@@ -428,6 +426,7 @@ class CesnetDataset():
                                    output_dir=self.statistics_path,
                                    flowstats_features=flowstats_features,
                                    protocol=self.metadata.protocol,
+                                   extra_fields=not self.name.startswith("CESNET-TLS22"),
                                    disabled_apps=disabled_apps if disabled_apps is not None else [],
                                    num_samples=num_samples,
                                    num_workers=num_workers,
