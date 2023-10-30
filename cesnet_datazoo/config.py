@@ -21,10 +21,15 @@ if TYPE_CHECKING:
 Scaler = RobustScaler | StandardScaler | MinMaxScaler | None
 
 class ScalerEnum(Enum):
-    ROBUST = "robust"
+    """Available scalers for flow statistics, packet sizes, and inter-packet times."""
     STANDARD = "standard"
+    """Standardize features by removing the mean and scaling to unit variance - [`sklearn.preprocessing.StandardScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)."""
+    ROBUST = "robust"
+    """Robust scaling with the median and the interquartile range - [`sklearn.preprocessing.RobustScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html)."""
     MINMAX = "minmax"
+    """Scaling to a (0, 1) range - [`sklearn.preprocessing.MinMaxScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html)."""
     NO_SCALER = "no-scaler"
+    """No scaling."""
     def __str__(self): return self.value
 
 class Protocol(Enum):
