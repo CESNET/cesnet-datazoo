@@ -58,7 +58,8 @@ class AppSelection(Enum):
     ALL_KNOWN = "all-known"
     """Use all applications as *known*."""
     TOPX_KNOWN = "topx-known"
-    """Use the first X (`apps_selection_topx`) most frequent (with the most samples) applications as *known*, and the rest as *unknown*."""
+    """Use the first X (`apps_selection_topx`) most frequent (with the most samples) applications as *known*, and the rest as *unknown*.
+    Applications with the same provider are never separated, i.e., all applications of a given provider are either *known* or *unknown*."""
     EXPLICIT_UNKNOWN = "explicit-unknown"
     """Use the provided list of applications (`apps_selection_explicit_unknown`) as *unknown*, and the rest as *known*."""
     LONGTERM_FIXED = "longterm-fixed"
