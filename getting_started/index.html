@@ -694,8 +694,8 @@ For running on Windows, we recommend using the <code>spawn</code> method for cre
 <span class="n">dataset_config</span> <span class="o">=</span> <span class="n">DatasetConfig</span><span class="p">(</span>
     <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
     <span class="n">apps_selection</span><span class="o">=</span><span class="n">AppSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span><span class="p">,</span>
-    <span class="n">train_period</span><span class="o">=</span><span class="s2">&quot;W-2022-44&quot;</span><span class="p">,</span>
-    <span class="n">test_period</span><span class="o">=</span><span class="s2">&quot;W-2022-45&quot;</span><span class="p">,</span>
+    <span class="n">train_period_name</span><span class="o">=</span><span class="s2">&quot;W-2022-44&quot;</span><span class="p">,</span>
+    <span class="n">test_period_name</span><span class="o">=</span><span class="s2">&quot;W-2022-45&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">dataset</span><span class="o">.</span><span class="n">set_dataset_config_and_initialize</span><span class="p">(</span><span class="n">dataset_config</span><span class="p">)</span>
 <span class="n">train_dataframe</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_train_df</span><span class="p">()</span>

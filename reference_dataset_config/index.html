@@ -591,6 +591,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#config.ScalerEnum" class="md-nav__link">
+    ScalerEnum
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -789,6 +796,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#config.ScalerEnum" class="md-nav__link">
+    ScalerEnum
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -869,7 +883,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Extracted from the dataset instance</p>
+              <p>Taken from the dataset instance</p>
             </div>
           </td>
         </tr>
@@ -880,7 +894,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Extracted from the dataset instance</p>
+              <p>Taken from the dataset instance</p>
             </div>
           </td>
         </tr>
@@ -891,7 +905,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Extracted from the dataset instance</p>
+              <p>Taken from the dataset instance</p>
             </div>
           </td>
         </tr>
@@ -902,7 +916,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Extracted from the dataset instance</p>
+              <p>Taken from the dataset instance</p>
             </div>
           </td>
         </tr>
@@ -913,7 +927,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Extracted from the <code>dataset.metadata.flowstats_features</code></p>
+              <p>Taken from <code>dataset.metadata.flowstats_features</code></p>
             </div>
           </td>
         </tr>
@@ -934,7 +948,7 @@
     </thead>
     <tbody>
         <tr>
-          <td><code>train_period</code></td>
+          <td><code>train_period_name</code></td>
           <td>
                 <code>str</code>
           </td>
@@ -989,7 +1003,7 @@
           </td>
         </tr>
         <tr>
-          <td><code>val_period</code></td>
+          <td><code>val_period_name</code></td>
           <td>
                 <code>str</code>
           </td>
@@ -1011,7 +1025,18 @@
           </td>
         </tr>
         <tr>
-          <td><code>test_period</code></td>
+          <td><code>no_test_set</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Disable the test set. <code>Default: False</code></p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>test_period_name</code></td>
           <td>
                 <code>str</code>
           </td>
@@ -1365,7 +1390,7 @@
         <tr>
           <td><code>flowstats_scaler</code></td>
           <td>
-                <code><span title="config.ScalerEnum">ScalerEnum</span></code>
+                <code><a class="autorefs autorefs-internal" title="config.ScalerEnum" href="#config.ScalerEnum">ScalerEnum</a></code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1387,7 +1412,7 @@
         <tr>
           <td><code>psizes_scaler</code></td>
           <td>
-                <code><span title="config.ScalerEnum">ScalerEnum</span></code>
+                <code><a class="autorefs autorefs-internal" title="config.ScalerEnum" href="#config.ScalerEnum">ScalerEnum</a></code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1409,7 +1434,7 @@
         <tr>
           <td><code>ipt_scaler</code></td>
           <td>
-                <code><span title="config.ScalerEnum">ScalerEnum</span></code>
+                <code><a class="autorefs autorefs-internal" title="config.ScalerEnum" href="#config.ScalerEnum">ScalerEnum</a></code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -1442,18 +1467,18 @@
     </tbody>
   </table>
       <h3 id="config.DatasetConfig--how-to-configure-train-validation-and-test-sets">How to configure train, validation, and test sets</h3>
-<p>There are three options for how to define train/validation/test <strong>time periods and dates</strong>.</p>
+<p>There are three options for how to define train/validation/test dates.</p>
 <ol>
-<li>Specify a predefined time period (<code>train_period</code>, <code>val_period</code>, or <code>test_period</code>) available in <code>dataset.time_periods</code> and leave the list of dates (<code>train_dates</code>, <code>val_dates</code>, or <code>test_dates</code>) empty.</li>
-<li>Name a custom time period and provide a list of dates. The dates are checked against <code>dataset.available_dates</code>.</li>
-<li>Leave everything empty and use the dataset's defaults <code>dataset.default_train_period</code> and <code>dataset.default_test_period</code>.</li>
+<li>Choose a predefined time period (<code>train_period_name</code>, <code>val_period_name</code>, or <code>test_period_name</code>) available in <code>dataset.time_periods</code> and leave the list of dates (<code>train_dates</code>, <code>val_dates</code>, or <code>test_dates</code>) empty.</li>
+<li>Provide a list of dates and a name for the time period. The dates are checked against <code>dataset.available_dates</code>.</li>
+<li>Do not specify anything and use the dataset's defaults <code>dataset.default_train_period_name</code> and <code>dataset.default_test_period_name</code>.</li>
 </ol>
-<p>There are two options for configuring <strong>sizes</strong> of train/validation/test sets.</p>
+<p>There are two options for configuring sizes of train/validation/test sets.</p>
 <ol>
 <li>Select an appropriate dataset size (default is <code>S</code>) when creating the <a class="autorefs autorefs-internal" href="../reference_cesnet_dataset/#datasets.cesnet_dataset.CesnetDataset"><code>CesnetDataset</code></a> instance and leave <code>train_size</code>, <code>val_known_size</code>, and <code>test_known_size</code> with their default <code>all</code> value.
 This will create train/validation/test sets with all samples available in the selected dataset size (of course, depending on the selected dates and validation approach).</li>
 <li>Provide exact sizes in <code>train_size</code>, <code>val_known_size</code>, and <code>test_known_size</code>. This will create train/validation/test sets of the given sizes by doing a random subset.
-This is especially useful when using the <code>ORIG</code> dataset size and want to run smaller experiments.</li>
+This is especially useful when using the <code>ORIG</code> dataset size and want to control the size of experiments.</li>
 </ol>
 <div class="admonition tip validation set">
 <p class="admonition-title">Tip</p>
@@ -1462,16 +1487,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
             <details class="quote">
               <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
@@ -1842,7 +1858,48 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="normal">491</span>
 <span class="normal">492</span>
 <span class="normal">493</span>
-<span class="normal">494</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">C</span><span class="p">)</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span>
+<span class="normal">497</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">C</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">DatasetConfig</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The main class for the configuration of:</span>
@@ -1856,23 +1913,24 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        dataset: The dataset instance to be configured</span>
-<span class="sd">        data_root: Extracted from the dataset instance</span>
-<span class="sd">        database_filename: Extracted from the dataset instance</span>
-<span class="sd">        database_path: Extracted from the dataset instance</span>
-<span class="sd">        servicemap_path: Extracted from the dataset instance</span>
-<span class="sd">        flowstats_features: Extracted from the `dataset.metadata.flowstats_features`</span>
+<span class="sd">        data_root: Taken from the dataset instance</span>
+<span class="sd">        database_filename: Taken from the dataset instance</span>
+<span class="sd">        database_path: Taken from the dataset instance</span>
+<span class="sd">        servicemap_path: Taken from the dataset instance</span>
+<span class="sd">        flowstats_features: Taken from `dataset.metadata.flowstats_features`</span>
 
 <span class="sd">    # Configuration options</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        train_period: Name of the train period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
+<span class="sd">        train_period_name: Name of the train period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
 <span class="sd">        train_dates: Dates used for creating a train set.</span>
 <span class="sd">        train_dates_weigths: To use a non-uniform distribution of samples across train dates.</span>
 <span class="sd">        val_approach: How a validation set should be created. Either split train data into train and validation, have a separate validation period, or no validation at all. `Default: SPLIT_FROM_TRAIN`</span>
 <span class="sd">        train_val_split_fraction: The fraction of validation samples when splitting from the train set. `Default: 0.2`</span>
-<span class="sd">        val_period: Name of the validation period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
+<span class="sd">        val_period_name: Name of the validation period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
 <span class="sd">        val_dates: Dates used for creating a validation set.</span>
-<span class="sd">        test_period: Name of the test period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
+<span class="sd">        no_test_set: Disable the test set. `Default: False`</span>
+<span class="sd">        test_period_name: Name of the test period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
 <span class="sd">        test_dates: Dates used for creating a test set.</span>
 
 <span class="sd">        apps_selection: How to select application classes. `Default: ALL_KNOWN`</span>
@@ -1916,18 +1974,18 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        ipt_max: Max clip inter-packet times before scaling. `Default: 15000`</span>
 
 <span class="sd">    # How to configure train, validation, and test sets</span>
-<span class="sd">    There are three options for how to define train/validation/test __time periods and dates__.</span>
+<span class="sd">    There are three options for how to define train/validation/test dates.</span>
 
-<span class="sd">    1. Specify a predefined time period (`train_period`, `val_period`, or `test_period`) available in `dataset.time_periods` and leave the list of dates (`train_dates`, `val_dates`, or `test_dates`) empty.</span>
-<span class="sd">    2. Name a custom time period and provide a list of dates. The dates are checked against `dataset.available_dates`.</span>
-<span class="sd">    3. Leave everything empty and use the dataset&#39;s defaults `dataset.default_train_period` and `dataset.default_test_period`.</span>
+<span class="sd">    1. Choose a predefined time period (`train_period_name`, `val_period_name`, or `test_period_name`) available in `dataset.time_periods` and leave the list of dates (`train_dates`, `val_dates`, or `test_dates`) empty.</span>
+<span class="sd">    2. Provide a list of dates and a name for the time period. The dates are checked against `dataset.available_dates`.</span>
+<span class="sd">    3. Do not specify anything and use the dataset&#39;s defaults `dataset.default_train_period_name` and `dataset.default_test_period_name`.</span>
 
-<span class="sd">    There are two options for configuring __sizes__ of train/validation/test sets.</span>
+<span class="sd">    There are two options for configuring sizes of train/validation/test sets.</span>
 
 <span class="sd">    1. Select an appropriate dataset size (default is `S`) when creating the [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance and leave `train_size`, `val_known_size`, and `test_known_size` with their default `all` value.</span>
 <span class="sd">    This will create train/validation/test sets with all samples available in the selected dataset size (of course, depending on the selected dates and validation approach).</span>
 <span class="sd">    2. Provide exact sizes in `train_size`, `val_known_size`, and `test_known_size`. This will create train/validation/test sets of the given sizes by doing a random subset.</span>
-<span class="sd">    This is especially useful when using the `ORIG` dataset size and want to run smaller experiments.</span>
+<span class="sd">    This is especially useful when using the `ORIG` dataset size and want to control the size of experiments.</span>
 
 <span class="sd">    !!! tip Validation set</span>
 <span class="sd">        The default approach for creating a validation set is to randomly split the train data into train and validation. The second approach is to define separate validation dates. See [ValidationApproach][config.ValidationApproach].</span>
@@ -1940,14 +1998,15 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">servicemap_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">flowstats_features</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="n">train_period</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">train_period_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">train_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="n">train_dates_weigths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">val_approach</span><span class="p">:</span> <span class="n">ValidationApproach</span> <span class="o">=</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span>
     <span class="n">train_val_split_fraction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span>
-    <span class="n">val_period</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">val_period_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">val_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-    <span class="n">test_period</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">no_test_set</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">test_period_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">test_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 
     <span class="n">apps_selection</span><span class="p">:</span> <span class="n">AppSelection</span> <span class="o">=</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span>
@@ -2000,52 +2059,67 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="bp">self</span><span class="o">.</span><span class="n">database_path</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">database_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">flowstats_features</span>
 
-        <span class="c1"># Configure train dates and period</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_period has to be specified when train_dates are set&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown train_period </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">train_period</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period</span><span class="p">]</span>
-        <span class="c1"># Configure test dates and period</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;test_period has to be specified when test_dates are set&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown test_period </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">test_period</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">test_period</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">test_period</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">default_test_period</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_test_period</span><span class="p">]</span>
-        <span class="c1"># Configure val dates and period</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">NO_VALIDATION</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_dates and val_period cannot be specified when val_approach is no-validation or split-from-train&quot;</span><span class="p">)</span>
+        <span class="c1"># Configure train dates</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_period_name has to be specified when train_dates are set&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown train_period_name </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period_name</span><span class="p">]</span>
+        <span class="c1"># Configure test dates</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_test_set</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;test_dates and test_period_name cannot be specified when no_test_set is true&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;test_period_name has to be specified when test_dates are set&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown test_period_name </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">default_test_period_name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_test_period_name</span><span class="p">]</span>
+        <span class="c1"># Configure val dates</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">NO_VALIDATION</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_dates and val_period_name cannot be specified when val_approach is no-validation or split-from-train&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">VALIDATION_DATES</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_period has to be specified when val_dates are set&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown val_period </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">val_period</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">val_period</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_period and val_dates (or val_period from dataset.time_periods) have to be specified when val_approach is validation-dates&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_period_name has to be specified when val_dates are set&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown val_period_name </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_period_name and val_dates (or val_period_name from dataset.time_periods) have to be specified when val_approach is validation-dates&quot;</span><span class="p">)</span>
         <span class="c1"># Check if train, val, and test dates are available in the dataset</span>
         <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">:</span>
             <span class="n">unknown_train_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">]</span>
             <span class="n">unknown_val_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">]</span>
             <span class="n">unknown_test_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown train dates </span><span class="si">{</span><span class="n">unknown_train_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates&quot;</span> \
-                                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown train dates </span><span class="si">{</span><span class="n">unknown_train_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates (collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collection_period</span><span class="si">}</span><span class="s2">)&quot;</span> \
+                                <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown validation dates </span><span class="si">{</span><span class="n">unknown_val_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates&quot;</span> \
-                                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown validation dates </span><span class="si">{</span><span class="n">unknown_val_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates (collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collection_period</span><span class="si">}</span><span class="s2">)&quot;</span> \
+                                <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown test dates </span><span class="si">{</span><span class="n">unknown_test_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates&quot;</span> \
-                                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown test dates </span><span class="si">{</span><span class="n">unknown_test_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates (collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collection_period</span><span class="si">}</span><span class="s2">)&quot;</span> \
+                                <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="c1"># Check time order of train, val, and test periods</span>
+        <span class="n">train_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">date_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">]</span>
+        <span class="n">test_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">date_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_test_set</span> <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">train_dates</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Some test dates (</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">) are before or equal to the last train date (</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">train_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">). This might lead to improper evaluation and should be avoided.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">VALIDATION_DATES</span><span class="p">:</span>
+            <span class="n">val_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">date_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">train_dates</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Some validation dates (</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">val_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">) are before or equal to the last train date (</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">train_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">). This might lead to improper evaluation and should be avoided.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_test_set</span> <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">val_dates</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Some test dates (</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">) are before or equal to the last validation date (</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">val_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">). This might lead to improper evaluation and should be avoided.&quot;</span><span class="p">)</span>
         <span class="c1"># Configure features</span>
         <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">protocol</span> <span class="o">==</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">TLS</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_tcp_features</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">+</span> <span class="n">SELECTED_TCP_FLAGS</span>
@@ -2179,7 +2253,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="k">def</span> <span class="nf">_get_train_data_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrainDataParams</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TrainDataParams</span><span class="p">(</span>
             <span class="n">database_filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">database_filename</span><span class="p">,</span>
-            <span class="n">train_period</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period</span><span class="p">,</span>
+            <span class="n">train_period_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span><span class="p">,</span>
             <span class="n">train_tables_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_train_tables_paths</span><span class="p">(),</span>
             <span class="n">apps_selection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span><span class="p">,</span>
             <span class="n">apps_selection_topx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span><span class="p">,</span>
@@ -2193,7 +2267,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">VALIDATION_DATES</span>
         <span class="n">val_data_params</span> <span class="o">=</span> <span class="n">TestDataParams</span><span class="p">(</span>
             <span class="n">database_filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">database_filename</span><span class="p">,</span>
-            <span class="n">test_period</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_period</span><span class="p">,</span>
+            <span class="n">test_period_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span><span class="p">,</span>
             <span class="n">test_tables_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_val_tables_paths</span><span class="p">(),</span>
             <span class="n">known_apps_database_enum</span><span class="o">=</span><span class="n">known_apps_database_enum</span><span class="p">,</span>
             <span class="n">unknown_apps_database_enum</span><span class="o">=</span><span class="n">unknown_apps_database_enum</span><span class="p">,)</span>
@@ -2205,7 +2279,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="k">def</span> <span class="nf">_get_test_data_params_and_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">known_apps_database_enum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">unknown_apps_database_enum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">TestDataParams</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">test_data_params</span> <span class="o">=</span> <span class="n">TestDataParams</span><span class="p">(</span>
             <span class="n">database_filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">database_filename</span><span class="p">,</span>
-            <span class="n">test_period</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_period</span><span class="p">,</span>
+            <span class="n">test_period_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span><span class="p">,</span>
             <span class="n">test_tables_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_test_tables_paths</span><span class="p">(),</span>
             <span class="n">known_apps_database_enum</span><span class="o">=</span><span class="n">known_apps_database_enum</span><span class="p">,</span>
             <span class="n">unknown_apps_database_enum</span><span class="o">=</span><span class="n">unknown_apps_database_enum</span><span class="p">,)</span>
@@ -2213,6 +2287,21 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="n">params_hash</span> <span class="o">=</span> <span class="n">params_hash</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
         <span class="n">test_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="s2">&quot;test-data&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">params_hash</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">test_data_params</span><span class="p">,</span> <span class="n">test_data_path</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_deprecated_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">kwargs</span>
+        <span class="k">if</span> <span class="s2">&quot;train_period&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;train_period is deprecated. Use train_period_name instead.&quot;</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;train_period_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;train_period&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;val_period&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;val_period is deprecated. Use val_period_name instead.&quot;</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;val_period_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;val_period&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;test_period&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;test_period is deprecated. Use test_period_name instead.&quot;</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;test_period_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;test_period&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">values</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">_process_tag</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">emitter</span><span class="o">.</span><span class="n">Emitter</span><span class="o">.</span><span class="n">process_tag</span>
@@ -2258,15 +2347,15 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">365</span>
-<span class="normal">366</span>
-<span class="normal">367</span>
-<span class="normal">368</span>
-<span class="normal">369</span>
-<span class="normal">370</span>
-<span class="normal">371</span>
-<span class="normal">372</span>
-<span class="normal">373</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_features_len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_features_len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the number of flow statistics features.&quot;&quot;&quot;</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">:</span>
@@ -2301,30 +2390,30 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">375</span>
-<span class="normal">376</span>
-<span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
-<span class="normal">384</span>
-<span class="normal">385</span>
-<span class="normal">386</span>
-<span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets names of flow statistics features. Packet histograms are expanded into individual features.&quot;&quot;&quot;</span>
     <span class="n">name_mapping</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;PHIST_SRC_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
@@ -2374,14 +2463,14 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets names of flattened per-packet information (PPI) features.&quot;&quot;&quot;</span>
     <span class="n">ppi_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
                            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;DIR_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
@@ -2415,12 +2504,12 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the number of per-packet information (PPI) channels.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TCP_PPI_CHANNELS</span>
@@ -2482,16 +2571,16 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span>
-<span class="normal">425</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Gets feature names.</span>
 
@@ -2592,7 +2681,7 @@ is used to create a random stratified validation set. The fraction of validation
 
   <div class="doc doc-contents ">
   
-      <p>Use separate validation dates to create a validation set. Validation dates need to be specified in <code>val_dates</code>, and the name of the validation period in <code>val_period</code>.</p>
+      <p>Use separate validation dates to create a validation set. Validation dates need to be specified in <code>val_dates</code>, and the name of the validation period in <code>val_period_name</code>.</p>
   </div>
 
 </div>
@@ -2707,7 +2796,8 @@ The <code>LONGTERM_FIXED</code> is for long-term measurements when it is desired
 
   <div class="doc doc-contents ">
   
-      <p>Use the first X (<code>apps_selection_topx</code>) most frequent (with the most samples) applications as <em>known</em>, and the rest as <em>unknown</em>.</p>
+      <p>Use the first X (<code>apps_selection_topx</code>) most frequent (with the most samples) applications as <em>known</em>, and the rest as <em>unknown</em>.
+Applications with the same provider are never separated, i.e., all applications of a given provider are either <em>known</em> or <em>unknown</em>.</p>
   </div>
 
 </div>
@@ -2941,6 +3031,144 @@ This setting affects only <a class="autorefs autorefs-internal" href="../referen
   <div class="doc doc-contents ">
   
       <p>Iterate train data in sequential (datetime) order.</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h6 id="config.ScalerEnum" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">config.ScalerEnum</span>
+
+
+</h6>
+
+
+  <div class="doc doc-contents first">
+
+  
+      <p>Available scalers for flow statistics, packet sizes, and inter-packet times.</p>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h7 id="config.ScalerEnum.STANDARD" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">STANDARD</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h7>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">STANDARD</span> <span class="o">=</span> <span class="s1">&#39;standard&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Standardize features by removing the mean and scaling to unit variance - <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html"><code>sklearn.preprocessing.StandardScaler</code></a>.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h7 id="config.ScalerEnum.ROBUST" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">ROBUST</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h7>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">ROBUST</span> <span class="o">=</span> <span class="s1">&#39;robust&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Robust scaling with the median and the interquartile range - <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html"><code>sklearn.preprocessing.RobustScaler</code></a>.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h7 id="config.ScalerEnum.MINMAX" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">MINMAX</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h7>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">MINMAX</span> <span class="o">=</span> <span class="s1">&#39;minmax&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Scaling to a (0, 1) range - <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html"><code>sklearn.preprocessing.MinMaxScaler</code></a>.</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h7 id="config.ScalerEnum.NO_SCALER" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">NO_SCALER</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h7>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">NO_SCALER</span> <span class="o">=</span> <span class="s1">&#39;no-scaler&#39;</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>No scaling.</p>
   </div>
 
 </div>
