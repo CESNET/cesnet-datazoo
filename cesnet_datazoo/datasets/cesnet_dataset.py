@@ -74,8 +74,8 @@ class CesnetDataset():
         metadata: Additional [dataset metadata][metadata].
         available_dates: List of all available dates in the dataset.
         time_periods: Predefined time periods. Each time period is a list of dates.
-        default_train_period: Default time period for training.
-        default_test_period: Default time period for testing.
+        default_train_period_name: Default time period for training.
+        default_test_period_name: Default time period for testing.
 
     The following attributes are initialized when [`set_dataset_config_and_initialize`][datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize] is called.
 
@@ -111,8 +111,8 @@ class CesnetDataset():
     metadata: DatasetMetadata
     available_dates: list[str]
     time_periods: dict[str, list[str]]
-    default_train_period: str
-    default_test_period: str
+    default_train_period_name: str
+    default_test_period_name: str
     time_periods_gen: bool = False
     silent: bool = False
 
@@ -172,6 +172,9 @@ class CesnetDataset():
             self.available_dates = []
         if self.time_periods_gen:
             self._generate_time_periods()
+        # Add all available dates as single date time periods
+        for d in self.available_dates:
+            self.time_periods[d] = [d]
 
     def set_dataset_config_and_initialize(self, dataset_config: DatasetConfig) -> None:
         """
@@ -249,9 +252,9 @@ class CesnetDataset():
         """
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting validaion dataloader")
-        assert self.val_dataset is not None
         if self.dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
             raise ValueError("Validation dataloader is not available when using no-validation")
+        assert self.val_dataset is not None
         if self.val_dataloader:
             return self.val_dataloader
         batch_sampler = BatchSampler(sampler=SequentialSampler(self.val_dataset), batch_size=self.dataset_config.test_batch_size, drop_last=False)
@@ -288,6 +291,8 @@ class CesnetDataset():
         """
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting test dataloader")
+        if self.dataset_config.no_test_set:
+            raise ValueError("Test dataloader is not available when no_test_set is true")
         assert self.test_dataset is not None
         if self.test_dataloader:
             return self.test_dataloader
@@ -358,7 +363,7 @@ class CesnetDataset():
         Returns:
             Validation data as a dataframe.
         """
-        self._check_before_dataframe()
+        self._check_before_dataframe(check_no_val=True)
         assert self.dataset_config is not None and self.val_dataset is not None
         if len(self.val_dataset) > DATAFRAME_SAMPLES_WARNING_THRESHOLD:
             warnings.warn(f"Validation set has ({len(self.val_dataset)} samples), consider using get_val_dataloader() instead")
@@ -384,7 +389,7 @@ class CesnetDataset():
         Returns:
             Test data as a dataframe.
         """
-        self._check_before_dataframe()
+        self._check_before_dataframe(check_no_test=True)
         assert self.dataset_config is not None and self.test_dataset is not None
         if len(self.test_dataset) > DATAFRAME_SAMPLES_WARNING_THRESHOLD:
             warnings.warn(f"Test set has ({len(self.test_dataset)} samples), consider using get_test_dataloader() instead")
@@ -392,19 +397,19 @@ class CesnetDataset():
         return create_df_from_dataloader(dataloader=self.get_test_dataloader(), feature_names=feature_names, flatten_ppi=flatten_ppi, silent=self.silent)
 
     def get_num_classes(self) -> int:
-        """Returns the number of classes in the datasets with the current configuration."""
+        """Returns the number of classes in the current configuration of the dataset."""
         if self.class_info is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting the number of classes")
         return self.class_info.num_classes
 
     def get_known_apps(self) -> list[str]:
-        """Returns the list of known applications in the datasets with the current configuration."""
+        """Returns the list of known applications in the current configuration of the dataset."""
         if self.class_info is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting known apps")
         return self.class_info.known_apps
 
     def get_unknown_apps(self) -> list[str]:
-        """Returns the list of unknown applications in the datasets with the current configuration."""
+        """Returns the list of unknown applications in the current configuration of the dataset."""
         if self.class_info is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting unknown apps")
         return self.class_info.unknown_apps
@@ -488,13 +493,17 @@ class CesnetDataset():
         self.val_dataloader = None
         self.test_dataloader = None
 
-    def _check_before_dataframe(self) -> None:
+    def _check_before_dataframe(self, check_no_val: bool = False, check_no_test: bool = False) -> None:
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting a dataframe")
         if self.dataset_config.return_ips:
             raise ValueError("Dataframes are not available when return_ips is set. Use a dataloader instead.")
         if self.dataset_config.return_torch:
             raise ValueError("Dataframes are not available when return_torch is set. Use a dataloader instead.")
+        if check_no_val and self.dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
+            raise ValueError("Validation dataframe is not available when using no-validation")
+        if check_no_test and self.dataset_config.no_test_set:
+            raise ValueError("Test dataframe is not available when no_test_set is true")
 
     def _initialize_train_val_test(self) -> None:
         assert self.dataset_config is not None
@@ -502,7 +511,12 @@ class CesnetDataset():
         servicemap = pd.read_csv(dataset_config.servicemap_path, index_col="Tag")
         # Initialize train and test indices
         train_indices, train_unknown_indices, encoder, known_apps_database_enum, unknown_apps_database_enum = init_or_load_train_indices(dataset_config=dataset_config, servicemap=servicemap)
-        test_known_indices, test_unknown_indices, test_data_path = init_or_load_test_indices(dataset_config=dataset_config, known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
+        if self.dataset_config.no_test_set:
+            test_known_indices = np.empty((0,3), dtype=np.int64)
+            test_unknown_indices = np.empty((0,3), dtype=np.int64)
+            test_data_path = None
+        else:
+            test_known_indices, test_unknown_indices, test_data_path = init_or_load_test_indices(dataset_config=dataset_config, known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
         # Date weight sampling of train indices
         if dataset_config.train_dates_weigths is not None:
             assert dataset_config.train_size != "all"
@@ -544,9 +558,9 @@ class CesnetDataset():
                                                                           test_size=dataset_config.val_known_size if dataset_config.val_known_size != "all" else None,
                                                                           stratify=train_labels, shuffle=True, random_state=train_val_rng)
         elif dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
-            val_data_path = None
             val_known_indices = np.empty((0,3), dtype=np.int64)
             val_unknown_indices = np.empty((0,3), dtype=np.int64)
+            val_data_path = None
         else: assert_never(dataset_config.val_approach)
 
         # Create class info
@@ -572,16 +586,21 @@ class CesnetDataset():
             indices=dataset_indices.train_indices,
             flowstats_features=dataset_config.flowstats_features,
             return_ips=dataset_config.return_ips,)
-        test_dataset = PyTablesDataset(
-            database_path=dataset_config.database_path,
-            tables_paths=dataset_config._get_test_tables_paths(),
-            indices=test_combined_indices,
-            flowstats_features=dataset_config.flowstats_features,
-            preload=dataset_config.preload_test,
-            preload_blob=os.path.join(test_data_path, "preload", f"test_dataset-{dataset_config.test_known_size}-{dataset_config.test_unknown_size}.npz"),
-            return_ips=dataset_config.return_ips,)
-        val_dataset = None
-        if dataset_config.val_approach != ValidationApproach.NO_VALIDATION:
+        if dataset_config.no_test_set:
+            test_dataset = None
+        else:
+            assert test_data_path is not None
+            test_dataset = PyTablesDataset(
+                database_path=dataset_config.database_path,
+                tables_paths=dataset_config._get_test_tables_paths(),
+                indices=test_combined_indices,
+                flowstats_features=dataset_config.flowstats_features,
+                preload=dataset_config.preload_test,
+                preload_blob=os.path.join(test_data_path, "preload", f"test_dataset-{dataset_config.test_known_size}-{dataset_config.test_unknown_size}.npz"),
+                return_ips=dataset_config.return_ips,)
+        if dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
+            val_dataset = None
+        else:
             assert val_data_path is not None
             val_dataset = PyTablesDataset(
             database_path=dataset_config.database_path,

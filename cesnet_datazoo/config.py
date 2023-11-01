@@ -4,11 +4,14 @@ import dataclasses
 import hashlib
 import json
 import os
+import warnings
 from dataclasses import InitVar, field
+from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Literal, Optional
 
 import yaml
+from pydantic import model_validator
 from pydantic.dataclasses import dataclass
 from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
@@ -44,7 +47,7 @@ class ValidationApproach(Enum):
     Scikit-learn [`train_test_split`](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)
     is used to create a random stratified validation set. The fraction of validation samples is defined in `train_val_split_fraction`."""
     VALIDATION_DATES = "validation-dates"
-    """Use separate validation dates to create a validation set. Validation dates need to be specified in `val_dates`, and the name of the validation period in `val_period`."""
+    """Use separate validation dates to create a validation set. Validation dates need to be specified in `val_dates`, and the name of the validation period in `val_period_name`."""
     NO_VALIDATION = "no-validation"
     """Do not use validation. The validation dataloader and dataframe will not be available."""
     def __str__(self): return self.value
@@ -96,7 +99,7 @@ class DataLoaderOrder(Enum):
 @dataclass(frozen=True)
 class TrainDataParams():
     database_filename: str
-    train_period: str
+    train_period_name: str
     train_tables_paths: list[str]
     apps_selection: AppSelection
     apps_selection_topx: int
@@ -109,7 +112,7 @@ class TrainDataParams():
 @dataclass(frozen=True)
 class TestDataParams():
     database_filename: str
-    test_period: str
+    test_period_name: str
     test_tables_paths: list[str]
     known_apps_database_enum: dict[int, str]
     unknown_apps_database_enum: dict[int, str]
@@ -131,23 +134,24 @@ class DatasetConfig():
 
     Attributes:
         dataset: The dataset instance to be configured
-        data_root: Extracted from the dataset instance
-        database_filename: Extracted from the dataset instance
-        database_path: Extracted from the dataset instance
-        servicemap_path: Extracted from the dataset instance
-        flowstats_features: Extracted from the `dataset.metadata.flowstats_features`
+        data_root: Taken from the dataset instance
+        database_filename: Taken from the dataset instance
+        database_path: Taken from the dataset instance
+        servicemap_path: Taken from the dataset instance
+        flowstats_features: Taken from `dataset.metadata.flowstats_features`
 
     # Configuration options
 
     Attributes:
-        train_period: Name of the train period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
+        train_period_name: Name of the train period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
         train_dates: Dates used for creating a train set.
         train_dates_weigths: To use a non-uniform distribution of samples across train dates.
         val_approach: How a validation set should be created. Either split train data into train and validation, have a separate validation period, or no validation at all. `Default: SPLIT_FROM_TRAIN`
         train_val_split_fraction: The fraction of validation samples when splitting from the train set. `Default: 0.2`
-        val_period: Name of the validation period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
+        val_period_name: Name of the validation period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
         val_dates: Dates used for creating a validation set.
-        test_period: Name of the test period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
+        no_test_set: Disable the test set. `Default: False`
+        test_period_name: Name of the test period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
         test_dates: Dates used for creating a test set.
 
         apps_selection: How to select application classes. `Default: ALL_KNOWN`
@@ -191,18 +195,18 @@ class DatasetConfig():
         ipt_max: Max clip inter-packet times before scaling. `Default: 15000`
 
     # How to configure train, validation, and test sets
-    There are three options for how to define train/validation/test __time periods and dates__.
+    There are three options for how to define train/validation/test dates.
 
-    1. Specify a predefined time period (`train_period`, `val_period`, or `test_period`) available in `dataset.time_periods` and leave the list of dates (`train_dates`, `val_dates`, or `test_dates`) empty.
-    2. Name a custom time period and provide a list of dates. The dates are checked against `dataset.available_dates`.
-    3. Leave everything empty and use the dataset's defaults `dataset.default_train_period` and `dataset.default_test_period`.
+    1. Choose a predefined time period (`train_period_name`, `val_period_name`, or `test_period_name`) available in `dataset.time_periods` and leave the list of dates (`train_dates`, `val_dates`, or `test_dates`) empty.
+    2. Provide a list of dates and a name for the time period. The dates are checked against `dataset.available_dates`.
+    3. Do not specify anything and use the dataset's defaults `dataset.default_train_period_name` and `dataset.default_test_period_name`.
 
-    There are two options for configuring __sizes__ of train/validation/test sets.
+    There are two options for configuring sizes of train/validation/test sets.
 
     1. Select an appropriate dataset size (default is `S`) when creating the [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance and leave `train_size`, `val_known_size`, and `test_known_size` with their default `all` value.
     This will create train/validation/test sets with all samples available in the selected dataset size (of course, depending on the selected dates and validation approach).
     2. Provide exact sizes in `train_size`, `val_known_size`, and `test_known_size`. This will create train/validation/test sets of the given sizes by doing a random subset.
-    This is especially useful when using the `ORIG` dataset size and want to run smaller experiments.
+    This is especially useful when using the `ORIG` dataset size and want to control the size of experiments.
 
     !!! tip Validation set
         The default approach for creating a validation set is to randomly split the train data into train and validation. The second approach is to define separate validation dates. See [ValidationApproach][config.ValidationApproach].
@@ -215,14 +219,15 @@ class DatasetConfig():
     servicemap_path: str = field(init=False)
     flowstats_features: list[str] = field(init=False)
 
-    train_period: str = ""
+    train_period_name: str = ""
     train_dates: list[str] = field(default_factory=list)
     train_dates_weigths: Optional[list[int]] = None
     val_approach: ValidationApproach = ValidationApproach.SPLIT_FROM_TRAIN
     train_val_split_fraction: float = 0.2
-    val_period: str = ""
+    val_period_name: str = ""
     val_dates: list[str] = field(default_factory=list)
-    test_period: str = ""
+    no_test_set: bool = False
+    test_period_name: str = ""
     test_dates: list[str] = field(default_factory=list)
 
     apps_selection: AppSelection = AppSelection.ALL_KNOWN
@@ -275,52 +280,67 @@ class DatasetConfig():
         self.database_path = dataset.database_path
         self.flowstats_features = dataset.metadata.flowstats_features
 
-        # Configure train dates and period
-        if len(self.train_dates) > 0 and self.train_period == "":
-            raise ValueError("train_period has to be specified when train_dates are set")
-        if len(self.train_dates) == 0 and self.train_period != "":
-            if self.train_period not in dataset.time_periods:
-                raise ValueError(f"Unknown train_period {self.train_period}. Use time period available in dataset.time_periods")
-            self.train_dates = dataset.time_periods[self.train_period]
-        if len(self.train_dates) == 0 and self.test_period == "":
-            self.train_period = dataset.default_train_period
-            self.train_dates = dataset.time_periods[dataset.default_train_period]
-        # Configure test dates and period
-        if len(self.test_dates) > 0 and self.test_period == "":
-            raise ValueError("test_period has to be specified when test_dates are set")
-        if len(self.test_dates) == 0 and self.test_period != "":
-            if self.test_period not in dataset.time_periods:
-                raise ValueError(f"Unknown test_period {self.test_period}. Use time period available in dataset.time_periods")
-            self.test_dates = dataset.time_periods[self.test_period]
-        if len(self.test_dates) == 0 and self.test_period == "":
-            self.test_period = dataset.default_test_period
-            self.test_dates = dataset.time_periods[dataset.default_test_period]
-        # Configure val dates and period
-        if (self.val_approach == ValidationApproach.NO_VALIDATION or self.val_approach == ValidationApproach.SPLIT_FROM_TRAIN) and (len(self.val_dates) > 0 or self.val_period != ""):
-            raise ValueError("val_dates and val_period cannot be specified when val_approach is no-validation or split-from-train")
+        # Configure train dates
+        if len(self.train_dates) > 0 and self.train_period_name == "":
+            raise ValueError("train_period_name has to be specified when train_dates are set")
+        if len(self.train_dates) == 0 and self.train_period_name != "":
+            if self.train_period_name not in dataset.time_periods:
+                raise ValueError(f"Unknown train_period_name {self.train_period_name}. Use time period available in dataset.time_periods")
+            self.train_dates = dataset.time_periods[self.train_period_name]
+        if len(self.train_dates) == 0 and self.test_period_name == "":
+            self.train_period_name = dataset.default_train_period_name
+            self.train_dates = dataset.time_periods[dataset.default_train_period_name]
+        # Configure test dates
+        if self.no_test_set:
+            if (len(self.test_dates) > 0 or self.test_period_name != ""):
+                raise ValueError("test_dates and test_period_name cannot be specified when no_test_set is true")
+        else:
+            if len(self.test_dates) > 0 and self.test_period_name == "":
+                raise ValueError("test_period_name has to be specified when test_dates are set")
+            if len(self.test_dates) == 0 and self.test_period_name != "":
+                if self.test_period_name not in dataset.time_periods:
+                    raise ValueError(f"Unknown test_period_name {self.test_period_name}. Use time period available in dataset.time_periods")
+                self.test_dates = dataset.time_periods[self.test_period_name]
+            if len(self.test_dates) == 0 and self.test_period_name == "":
+                self.test_period_name = dataset.default_test_period_name
+                self.test_dates = dataset.time_periods[dataset.default_test_period_name]
+        # Configure val dates
+        if (self.val_approach == ValidationApproach.NO_VALIDATION or self.val_approach == ValidationApproach.SPLIT_FROM_TRAIN) and (len(self.val_dates) > 0 or self.val_period_name != ""):
+            raise ValueError("val_dates and val_period_name cannot be specified when val_approach is no-validation or split-from-train")
         if self.val_approach == ValidationApproach.VALIDATION_DATES:
-            if len(self.val_dates) > 0 and self.val_period == "":
-                raise ValueError("val_period has to be specified when val_dates are set")
-            if len(self.val_dates) == 0 and self.val_period != "":
-                if self.val_period not in dataset.time_periods:
-                    raise ValueError(f"Unknown val_period {self.val_period}. Use time period available in dataset.time_periods")
-                self.val_dates = dataset.time_periods[self.val_period]
-            if len(self.val_dates) == 0 and self.val_period == "":
-                raise ValueError("val_period and val_dates (or val_period from dataset.time_periods) have to be specified when val_approach is validation-dates")
+            if len(self.val_dates) > 0 and self.val_period_name == "":
+                raise ValueError("val_period_name has to be specified when val_dates are set")
+            if len(self.val_dates) == 0 and self.val_period_name != "":
+                if self.val_period_name not in dataset.time_periods:
+                    raise ValueError(f"Unknown val_period_name {self.val_period_name}. Use time period available in dataset.time_periods")
+                self.val_dates = dataset.time_periods[self.val_period_name]
+            if len(self.val_dates) == 0 and self.val_period_name == "":
+                raise ValueError("val_period_name and val_dates (or val_period_name from dataset.time_periods) have to be specified when val_approach is validation-dates")
         # Check if train, val, and test dates are available in the dataset
         if dataset.available_dates:
             unknown_train_dates = [t for t in self.train_dates if t not in dataset.available_dates]
             unknown_val_dates = [t for t in self.val_dates if t not in dataset.available_dates]
             unknown_test_dates = [t for t in self.test_dates if t not in dataset.available_dates]
             if len(unknown_train_dates) > 0:
-                raise ValueError(f"Unknown train dates {unknown_train_dates}. Use dates available in dataset.available_dates" \
-                                + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
+                raise ValueError(f"Unknown train dates {unknown_train_dates}. Use dates available in dataset.available_dates (collection period {dataset.metadata.collection_period})" \
+                                + (f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else ""))
             if len(unknown_val_dates) > 0:
-                raise ValueError(f"Unknown validation dates {unknown_val_dates}. Use dates available in dataset.available_dates" \
-                                + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
+                raise ValueError(f"Unknown validation dates {unknown_val_dates}. Use dates available in dataset.available_dates (collection period {dataset.metadata.collection_period})" \
+                                + (f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else ""))
             if len(unknown_test_dates) > 0:
-                raise ValueError(f"Unknown test dates {unknown_test_dates}. Use dates available in dataset.available_dates" \
-                                + f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else "")
+                raise ValueError(f"Unknown test dates {unknown_test_dates}. Use dates available in dataset.available_dates (collection period {dataset.metadata.collection_period})" \
+                                + (f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else ""))
+        # Check time order of train, val, and test periods
+        train_dates = [datetime.strptime(date_str, "%Y%m%d").date() for date_str in self.train_dates]
+        test_dates = [datetime.strptime(date_str, "%Y%m%d").date() for date_str in self.test_dates]
+        if not self.no_test_set and min(test_dates) <= max(train_dates):
+            warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last train date ({max(train_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
+        if self.val_approach == ValidationApproach.VALIDATION_DATES:
+            val_dates = [datetime.strptime(date_str, "%Y%m%d").date() for date_str in self.val_dates]
+            if min(val_dates) <= max(train_dates):
+                warnings.warn(f"Some validation dates ({min(val_dates).strftime('%Y%m%d')}) are before or equal to the last train date ({max(train_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
+            if not self.no_test_set and min(test_dates) <= max(val_dates):
+                warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last validation date ({max(val_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
         # Configure features
         if dataset.metadata.protocol == Protocol.TLS and self.use_tcp_features:
             self.flowstats_features = self.flowstats_features + SELECTED_TCP_FLAGS
@@ -454,7 +474,7 @@ class DatasetConfig():
     def _get_train_data_params(self) -> TrainDataParams:
         return TrainDataParams(
             database_filename=self.database_filename,
-            train_period=self.train_period,
+            train_period_name=self.train_period_name,
             train_tables_paths=self._get_train_tables_paths(),
             apps_selection=self.apps_selection,
             apps_selection_topx=self.apps_selection_topx,
@@ -468,7 +488,7 @@ class DatasetConfig():
         assert self.val_approach == ValidationApproach.VALIDATION_DATES
         val_data_params = TestDataParams(
             database_filename=self.database_filename,
-            test_period=self.val_period,
+            test_period_name=self.val_period_name,
             test_tables_paths=self._get_val_tables_paths(),
             known_apps_database_enum=known_apps_database_enum,
             unknown_apps_database_enum=unknown_apps_database_enum,)
@@ -480,7 +500,7 @@ class DatasetConfig():
     def _get_test_data_params_and_path(self, known_apps_database_enum: dict[int, str], unknown_apps_database_enum: dict[int, str]) -> tuple[TestDataParams, str]:
         test_data_params = TestDataParams(
             database_filename=self.database_filename,
-            test_period=self.test_period,
+            test_period_name=self.test_period_name,
             test_tables_paths=self._get_test_tables_paths(),
             known_apps_database_enum=known_apps_database_enum,
             unknown_apps_database_enum=unknown_apps_database_enum,)
@@ -488,6 +508,21 @@ class DatasetConfig():
         params_hash = params_hash[:10]
         test_data_path = os.path.join(self.data_root, "test-data", f"{params_hash}_{self.random_state}")
         return test_data_params, test_data_path
+
+    @model_validator(mode="before")
+    @classmethod
+    def check_deprecated_args(cls, values):
+        kwargs = values.kwargs
+        if "train_period" in kwargs:
+            warnings.warn("train_period is deprecated. Use train_period_name instead.")
+            kwargs["train_period_name"] = kwargs["train_period"]
+        if "val_period" in kwargs:
+            warnings.warn("val_period is deprecated. Use val_period_name instead.")
+            kwargs["val_period_name"] = kwargs["val_period"]
+        if "test_period" in kwargs:
+            warnings.warn("test_period is deprecated. Use test_period_name instead.")
+            kwargs["test_period_name"] = kwargs["test_period"]
+        return values
 
     def __str__(self):
         _process_tag = yaml.emitter.Emitter.process_tag
