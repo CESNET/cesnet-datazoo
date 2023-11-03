@@ -447,9 +447,10 @@ class CesnetDataset():
                 collection_year, week = int(split[1]), int(split[2])
                 for d in range(1, 8):
                     s = datetime.date.fromisocalendar(collection_year, week, d).strftime("%Y%m%d")
-                    if s not in self.metadata.missing_dates_in_collection_period:
+                    # last week of a year can span into the following year
+                    if s not in self.metadata.missing_dates_in_collection_period and s.startswith(str(collection_year)):
                         time_periods[period].append(s)
-            if period.startswith("M"):
+            elif period.startswith("M"):
                 split = period.split("-")
                 collection_year, month = int(split[1]), int(split[2])
                 for d in range(1, calendar.monthrange(collection_year, month)[1]):
