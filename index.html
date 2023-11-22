@@ -301,7 +301,7 @@
         
   
   <span class="md-ellipsis">
-    Features
+    Data features
   </span>
   
 
@@ -360,6 +360,26 @@
   
   <span class="md-ellipsis">
     Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="dataloaders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using dataloaders
   </span>
   
 
@@ -542,7 +562,8 @@
 <p>This is the documentation of the <a href="https://github.com/CESNET/cesnet-datazoo">CESNET DataZoo</a> project. </p>
 <p>The goal of this project is to provide tools for working with large network traffic datasets and to facilitate research in the traffic classification area. The core functions of the <code>cesnet-datazoo</code> package are:</p>
 <ul>
-<li>A common API for downloading, configuring, and loading of three public datasets of encrypted network traffic — CESNET-TLS22, CESNET-QUIC22, and CESNET-TLS-Year22. Details about the available datasets are at the <a class="autorefs autorefs-internal" href="datasets_overview/#overview-of-datasets">dataset overview</a> page.</li>
+<li>A common API for downloading, configuring, and loading of three public datasets of encrypted network traffic — CESNET-TLS22, CESNET-QUIC22, and CESNET-TLS-Year22. Details about the available datasets are on the <a class="autorefs autorefs-internal" href="datasets_overview/#overview-of-datasets">dataset overview</a> page.</li>
+<li>Provides standard features used for traffic classification, such as sizes, directions, and inter-packet times of the first 30 packets of each flow. More details on the <a class="autorefs autorefs-internal" href="features/#features">data features</a> page.</li>
 <li>Extensive configuration options for:<ul>
 <li>Selection of train, validation, and test periods. The datasets span from two weeks to one year; therefore, it is possible to evaluate classification methods in a time-based fashion that is closer to practical deployment.</li>
 <li>Selection of application classes and splitting classes between <em>known</em> and <em>unknown</em>. This enables research in the open-world setting, in which classification models need to handle new classes that were not seen during the training process.</li>

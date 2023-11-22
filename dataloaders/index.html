@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../installation/">
+        <link rel="prev" href="../getting_started/">
       
       
-        <link rel="next" href="../features/">
+        <link rel="next" href="../reference_cesnet_dataset/">
       
       
       <link rel="icon" href="../images/datazoo_logo.svg">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Oveview of datasets - CESNET DataZoo</title>
+        <title>Using dataloaders - CESNET DataZoo</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#overview-of-datasets" class="md-skip">
+        <a href="#using-dataloaders" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Oveview of datasets
+              Using dataloaders
             
           </span>
         </div>
@@ -268,29 +268,9 @@
       
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Oveview of datasets
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../datasets_overview/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -299,47 +279,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-tls22" class="md-nav__link">
-    CESNET-TLS22
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-quic22" class="md-nav__link">
-    CESNET-QUIC22
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-tls-year22" class="md-nav__link">
-    CESNET-TLS-Year22
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -367,6 +306,8 @@
       
   
   
+    
+  
   
     
     
@@ -376,12 +317,12 @@
       
       
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
@@ -395,7 +336,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Tutorials
@@ -426,9 +367,18 @@
                 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../dataloaders/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -437,6 +387,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -595,35 +546,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-tls22" class="md-nav__link">
-    CESNET-TLS22
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-quic22" class="md-nav__link">
-    CESNET-QUIC22
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-tls-year22" class="md-nav__link">
-    CESNET-TLS-Year22
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -640,47 +562,30 @@
   
 
 
-<h1 id="overview-of-datasets">Overview of datasets</h1>
-<h2 id="cesnet-tls22">CESNET-TLS22</h2>
-<div class="admonition info inline end">
-<p class="admonition-title">CESNET-TLS22</p>
+<h1 id="using-dataloaders">Using dataloaders</h1>
+<p>Apart from loading data into dataframes, the <code>cesnet-datazoo</code> package provides dataloaders for processing data in smaller batches.</p>
+<p>An example of how dataloaders can be used is in <code>cesnet_datazoo.datasets.loaders</code> or in the following snippet:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">load_from_dataloader</span><span class="p">(</span><span class="n">dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">):</span>
+    <span class="n">data_ppi</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">data_flowstats</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">batch_ppi</span><span class="p">,</span> <span class="n">batch_flowstats</span><span class="p">,</span> <span class="n">batch_labels</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+        <span class="n">data_ppi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_ppi</span><span class="p">)</span>
+        <span class="n">data_flowstats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_flowstats</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_labels</span><span class="p">)</span>
+    <span class="n">data_ppi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">data_ppi</span><span class="p">)</span>
+    <span class="n">data_flowstats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">data_flowstats</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data_ppi</span><span class="p">,</span> <span class="n">data_flowstats</span><span class="p">,</span> <span class="n">labels</span>
+</code></pre></div>
+<p>When a dataloader is iterated, the returned data are in the format <code>tuple(batch_ppi, batch_flowstats, batch_labels)</code>. The batch size (B) is configured with <code>batch_size</code> and <code>test_batch_size</code> config options. 
+The shapes are:</p>
 <ul>
-<li>TLS protocol</li>
-<li>Collected in 2021</li>
-<li>Spans two weeks</li>
-<li>Contains 141 million samples</li>
-<li>Has 191 application classes</li>
+<li>batch_ppi - <code>(B, [3, 4], 30)</code> - the middle dimension is either 4 when TCP push flags are used (<code>use_push_flags</code>) or 3 otherwise.</li>
+<li>batch_flowstats <code>(B, F)</code> - where F is the number of flowstats features computed with <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig.get_flowstats_features_len">DatasetConfig.get_flowstats_features_len</a>. To get the order and names of flowstats features, call <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig.get_flowstats_feature_names_expanded">DatasetConfig.get_flowstats_feature_names_expanded</a>. The batch_flowstats array includes flow statistics, TCP features (if available and configured), and bins of packet histograms (if available and configured). See the <a class="autorefs autorefs-internal" href="../features/#features">data features</a> page for more information about features.</li>
+<li>batch_labels <code>(B)</code> - integer labels encoded with <code>LabelEncoder</code> available at <code>dataset.encoder</code>.</li>
 </ul>
-</div>
-<p>This dataset was published in <em>"Fine-grained TLS services classification with reject option"</em> (<a href="https://doi.org/10.1016/j.comnet.2022.109467">DOI</a>, <a href="https://arxiv.org/abs/2202.11984">arXiv</a>). It was built from live traffic collected using high-speed monitoring probes at the perimeter of the CESNET2 network.</p>
-<p>For detailed information about the dataset, see the linked paper and the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page.</p>
-<h2 id="cesnet-quic22">CESNET-QUIC22</h2>
-<div class="admonition info inline end">
-<p class="admonition-title">CESNET-QUIC22</p>
-<ul>
-<li>QUIC protocol</li>
-<li>Collected in 2022</li>
-<li>Spans four weeks</li>
-<li>Contains 153 million samples</li>
-<li>Has 102 application classes and three background traffic classes</li>
-</ul>
-</div>
-<p>This dataset was published in <em>"CESNET-QUIC22: A large one-month QUIC network traffic dataset from backbone lines"</em> (<a href="https://doi.org/10.1016/j.dib.2023.108888">DOI</a>).
-The QUIC protocol has the potential to replace TLS over TLS as the standard protocol for reliable and secure Internet communication.
-Due to its design that makes the inspection of connection handshakes challenging and its usage in HTTP/3, there is an increasing demand for QUIC traffic classification methods.</p>
-<p>For detailed information about the dataset, see the linked paper and the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page. Experiments based on this dataset were published in <em>"Encrypted traffic classification: the QUIC case"</em> (<a href="https://ieeexplore.ieee.org/abstractdocument/10199052/">DOI</a>).</p>
-<h2 id="cesnet-tls-year22">CESNET-TLS-Year22</h2>
-<div class="admonition info inline end">
-<p class="admonition-title">CESNET-TLS-Year22</p>
-<ul>
-<li>TLS protocol</li>
-<li>Collected in 2022</li>
-<li>Spans one year</li>
-<li>Contains 507 million samples</li>
-<li>Has 182 application classes</li>
-</ul>
-</div>
-<p>This dataset is similar to CESNET-TLS22; however, it spans the <em>entire year 2022</em>. It will be published in the near future.</p>
+<p>Data returned from dataloaders are scaled depending on the selected configuration; see <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> for options.</p>
 
 
   

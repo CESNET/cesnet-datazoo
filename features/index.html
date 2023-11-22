@@ -20,7 +20,7 @@
     
     
       
-        <title>Features - CESNET DataZoo</title>
+        <title>Data features - CESNET DataZoo</title>
       
     
     
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Features
+              Data features
             
           </span>
         </div>
@@ -302,7 +302,7 @@
           
   
   <span class="md-ellipsis">
-    Features
+    Data features
   </span>
   
 
@@ -313,7 +313,7 @@
         
   
   <span class="md-ellipsis">
-    Features
+    Data features
   </span>
   
 
@@ -335,8 +335,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#details-about-packet-histograms-and-packet-sequences" class="md-nav__link">
-    Details about packet histograms and packet sequences
+  <a href="#ppi-sequence" class="md-nav__link">
+    PPI sequence
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flow-statistics" class="md-nav__link">
+    Flow statistics
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packet-histograms" class="md-nav__link">
+    Packet histograms
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcp-features" class="md-nav__link">
+    TCP features
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-fields" class="md-nav__link">
+    Other fields
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details-about-packet-histograms-and-ppi" class="md-nav__link">
+    Details about packet histograms and PPI
   </a>
   
 </li>
@@ -399,6 +434,26 @@
   
   <span class="md-ellipsis">
     Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataloaders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using dataloaders
   </span>
   
 
@@ -568,8 +623,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#details-about-packet-histograms-and-packet-sequences" class="md-nav__link">
-    Details about packet histograms and packet sequences
+  <a href="#ppi-sequence" class="md-nav__link">
+    PPI sequence
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flow-statistics" class="md-nav__link">
+    Flow statistics
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packet-histograms" class="md-nav__link">
+    Packet histograms
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tcp-features" class="md-nav__link">
+    TCP features
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-fields" class="md-nav__link">
+    Other fields
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details-about-packet-histograms-and-ppi" class="md-nav__link">
+    Details about packet histograms and PPI
   </a>
   
 </li>
@@ -593,9 +683,260 @@
 
 
 <h1 id="features">Features</h1>
-<h2 id="details-about-packet-histograms-and-packet-sequences">Details about packet histograms and packet sequences</h2>
-<p>Due to differences in implementation between packet sequences (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/pstats.cpp">pstats.cpp</a>) and packet histogram (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/phists.cpp">phist.cpp</a>) plugins of the ipfixprobe exporter, the number of packets in those features can differ. The differences are summarized in the following table.
-Note that this is related to TLS over TCP datasets. For QUIC, there is no detection of retransmissions or out-of-order packets. Also, QUIC acknowledgment packets are included in both packet sequences and packet histograms.</p>
+<p>This page provides a description of individual data features in the datasets. Features available in each dataset are listed on the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page.</p>
+<h2 id="ppi-sequence">PPI sequence</h2>
+<p>A per-packet information (PPI) sequence is a 2D matrix describing the first 30 packets of a flow. For flows shorter than 30 packets, the PPI sequence is padded with zeros.
+When data scalers (<code>psizes_scaler</code> and <code>ipt_scaler</code> config options) are enabled, this padding is ignored during the scaling transformation, and padding zeroes are kept in the final scaled data.
+The <code>zero_ppi_start</code> config option can be used to zero out the first <em>N</em> packets of PPI sequences, which is useful when evaluating the importance of handshake packets that are transmitted at the start of each connection.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Config options</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SIZE</td>
+<td>Size of the transport payload</td>
+<td><code>psizes_scaler</code>, <code>psizes_max</code></td>
+</tr>
+<tr>
+<td>IPT</td>
+<td>Inter-packet time in milliseconds. The IPT of the first packet is set to zero</td>
+<td><code>ipt_scaler</code>, <code>ipt_min</code>, <code>ipt_max</code></td>
+</tr>
+<tr>
+<td>DIR</td>
+<td>Direction of the packet encoded as ±1</td>
+<td></td>
+</tr>
+<tr>
+<td>PUSH_FLAG</td>
+<td>Whether the push flag was set in the TCP packet</td>
+<td><code>use_push_flags</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="flow-statistics">Flow statistics</h2>
+<p>Flow statistics are standard features describing the entire flow (with exceptions of <em>PPI_</em> features that relate to the PPI sequence of the given flow). <em>_REV</em> features correspond to the reverse (server to client) direction.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Config options</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DURATION</td>
+<td>Duration of the flow in seconds</td>
+<td><code>flowstats_scaler</code></td>
+</tr>
+<tr>
+<td>BYTES</td>
+<td>Number of transmitted bytes from client to server</td>
+<td><code>flowstats_scaler</code>, <code>flowstats_clip</code></td>
+</tr>
+<tr>
+<td>BYTES_REV</td>
+<td>Number of transmitted bytes from server to client</td>
+<td><code>flowstats_scaler</code>, <code>flowstats_clip</code></td>
+</tr>
+<tr>
+<td>PACKETS</td>
+<td>Number of packets transmitted from client to server</td>
+<td><code>flowstats_scaler</code>, <code>flowstats_clip</code></td>
+</tr>
+<tr>
+<td>PACKETS_REV</td>
+<td>Number of packets transmitted from server to client</td>
+<td><code>flowstats_scaler</code>, <code>flowstats_clip</code></td>
+</tr>
+<tr>
+<td>PPI_LEN</td>
+<td>Number of packets in the PPI sequence</td>
+<td><code>flowstats_scaler</code></td>
+</tr>
+<tr>
+<td>PPI_DURATION</td>
+<td>Duration of the PPI sequence in seconds</td>
+<td><code>flowstats_scaler</code></td>
+</tr>
+<tr>
+<td>PPI_ROUNDTRIPS</td>
+<td>Number of roundtrips in the PPI sequence</td>
+<td><code>flowstats_scaler</code></td>
+</tr>
+<tr>
+<td>FLOW_ENDREASON_IDLE</td>
+<td>Flow was terminated because it was idle</td>
+<td></td>
+</tr>
+<tr>
+<td>FLOW_ENDREASON_ACTIVE</td>
+<td>Flow was terminated because it reached the active timeout</td>
+<td></td>
+</tr>
+<tr>
+<td>FLOW_ENDREASON_OTHER</td>
+<td>Flow was terminated for other reasons</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="packet-histograms">Packet histograms</h2>
+<p>Packet histograms include binned counts of packet sizes and inter-packet times of the entire flow.
+There are 8 bins with a logarithmic scale; the intervals are 0–15, 16–31, 32–63, 64–127, 128–255, 256–511, 512–1024, &gt;1024 [ms or B]. The units are milliseconds for inter-packet times and bytes for packet sizes.
+The histograms are built from all packets of the entire flow, unlike PPI sequences that describe the first 30 packets.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Config options</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PSIZE_BIN{<em>x</em>}</td>
+<td>Packet sizes histogram <em>x</em>-th bin for the forward direction</td>
+<td><code>use_packet_histograms</code>, <code>normalize_packet_histograms</code></td>
+</tr>
+<tr>
+<td>PSIZE_BIN{<em>x</em>}_REV</td>
+<td>Packet sizes histogram <em>x</em>-th bin for the reverse direction</td>
+<td><code>use_packet_histograms</code>, <code>normalize_packet_histograms</code></td>
+</tr>
+<tr>
+<td>IPT_BIN{<em>x</em>}</td>
+<td>Inter-packet times histogram <em>x</em>-th bin for the forward direction</td>
+<td><code>use_packet_histograms</code>, <code>normalize_packet_histograms</code></td>
+</tr>
+<tr>
+<td>IPT_BIN{<em>x</em>}_REV</td>
+<td>Inter-packet times histogram <em>x</em>-th bin for the reverse direction</td>
+<td><code>use_packet_histograms</code>, <code>normalize_packet_histograms</code></td>
+</tr>
+</tbody>
+</table>
+<p>On the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page, packet histogram features are called <code>PHIST_SRC_SIZES</code>, <code>PHIST_DST_SIZES</code>, <code>PHIST_SRC_IPT</code>, <code>PHIST_DST_IPT</code>. Those are the names of database columns that are flattened to the _BIN{<em>x</em>} features.</p>
+<h2 id="tcp-features">TCP features</h2>
+<p>Datasets with TLS over TCP traffic contain features indicating the presence of individual TCP flags in the flow. A subset of flags defined in <code>cesnet_datazoo.constants.SELECTED_TCP_FLAGS</code> is used.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Config options</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FLAG_{<em>F</em>}</td>
+<td>Whether <em>F</em> flag was present in the forward (client to server) direction</td>
+<td><code>use_tcp_features</code></td>
+</tr>
+<tr>
+<td>FLAG_{<em>F</em>}_REV</td>
+<td>Whether <em>F</em> flag was present in the reverse (server to client) direction</td>
+<td><code>use_tcp_features</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="other-fields">Other fields</h2>
+<p>Most of those fields are not yet available in the <a class="autorefs autorefs-internal" href="../reference_cesnet_dataset/#datasets.cesnet_dataset.CesnetDataset"><code>CesnetDataset</code></a> class. To access them, create an instance of <code>cesnet_datazoo.pytables_data.pytables_dataset.PyTablesDataset</code> and set <code>return_all_fields</code> to true.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Config options</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ID</td>
+<td>Per-dataset unique flow identifier</td>
+<td></td>
+</tr>
+<tr>
+<td>TIME_FIRST</td>
+<td>Timestamp of the first packet in format <em>YYYY-MM-DDTHH-MM-SS.ffffff</em></td>
+<td></td>
+</tr>
+<tr>
+<td>TIME_LAST</td>
+<td>Timestamp of the last packet in format <em>YYYY-MM-DDTHH-MM-SS.ffffff</em></td>
+<td></td>
+</tr>
+<tr>
+<td>SRC_IP</td>
+<td>Source IP address</td>
+<td><code>return_ips</code></td>
+</tr>
+<tr>
+<td>DST_IP</td>
+<td>Destination IP address</td>
+<td><code>return_ips</code></td>
+</tr>
+<tr>
+<td>DST_ASN</td>
+<td>Destination Autonomous System number</td>
+<td></td>
+</tr>
+<tr>
+<td>SRC_PORT</td>
+<td>Source port</td>
+<td><code>return_ips</code></td>
+</tr>
+<tr>
+<td>DST_PORT</td>
+<td>Destination port</td>
+<td><code>return_ips</code></td>
+</tr>
+<tr>
+<td>PROTOCOL</td>
+<td>Transport protocol</td>
+<td></td>
+</tr>
+<tr>
+<td>TLS_SNI / QUIC_SNI</td>
+<td>Server Name Indication domain</td>
+<td></td>
+</tr>
+<tr>
+<td>TLS_JA3</td>
+<td>JA3 fingerprint</td>
+<td></td>
+</tr>
+<tr>
+<td>QUIC_VERSION</td>
+<td>QUIC protocol version</td>
+<td></td>
+</tr>
+<tr>
+<td>QUIC_USER_AGENT</td>
+<td>User agent string if available in the QUIC Initial Packet</td>
+<td></td>
+</tr>
+<tr>
+<td>APP</td>
+<td>Web service label</td>
+<td></td>
+</tr>
+<tr>
+<td>CATEGORY</td>
+<td>Service category label</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="details-about-packet-histograms-and-ppi">Details about packet histograms and PPI</h2>
+<p>Due to differences in implementation between packet sequences (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/pstats.cpp">pstats.cpp</a>) and packet histogram (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/phists.cpp">phist.cpp</a>) plugins of the ipfixprobe exporter, the number of packets in PPI and histograms can differ (even for flows shorter than 30 packets). The differences are summarized in the following table.
+Note that this is related to TLS over TCP datasets.</p>
 <table>
 <thead>
 <tr>
@@ -613,14 +954,21 @@ Note that this is related to TLS over TCP datasets. For QUIC, there is no detect
 <td>Included</td>
 </tr>
 <tr>
-<td><strong>Retransmissions</strong><br/>(including out-of-order packets)</td>
+<td><strong>Retransmissions</strong><br/>(and out-of-order packets)</td>
 <td>Included</td>
-<td>Not included*</td>
+<td>Not included<em>*</em></td>
 <td>Included</td>
+</tr>
+<tr>
+<td><strong>Computed from</strong></td>
+<td>Entire flow</td>
+<td>First 30 packets</td>
+<td>Entire flow</td>
 </tr>
 </tbody>
 </table>
-<p>*<em>For PPI sequences, the implementation for the detection of retransmissions and out-of-order packets is not perfect. Packets with a non-increasing SEQ number are skipped.</em></p>
+<p>*<em>The implementation for the detection of TCP retransmissions and out-of-order packets is far from perfect. Packets with a non-increasing SEQ number are skipped.</em></p>
+<p>For QUIC, there is no detection of retransmissions or out-of-order packets, and QUIC acknowledgment packets are included in both packet sequences and packet histograms.</p>
 
 
   

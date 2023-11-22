@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../getting_started/">
+        <link rel="prev" href="../dataloaders/">
       
       
         <link rel="next" href="../reference_dataset_config/">
@@ -293,7 +293,7 @@
         
   
   <span class="md-ellipsis">
-    Features
+    Data features
   </span>
   
 
@@ -352,6 +352,26 @@
   
   <span class="md-ellipsis">
     Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataloaders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using dataloaders
   </span>
   
 
@@ -795,7 +815,7 @@
       <p>The main class for accessing CESNET datasets. It handles downloading, data preprocessing,
 train/validation/test splitting, and class selection. Access to data is provided through:</p>
 <ul>
-<li>Iterable PyTorch DataLoader for batch processing.</li>
+<li>Iterable PyTorch DataLoader for batch processing. See <a class="autorefs autorefs-internal" href="../dataloaders/#using-dataloaders">using dataloaders</a> for more details.</li>
 <li>Pandas DataFrame for loading the entire train, validation, or test set at once.</li>
 </ul>
 <p>The dataset is stored in a <a href="https://www.pytables.org/">PyTables</a> database. The internal <code>PyTablesDataset</code> class is used as a wrapper
@@ -804,7 +824,7 @@ and is compatible with <a href="https://pytorch.org/docs/stable/data.html#torch.
 which provides efficient parallel loading of the data. The dataset configuration is done through the <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> class.</p>
 <p><strong>Intended usage:</strong></p>
 <ol>
-<li>Create an instance of the dataset <a class="autorefs autorefs-internal" href="../reference_datasets/#dataset-classes">class</a> with the desired size and data root. This will download the dataset if it has not already been downloaded.</li>
+<li>Create an instance of the <a class="autorefs autorefs-internal" href="../reference_datasets/#dataset-classes">dataset class</a> with the desired size and data root. This will download the dataset if it has not already been downloaded.</li>
 <li>Create an instance of <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> and set it with <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize"><code>set_dataset_config_and_initialize</code></a>.
 This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers. All is done according to the provided configuration and is cached for later use.</li>
 <li>Use <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_train_dataloader"><code>get_train_dataloader</code></a> or <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_train_df"><code>get_train_df</code></a> to get training data for a classification model.</li>
@@ -1844,7 +1864,7 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">    The main class for accessing CESNET datasets. It handles downloading, data preprocessing,</span>
 <span class="sd">    train/validation/test splitting, and class selection. Access to data is provided through:</span>
 
-<span class="sd">    - Iterable PyTorch DataLoader for batch processing.</span>
+<span class="sd">    - Iterable PyTorch DataLoader for batch processing. See [using dataloaders][using-dataloaders] for more details.</span>
 <span class="sd">    - Pandas DataFrame for loading the entire train, validation, or test set at once.</span>
 
 <span class="sd">    The dataset is stored in a [PyTables](https://www.pytables.org/) database. The internal `PyTablesDataset` class is used as a wrapper</span>
@@ -1854,7 +1874,7 @@ This will initialize the dataset — select classes, split data into train/valid
 
 <span class="sd">    **Intended usage:**</span>
 
-<span class="sd">    1. Create an instance of the dataset [class][dataset-classes] with the desired size and data root. This will download the dataset if it has not already been downloaded.</span>
+<span class="sd">    1. Create an instance of the [dataset class][dataset-classes] with the desired size and data root. This will download the dataset if it has not already been downloaded.</span>
 <span class="sd">    2. Create an instance of [`DatasetConfig`][config.DatasetConfig] and set it with [`set_dataset_config_and_initialize`][datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize].</span>
 <span class="sd">    This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers. All is done according to the provided configuration and is cached for later use.</span>
 <span class="sd">    3. Use [`get_train_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_train_dataloader] or [`get_train_df`][datasets.cesnet_dataset.CesnetDataset.get_train_df] to get training data for a classification model.</span>
@@ -2003,7 +2023,7 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        | `train_dataloader_seed`      | Seed for loading train data in random order.                                               |</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Train data as an iterable dataloader.</span>
+<span class="sd">            Train data as an iterable dataloader. See [using dataloaders][using-dataloaders] for more details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting train dataloader&quot;</span><span class="p">)</span>
@@ -2050,7 +2070,7 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        | `val_workers`     | Number of workers for loading validation data.                    |</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Validation data as an iterable dataloader.</span>
+<span class="sd">            Validation data as an iterable dataloader. See [using dataloaders][using-dataloaders] for more details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting validaion dataloader&quot;</span><span class="p">)</span>
@@ -2089,7 +2109,7 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        | `test_workers`    | Number of workers for loading test data.                          |</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Test data as an iterable dataloader.</span>
+<span class="sd">            Test data as an iterable dataloader. See [using dataloaders][using-dataloaders] for more details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting test dataloader&quot;</span><span class="p">)</span>
@@ -2601,7 +2621,7 @@ The dataloader is configured with the following config attributes:</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Train data as an iterable dataloader.</p>
+              <p>Train data as an iterable dataloader. See <a class="autorefs autorefs-internal" href="../dataloaders/#using-dataloaders">using dataloaders</a> for more details.</p>
             </div>
           </td>
         </tr>
@@ -2671,7 +2691,7 @@ The dataloader is configured with the following config attributes:</p>
 <span class="sd">    | `train_dataloader_seed`      | Seed for loading train data in random order.                                               |</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Train data as an iterable dataloader.</span>
+<span class="sd">        Train data as an iterable dataloader. See [using dataloaders][using-dataloaders] for more details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting train dataloader&quot;</span><span class="p">)</span>
@@ -2766,7 +2786,7 @@ The dataloader is configured with the following config attributes:</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Validation data as an iterable dataloader.</p>
+              <p>Validation data as an iterable dataloader. See <a class="autorefs autorefs-internal" href="../dataloaders/#using-dataloaders">using dataloaders</a> for more details.</p>
             </div>
           </td>
         </tr>
@@ -2820,7 +2840,7 @@ The dataloader is configured with the following config attributes:</p>
 <span class="sd">    | `val_workers`     | Number of workers for loading validation data.                    |</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Validation data as an iterable dataloader.</span>
+<span class="sd">        Validation data as an iterable dataloader. See [using dataloaders][using-dataloaders] for more details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting validaion dataloader&quot;</span><span class="p">)</span>
@@ -2905,7 +2925,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Test data as an iterable dataloader.</p>
+              <p>Test data as an iterable dataloader. See <a class="autorefs autorefs-internal" href="../dataloaders/#using-dataloaders">using dataloaders</a> for more details.</p>
             </div>
           </td>
         </tr>
@@ -2967,7 +2987,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="sd">    | `test_workers`    | Number of workers for loading test data.                          |</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Test data as an iterable dataloader.</span>
+<span class="sd">        Test data as an iterable dataloader. See [using dataloaders][using-dataloaders] for more details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting test dataloader&quot;</span><span class="p">)</span>

@@ -293,7 +293,7 @@
         
   
   <span class="md-ellipsis">
-    Features
+    Data features
   </span>
   
 
@@ -352,6 +352,26 @@
   
   <span class="md-ellipsis">
     Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataloaders/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using dataloaders
   </span>
   
 
@@ -848,7 +868,7 @@
 <ul>
 <li>Train, validation, test sets (dates, sizes, validation approach).</li>
 <li>Application selection — either the standard closed-world setting (only <em>known</em> classes) or the open-world setting (<em>known</em> and <em>unknown</em> classes).</li>
-<li>Feature scaling.</li>
+<li>Feature scaling. See the <a class="autorefs autorefs-internal" href="../features/#features">data features</a> page for more information.</li>
 <li>Dataloader options like batch sizes, order of loading, or number of workers.</li>
 </ul>
 <p>When initializing this class, pass a <a class="autorefs autorefs-internal" href="../reference_cesnet_dataset/#datasets.cesnet_dataset.CesnetDataset"><code>CesnetDataset</code></a> instance to be configured and the desired configuration. Available options are <a class="autorefs autorefs-internal" href="#config.DatasetConfig--configuration-options">here</a>.</p>
@@ -1906,7 +1926,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
 <span class="sd">    - Train, validation, test sets (dates, sizes, validation approach).</span>
 <span class="sd">    - Application selection — either the standard closed-world setting (only *known* classes) or the open-world setting (*known* and *unknown* classes).</span>
-<span class="sd">    - Feature scaling.</span>
+<span class="sd">    - Feature scaling. See the [data features][features] page for more information.</span>
 <span class="sd">    - Dataloader options like batch sizes, order of loading, or number of workers.</span>
 
 <span class="sd">    When initializing this class, pass a [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance to be configured and the desired configuration. Available options are [here][config.DatasetConfig--configuration-options].</span>
@@ -2177,23 +2197,23 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
                 <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">n</span>
 
-    <span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets names of flow statistics features. Packet histograms are expanded into individual features.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets names of flow statistics features. Packet histograms are expanded into bin features.&quot;&quot;&quot;</span>
         <span class="n">name_mapping</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;PHIST_SRC_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
             <span class="s2">&quot;PHIST_DST_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_REV&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
             <span class="s2">&quot;PHIST_SRC_IPT&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
             <span class="s2">&quot;PHIST_DST_IPT&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_REV&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
-            <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_IDLE&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_ACTIVE&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_END&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_OTHER&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_IDLE&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_ACTIVE&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_END&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_OTHER&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name_mapping</span><span class="p">:</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;F&quot;</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">)</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">shorter_names</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">):</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="s2">&quot;F&quot;</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">)</span>
                 <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="n">feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
@@ -2203,7 +2223,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="k">return</span> <span class="n">feature_names</span>
 
     <span class="k">def</span> <span class="nf">get_ppi_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets names of flattened per-packet information (PPI) features.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the names of flattened PPI features.&quot;&quot;&quot;</span>
         <span class="n">ppi_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
                                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;DIR_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
                                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;SIZE_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
@@ -2212,13 +2232,13 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="k">return</span> <span class="n">ppi_feature_names</span>
 
     <span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the number of per-packet information (PPI) channels.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the number of features (channels) in PPI.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">TCP_PPI_CHANNELS</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">UDP_PPI_CHANNELS</span>
 
-    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets feature names.</span>
 
@@ -2226,7 +2246,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">            flatten_ppi: Whether to flatten PPI into individual feature names or keep one `PPI` column.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ppi_feature_names</span><span class="p">()</span> <span class="k">if</span> <span class="n">flatten_ppi</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;PPI&quot;</span><span class="p">]</span>
-        <span class="n">feature_names</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_flowstats_feature_names_expanded</span><span class="p">()</span>
+        <span class="n">feature_names</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="n">shorter_names</span><span class="o">=</span><span class="n">shorter_names</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">feature_names</span>
 
     <span class="k">def</span> <span class="nf">_get_train_tables_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -2381,12 +2401,14 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">get_flowstats_feature_names_expanded</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">get_flowstats_feature_names_expanded</span><span class="p">(</span>
+    <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </code></pre></div>
 
   <div class="doc doc-contents ">
   
-      <p>Gets names of flow statistics features. Packet histograms are expanded into individual features.</p>
+      <p>Gets names of flow statistics features. Packet histograms are expanded into bin features.</p>
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
@@ -2413,23 +2435,23 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="normal">421</span>
 <span class="normal">422</span>
 <span class="normal">423</span>
-<span class="normal">424</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets names of flow statistics features. Packet histograms are expanded into individual features.&quot;&quot;&quot;</span>
+<span class="normal">424</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets names of flow statistics features. Packet histograms are expanded into bin features.&quot;&quot;&quot;</span>
     <span class="n">name_mapping</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;PHIST_SRC_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
         <span class="s2">&quot;PHIST_DST_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_REV&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
         <span class="s2">&quot;PHIST_SRC_IPT&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
         <span class="s2">&quot;PHIST_DST_IPT&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_REV&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
-        <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_IDLE&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_ACTIVE&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_END&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_OTHER&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_IDLE&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_ACTIVE&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_END&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_OTHER&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name_mapping</span><span class="p">:</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">f</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;F&quot;</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">)</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">shorter_names</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">):</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="s2">&quot;F&quot;</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">)</span>
             <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
@@ -2459,7 +2481,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
   <div class="doc doc-contents ">
   
-      <p>Gets names of flattened per-packet information (PPI) features.</p>
+      <p>Gets the names of flattened PPI features.</p>
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
@@ -2471,7 +2493,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="normal">431</span>
 <span class="normal">432</span>
 <span class="normal">433</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets names of flattened per-packet information (PPI) features.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the names of flattened PPI features.&quot;&quot;&quot;</span>
     <span class="n">ppi_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
                            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;DIR_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
                            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;SIZE_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
@@ -2500,7 +2522,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
   <div class="doc doc-contents ">
   
-      <p>Gets the number of per-packet information (PPI) channels.</p>
+      <p>Gets the number of features (channels) in PPI.</p>
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
@@ -2510,7 +2532,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="normal">438</span>
 <span class="normal">439</span>
 <span class="normal">440</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the number of per-packet information (PPI) channels.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the number of features (channels) in PPI.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TCP_PPI_CHANNELS</span>
     <span class="k">else</span><span class="p">:</span>
@@ -2532,7 +2554,9 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">get_feature_names</span><span class="p">(</span><span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">get_feature_names</span><span class="p">(</span>
+    <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </code></pre></div>
 
   <div class="doc doc-contents ">
@@ -2580,7 +2604,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="normal">448</span>
 <span class="normal">449</span>
 <span class="normal">450</span>
-<span class="normal">451</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">451</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Gets feature names.</span>
 
@@ -2588,7 +2612,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        flatten_ppi: Whether to flatten PPI into individual feature names or keep one `PPI` column.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ppi_feature_names</span><span class="p">()</span> <span class="k">if</span> <span class="n">flatten_ppi</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;PPI&quot;</span><span class="p">]</span>
-    <span class="n">feature_names</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_flowstats_feature_names_expanded</span><span class="p">()</span>
+    <span class="n">feature_names</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="n">shorter_names</span><span class="o">=</span><span class="n">shorter_names</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">feature_names</span>
 </code></pre></div></td></tr></table></div>
           </details>
