@@ -29,8 +29,8 @@ def create_df_from_dataloader(dataloader: DataLoader, feature_names: list[str], 
         data = np.column_stack((data_ppi, data_flowstats))
         df = pd.DataFrame(data=data, columns=feature_names)
     else:
-        ppi_column, *feature_names = feature_names
+        ppi_column_name, *feature_names = feature_names
         df = pd.DataFrame(data=data_flowstats, columns=feature_names)
-        df.insert(0, column=ppi_column, value=list(data_ppi))
+        df.insert(0, column=ppi_column_name, value=list(data_ppi))
     df[APP_COLUMN] = labels
     return df

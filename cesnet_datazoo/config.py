@@ -127,7 +127,7 @@ class DatasetConfig():
 
     - Train, validation, test sets (dates, sizes, validation approach).
     - Application selection — either the standard closed-world setting (only *known* classes) or the open-world setting (*known* and *unknown* classes).
-    - Feature scaling.
+    - Feature scaling. See the [data features][features] page for more information.
     - Dataloader options like batch sizes, order of loading, or number of workers.
 
     When initializing this class, pass a [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance to be configured and the desired configuration. Available options are [here][config.DatasetConfig--configuration-options].
@@ -398,23 +398,23 @@ class DatasetConfig():
                 n += 1
         return n
 
-    def get_flowstats_feature_names_expanded(self) -> list[str]:
-        """Gets names of flow statistics features. Packet histograms are expanded into individual features."""
+    def get_flowstats_feature_names_expanded(self, shorter_names: bool = False) -> list[str]:
+        """Gets names of flow statistics features. Packet histograms are expanded into bin features."""
         name_mapping = {
             "PHIST_SRC_SIZES": [f"PSIZE_BIN{i}" for i in range(1, PHIST_BIN_COUNT + 1)],
             "PHIST_DST_SIZES": [f"PSIZE_BIN{i}_REV" for i in range(1, PHIST_BIN_COUNT + 1)],
             "PHIST_SRC_IPT": [f"IPT_BIN{i}" for i in range(1, PHIST_BIN_COUNT + 1)],
             "PHIST_DST_IPT": [f"IPT_BIN{i}_REV" for i in range(1, PHIST_BIN_COUNT + 1)],
-            "FLOW_ENDREASON_IDLE": "FEND_IDLE",
-            "FLOW_ENDREASON_ACTIVE": "FEND_ACTIVE",
-            "FLOW_ENDREASON_END": "FEND_END",
-            "FLOW_ENDREASON_OTHER": "FEND_OTHER",
+            "FLOW_ENDREASON_IDLE": "FEND_IDLE" if shorter_names else "FLOW_ENDREASON_IDLE",
+            "FLOW_ENDREASON_ACTIVE": "FEND_ACTIVE" if shorter_names else "FLOW_ENDREASON_ACTIVE",
+            "FLOW_ENDREASON_END": "FEND_END" if shorter_names else "FLOW_ENDREASON_END",
+            "FLOW_ENDREASON_OTHER": "FEND_OTHER" if shorter_names else "FLOW_ENDREASON_OTHER",
         }
         feature_names = []
         for f in self.flowstats_features:
             if f not in name_mapping:
-                f = f if not f.startswith("FLAG") else "F" + f.lstrip("FLAG")
-                f = f.upper()
+                if shorter_names and f.startswith("FLAG"):
+                    f = "F" + f.lstrip("FLAG")
                 feature_names.append(f)
             elif isinstance(name_mapping[f], list):
                 feature_names.extend(name_mapping[f])
@@ -424,7 +424,7 @@ class DatasetConfig():
         return feature_names
 
     def get_ppi_feature_names(self) -> list[str]:
-        """Gets names of flattened per-packet information (PPI) features."""
+        """Gets the names of flattened PPI features."""
         ppi_feature_names = [f"IPT_{i}" for i in range(1, PPI_MAX_LEN + 1)] + \
                                [f"DIR_{i}" for i in range(1, PPI_MAX_LEN + 1)] + \
                                [f"SIZE_{i}" for i in range(1, PPI_MAX_LEN + 1)]
@@ -433,13 +433,13 @@ class DatasetConfig():
         return ppi_feature_names
 
     def get_ppi_channels(self) -> int:
-        """Gets the number of per-packet information (PPI) channels."""
+        """Gets the number of features (channels) in PPI."""
         if self.use_push_flags:
             return TCP_PPI_CHANNELS
         else:
             return UDP_PPI_CHANNELS
 
-    def get_feature_names(self, flatten_ppi: bool = False) -> list[str]:
+    def get_feature_names(self, flatten_ppi: bool = False, shorter_names: bool = False) -> list[str]:
         """
         Gets feature names.
 
@@ -447,7 +447,7 @@ class DatasetConfig():
             flatten_ppi: Whether to flatten PPI into individual feature names or keep one `PPI` column.
         """
         feature_names = self.get_ppi_feature_names() if flatten_ppi else ["PPI"]
-        feature_names += self.get_flowstats_feature_names_expanded()
+        feature_names += self.get_flowstats_feature_names_expanded(shorter_names=shorter_names)
         return feature_names
 
     def _get_train_tables_paths(self) -> list[str]:

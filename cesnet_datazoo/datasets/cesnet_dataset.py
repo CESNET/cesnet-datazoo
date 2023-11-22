@@ -42,7 +42,7 @@ class CesnetDataset():
     The main class for accessing CESNET datasets. It handles downloading, data preprocessing,
     train/validation/test splitting, and class selection. Access to data is provided through:
 
-    - Iterable PyTorch DataLoader for batch processing.
+    - Iterable PyTorch DataLoader for batch processing. See [using dataloaders][using-dataloaders] for more details.
     - Pandas DataFrame for loading the entire train, validation, or test set at once.
 
     The dataset is stored in a [PyTables](https://www.pytables.org/) database. The internal `PyTablesDataset` class is used as a wrapper
@@ -52,7 +52,7 @@ class CesnetDataset():
 
     **Intended usage:**
 
-    1. Create an instance of the dataset [class][dataset-classes] with the desired size and data root. This will download the dataset if it has not already been downloaded.
+    1. Create an instance of the [dataset class][dataset-classes] with the desired size and data root. This will download the dataset if it has not already been downloaded.
     2. Create an instance of [`DatasetConfig`][config.DatasetConfig] and set it with [`set_dataset_config_and_initialize`][datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize].
     This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers. All is done according to the provided configuration and is cached for later use.
     3. Use [`get_train_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_train_dataloader] or [`get_train_df`][datasets.cesnet_dataset.CesnetDataset.get_train_df] to get training data for a classification model.
@@ -201,7 +201,7 @@ class CesnetDataset():
         | `train_dataloader_seed`      | Seed for loading train data in random order.                                               |
 
         Returns:
-            Train data as an iterable dataloader.
+            Train data as an iterable dataloader. See [using dataloaders][using-dataloaders] for more details.
         """
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting train dataloader")
@@ -248,7 +248,7 @@ class CesnetDataset():
         | `val_workers`     | Number of workers for loading validation data.                    |
 
         Returns:
-            Validation data as an iterable dataloader.
+            Validation data as an iterable dataloader. See [using dataloaders][using-dataloaders] for more details.
         """
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting validaion dataloader")
@@ -287,7 +287,7 @@ class CesnetDataset():
         | `test_workers`    | Number of workers for loading test data.                          |
 
         Returns:
-            Test data as an iterable dataloader.
+            Test data as an iterable dataloader. See [using dataloaders][using-dataloaders] for more details.
         """
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting test dataloader")
