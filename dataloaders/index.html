@@ -578,7 +578,7 @@
     <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">data_ppi</span><span class="p">,</span> <span class="n">data_flowstats</span><span class="p">,</span> <span class="n">labels</span>
 </code></pre></div>
-<p>When a dataloader is iterated, the returned data are in the format <code>tuple(batch_ppi, batch_flowstats, batch_labels)</code>. The batch size <em>B</em> is configured with <code>batch_size</code> and <code>test_batch_size</code> config options. 
+<p>When a dataloader is iterated, the returned data are in the format <code>tuple(batch_ppi, batch_flowstats, batch_labels)</code>. The batch size <em>B</em> is configured with <code>batch_size</code> and <code>test_batch_size</code> config options.
 The shapes are:</p>
 <ul>
 <li>batch_ppi - <code>(B, [3, 4], 30)</code> - the middle dimension is either 4 when TCP push flags are used (<code>use_push_flags</code>) or 3 otherwise.</li>
