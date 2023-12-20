@@ -18,7 +18,7 @@ The goal of this project is to provide tools for working with large network traf
 - Built on suitable data structures for experiments with large datasets. There are several caching mechanisms to make repeated runs faster, for example, when searching for the best model configuration.
 - Datasets are offered in multiple sizes to give users an option to start the experiments at a smaller scale (also faster dataset download, disk space, etc.). The default is the `S` size containing 25 million samples. 
 
-### Datasets
+## Datasets
 
 The package is able to handle the following datasets:
 
@@ -28,14 +28,14 @@ The package is able to handle the following datasets:
 | _Published in_                     | 2022                                                                                                                                                                                           | 2023                                                                                                                                                      | 2023                                                                                                                                                                                           |
 | _Collection duration_              | 2 weeks                                                                                                                                                                                        | 4 weeks                                                                                                                                                   | 1 year                                                                                                                                                                                         |
 | _Collection period_                | 4.10.2021 - 17.10.2021                                                                                                                                                                         | 31.10.2022 - 27.11.2022                                                                                                                                   | 1.1.2022 - 31.12.2022                                                                                                                                                                          |                                                                                                                                                                                           | ID, SRC_IP, DST_IP, DST_ASN, SRC_PORT, DST_PORT, PROTOCOL, QUIC_VERSION, QUIC_SNI, QUIC_USERAGENT, TIME_FIRST, TIME_LAST                                  | ID, SRC_IP, DST_IP, DST_ASN, DST_PORT, PROTOCOL, TLS_SNI, TLS_JA3, TIME_FIRST, TIME_LAST                                                                                                       |
-| _Application count_                | 191                                                                                                                                                                                            | 102                                                                                                                                                       | 182                                                                                                                                                                                            |
+| _Application count_                | 191                                                                                                                                                                                            | 102                                                                                                                                                       | 180                                                                                                                                                                                            |
 | _Available samples_                | 141720670                                                                                                                                                                                      | 153226273                                                                                                                                                 | 507739322                                                                                                                                                                                      |
 | _Available dataset sizes_          | XS, S, M, L                                                                                                                                                                                    | XS, S, M, L                                                                                                                                               | XS, S, M, L                                                                                                                                                                                    |
 | _Cite_                             | [https://doi.org/10.1016/j.comnet.2022.109467](https://doi.org/10.1016/j.comnet.2022.109467)                                                                                                   | [https://doi.org/10.1016/j.dib.2023.108888](https://doi.org/10.1016/j.dib.2023.108888)                                                                    |                                                                                                                                                                                                |
 | _Zenodo URL_                       | [https://zenodo.org/record/7965515](https://zenodo.org/record/7965515)                                                                                                                         | [https://zenodo.org/record/7963302](https://zenodo.org/record/7963302)                                                                                    |                                                                                                                                                                                                |
 | _Related papers_                   |                                                                                                                                                                                                | [https://doi.org/10.23919/TMA58422.2023.10199052](https://doi.org/10.23919/TMA58422.2023.10199052)                                                        |                                                                                                                                                                                                |
 
-### Installation
+## Installation
 
 Install the package from pip with:
 
@@ -49,7 +49,7 @@ or for editable install with:
 pip install -e git+https://github.com/CESNET/cesnet-datazoo
 ```
 
-### Examples
+## Examples
 #### Initialize dataset to create train, validation, and test dataframes
 
 ```py
@@ -74,6 +74,12 @@ Data can be read into Pandas DataFrames as shown here or via PyTorch DataLoaders
 
 See more examples in the [documentation](https://cesnet.github.io/cesnet-datazoo/getting_started/).
 
+## Papers
+
+* [DataZoo: Streamlining Traffic Classification Experiments](https://doi.org/10.1145/3630050.3630176) <br>
+Jan Luxemburk and Karel Hynek <br>
+CoNEXT Workshop on Explainable and Safety Bounded, Fidelitous, Machine Learning for Networking (SAFE), 2023
+
 ### Acknowledgements
 
-    This work was supported by the Ministry of the Interior of the Czech Republic, grant No. VJ02010024: Flow-Based Encrypted Traffic Analysis.
+    This project was supported by the Ministry of the Interior of the Czech Republic, grant No. VJ02010024: Flow-Based Encrypted Traffic Analysis.

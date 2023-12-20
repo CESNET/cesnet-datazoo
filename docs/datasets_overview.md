@@ -35,6 +35,6 @@ For detailed information about the dataset, see the linked paper and the [datase
     - Collected in 2022
     - Spans one year
     - Contains 507 million samples
-    - Has 182 application classes
+    - Has 180 application classes
 
 This dataset is similar to CESNET-TLS22; however, it spans the *entire year 2022*. It will be published in the near future.

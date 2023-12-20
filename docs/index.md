@@ -11,4 +11,10 @@ The goal of this project is to provide tools for working with large network traf
     - Selection of application classes and splitting classes between *known* and *unknown*. This enables research in the open-world setting, in which classification models need to handle new classes that were not seen during the training process.
     - Feature scaling.
 - Built on suitable data structures for experiments with large datasets. There are several caching mechanisms to make repeated runs faster, for example, when searching for the best model configuration.
-- Datasets are offered in multiple sizes to give users an option to start the experiments at a smaller scale (also faster dataset download, disk space, etc.). The default is the `S` size containing 25 million samples. 
+- Datasets are offered in multiple sizes to give users an option to start experiments at a smaller scale (also faster dataset download, disk space, etc.). The default is the `S` size containing 25 million samples. 
+
+## Papers
+
+* [DataZoo: Streamlining Traffic Classification Experiments](https://doi.org/10.1145/3630050.3630176) <br>
+Jan Luxemburk and Karel Hynek <br>
+CoNEXT Workshop on Explainable and Safety Bounded, Fidelitous, Machine Learning for Networking (SAFE), 2023

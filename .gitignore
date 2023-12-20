@@ -3,6 +3,7 @@ __pycache__/
 site/
 dist/
 build/
+scripts/
 .vscode/*
 *.egg-info
 notebooks/data/

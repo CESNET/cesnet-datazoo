@@ -79,8 +79,8 @@ Note that this is related to TLS over TCP datasets.
 
 | *TLS over TCP datasets*                                       | Packet histograms | PPI sequence     | PACKETS and PACKET_REV |
 |---------------------------------------------------------------|-------------------|------------------|------------------------|
-| **Zero-length packets**<br/>(without L4 payload, e.g. ACKs)   | Not included      | Not included     | Included               |
-| **Retransmissions**<br/>(and out-of-order packets)            | Included          | Not included*\** | Included               |
+| **Zero-length packets**<br>(without L4 payload, e.g. ACKs)   | Not included      | Not included     | Included               |
+| **Retransmissions**<br>(and out-of-order packets)            | Included          | Not included*\** | Included               |
 | **Computed from**                                             | Entire flow       | First 30 packets | Entire flow            |
 
 **The implementation for the detection of TCP retransmissions and out-of-order packets is far from perfect. Packets with a non-increasing SEQ number are skipped.*

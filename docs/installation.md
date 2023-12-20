@@ -10,10 +10,10 @@ or for editable install with:
 pip install -e git+https://github.com/CESNET/cesnet-datazoo
 ```
 
-### Requirements
+## Requirements
 The `cesnet-datazoo` package requires Python >=3.10.
 
-#### Dependencies
+### Dependencies
 
 | Name         | Version  |
 |--------------|----------|
