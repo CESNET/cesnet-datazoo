@@ -119,6 +119,7 @@ class TestDataParams():
 
 class C:
     arbitrary_types_allowed = True
+    extra = "forbid"
 
 @dataclass(config=C)
 class DatasetConfig():
