@@ -4,6 +4,7 @@ site/
 dist/
 build/
 scripts/
+results/
 .vscode/*
 *.egg-info
 notebooks/data/
