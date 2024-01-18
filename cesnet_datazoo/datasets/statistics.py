@@ -222,7 +222,6 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
     ax2.axvline(mb_at_999perc, color="grey", linestyle="--")
     ax2.text(mb_at_999perc * x_log_text_margin, y_prob_text_margin, f"99.9% < {mb_at_999perc / 1_000_000:.1f}1MB", rotation=90)
 
-    feature_packets_total = np.clip(feature_packets_total, a_max=100, a_min=0)
     sns.ecdfplot(feature_packets_total, ax=ax3)
     cdf = ax3.get_lines()[0].get_data()
     ax3.set_title("Flow Length")
