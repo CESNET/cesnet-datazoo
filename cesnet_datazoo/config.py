@@ -193,7 +193,7 @@ class DatasetConfig():
         psizes_max: Max clip packet sizes before scaling. `Default: 1460`
         ipt_scaler: Which scaler to use for inter-packet times. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`
         ipt_min: Min clip inter-packet times before scaling. `Default: 0`
-        ipt_max: Max clip inter-packet times before scaling. `Default: 15000`
+        ipt_max: Max clip inter-packet times before scaling. `Default: 65000`
 
     # How to configure train, validation, and test sets
     There are three options for how to define train/validation/test dates.
@@ -269,7 +269,7 @@ class DatasetConfig():
     psizes_max: int = 1460
     ipt_scaler: ScalerEnum = ScalerEnum.STANDARD
     ipt_min: int = 0
-    ipt_max: int = 15000
+    ipt_max: int = 65000
 
     def __post_init__(self, dataset: CesnetDataset):
         """
