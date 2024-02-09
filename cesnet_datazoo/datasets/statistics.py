@@ -12,7 +12,7 @@ from torch.utils.data import BatchSampler, DataLoader, SequentialSampler
 from tqdm import tqdm
 
 from cesnet_datazoo.config import Protocol
-from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, FLOWEND_REASON_FEATURES,
+from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, FLOWEND_REASON_FEATURES, IPT_POS,
                                       PHISTS_FEATURES, PPI_COLUMN, SIZE_POS)
 from cesnet_datazoo.pytables_data.indices_setup import sort_indices
 from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, list_all_tables,
@@ -55,6 +55,7 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
     asn_path = os.path.join(output_dir, "asn.csv")
     phist_path = os.path.join(output_dir, "phists.csv")
     packet_sizes_path = os.path.join(output_dir, "ppi-packet-sizes.csv")
+    ipt_path = os.path.join(output_dir, "ppi-ipt.csv")
     flow_endreason_path = os.path.join(output_dir, "flow-endreason.csv")
     quic_sni_path = os.path.join(output_dir, "quic-sni.csv")
     quic_ua_path = os.path.join(output_dir, "quic-ua.csv")
@@ -72,6 +73,7 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
     feature_packets_total = []
     feature_bytes_total = []
     packet_sizes_counter = Counter()
+    ipt_counter = Counter()
     if not silent:
         print(f"Reading data from {database_path} for statistics")
     table_paths = list_all_tables(database_path)
@@ -99,6 +101,7 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
         feature_packets_total.append(packets_total)
         feature_bytes_total.append(bytes_total)
         packet_sizes_counter.update(ppi[:, SIZE_POS, :].flatten())
+        ipt_counter.update(ppi[:, IPT_POS, :].flatten())
         # Aggregating features for value_counts
         app_series = app_series.add(pd.Series(app).value_counts(), fill_value=0)
         # Grouping features per categories
@@ -155,6 +158,11 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
     packet_sizes_df["PERC"] = (packet_sizes_df["COUNT"] / packet_sizes_df["COUNT"].sum() * 100).round(3)
     packet_sizes_df.index.name = "PACKET SIZE"
     packet_sizes_df.to_csv(packet_sizes_path)
+    # IPT histogram output
+    ipt_df = pd.DataFrame({"COUNT": pd.Series(ipt_counter)}).sort_index()
+    ipt_df["PERC"] = (ipt_df["COUNT"] / ipt_df["COUNT"].sum() * 100).round(3)
+    ipt_df.index.name = "INTER-PACKET TIME"
+    ipt_df.to_csv(ipt_path)
     # QUIC features output
     if protocol == Protocol.QUIC:
         quic_ua_series = quic_ua_series.rename(index={"": "No User Agent"})

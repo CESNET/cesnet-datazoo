@@ -414,7 +414,7 @@ class CesnetDataset():
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting unknown apps")
         return self.class_info.unknown_apps
 
-    def compute_dataset_statistics(self, num_samples: int | Literal["all"] = 10_000_000, num_workers: int = 4, batch_size: int = 4096, disabled_apps: Optional[list[str]] = None)-> None:
+    def compute_dataset_statistics(self, num_samples: int | Literal["all"] = 10_000_000, num_workers: int = 4, batch_size: int = 16384, disabled_apps: Optional[list[str]] = None) -> None:
         """
         Computes dataset statistics and saves them to the `statistics_path` folder.
 
