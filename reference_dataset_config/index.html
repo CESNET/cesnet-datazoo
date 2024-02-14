@@ -951,6 +951,17 @@
             </div>
           </td>
         </tr>
+        <tr>
+          <td><code>other_fields</code></td>
+          <td>
+                <code>list[str]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Taken from <code>dataset.metadata.other_fields</code> if <code>return_other_fields</code> is true, otherwise an empty list</p>
+            </div>
+          </td>
+        </tr>
     </tbody>
   </table>
       <h3 id="config.DatasetConfig--configuration-options">Configuration options</h3>
@@ -1232,13 +1243,24 @@
           </td>
         </tr>
         <tr>
+          <td><code>preload_val</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Whether to dump the validation set with <code>numpy.savez_compressed</code> and preload it in future runs. Useful when running a lot of experiments with the same dataset configuration. <code>Default: True</code></p>
+            </div>
+          </td>
+        </tr>
+        <tr>
           <td><code>preload_test</code></td>
           <td>
                 <code>bool</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Whether to dump the test set with <code>numpy.savez_compressed</code> and preload it in future runs. Useful when running a lot of experiments with the same dataset configuration. <code>Default: False</code></p>
+              <p>Whether to dump the test set with <code>numpy.savez_compressed</code> and preload it in future runs. <code>Default: False</code></p>
             </div>
           </td>
         </tr>
@@ -1320,13 +1342,13 @@
           </td>
         </tr>
         <tr>
-          <td><code>return_ips</code></td>
+          <td><code>return_other_fields</code></td>
           <td>
                 <code>bool</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Use for IP-based classification. Dataloaders will return data in this tuple format <code>((SRC_IP, DST_IP, SRC_PORT, DST_PORT), LABELS)</code>. Dataframes are not available when this option is used. <code>Default: False</code></p>
+              <p>Whether to return <a class="autorefs autorefs-internal" href="../features/#other-fields">auxiliary fields</a>, such as communicating hosts, flow times, and more fields extracted from the ClientHello message. <code>Default: False</code></p>
             </div>
           </td>
         </tr>
@@ -1338,6 +1360,17 @@
           <td>
             <div class="doc-md-description">
               <p>Use for returning <code>torch.Tensor</code> from dataloaders. Dataframes are not available when this option is used. <code>Default: False</code></p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>raw_output</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Return raw output without data scaling, clipping, and normalization. <code>Default: False</code></p>
             </div>
           </td>
         </tr>
@@ -1447,7 +1480,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Max clip packet sizes before scaling. <code>Default: 1460</code></p>
+              <p>Max clip packet sizes before scaling. <code>Default: 1500</code></p>
             </div>
           </td>
         </tr>
@@ -1480,7 +1513,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Max clip inter-packet times before scaling. <code>Default: 15000</code></p>
+              <p>Max clip inter-packet times before scaling. <code>Default: 65000</code></p>
             </div>
           </td>
         </tr>
@@ -1919,7 +1952,23 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="normal">533</span>
 <span class="normal">534</span>
 <span class="normal">535</span>
-<span class="normal">536</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">C</span><span class="p">)</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">C</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">DatasetConfig</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The main class for the configuration of:</span>
@@ -1938,6 +1987,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        database_path: Taken from the dataset instance</span>
 <span class="sd">        servicemap_path: Taken from the dataset instance</span>
 <span class="sd">        flowstats_features: Taken from `dataset.metadata.flowstats_features`</span>
+<span class="sd">        other_fields: Taken from `dataset.metadata.other_fields` if `return_other_fields` is true, otherwise an empty list</span>
 
 <span class="sd">    # Configuration options</span>
 
@@ -1968,7 +2018,8 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        val_workers: Number of workers for loading validation data. `0` means that the data will be loaded in the main process. `Default: 1`</span>
 <span class="sd">        batch_size: Number of samples per batch. `Default: 192`</span>
 <span class="sd">        test_batch_size: Number of samples per batch for loading validation and test data. `Default: 2048`</span>
-<span class="sd">        preload_test: Whether to dump the test set with `numpy.savez_compressed` and preload it in future runs. Useful when running a lot of experiments with the same dataset configuration. `Default: False`</span>
+<span class="sd">        preload_val: Whether to dump the validation set with `numpy.savez_compressed` and preload it in future runs. Useful when running a lot of experiments with the same dataset configuration. `Default: True`</span>
+<span class="sd">        preload_test: Whether to dump the test set with `numpy.savez_compressed` and preload it in future runs. `Default: False`</span>
 <span class="sd">        train_size: Size of the train set. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets]. `Default: all`</span>
 <span class="sd">        val_known_size: Size of the validation set. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets]. `Default: all`</span>
 <span class="sd">        test_known_size: Size of the test set. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets]. `Default: all`</span>
@@ -1977,8 +2028,9 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        train_dataloader_order: Whether to load train data in sequential or random order. `Default: RANDOM`</span>
 <span class="sd">        train_dataloader_seed: Seed for loading train data in random order. `Default: None`</span>
 
-<span class="sd">        return_ips: Use for IP-based classification. Dataloaders will return data in this tuple format `((SRC_IP, DST_IP, SRC_PORT, DST_PORT), LABELS)`. Dataframes are not available when this option is used. `Default: False`</span>
+<span class="sd">        return_other_fields: Whether to return [auxiliary fields][other-fields], such as communicating hosts, flow times, and more fields extracted from the ClientHello message. `Default: False`</span>
 <span class="sd">        return_torch: Use for returning `torch.Tensor` from dataloaders. Dataframes are not available when this option is used. `Default: False`</span>
+<span class="sd">        raw_output: Return raw output without data scaling, clipping, and normalization. `Default: False`</span>
 <span class="sd">        use_packet_histograms: Whether to use packet histogram features, if available in the dataset. `Default: True`</span>
 <span class="sd">        normalize_packet_histograms: Whether to normalize packet histograms. If true, bins contain fractions instead of absolute numbers. `Default: True`</span>
 <span class="sd">        use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`</span>
@@ -1988,10 +2040,10 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        flowstats_scaler: Which scaler to use for flow statistics. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: ROBUST`</span>
 <span class="sd">        flowstats_clip: Quantile clip before the scaling of flow statistics. Should limit the influence of outliers. Set to `1` to disable. `Default: 0.99`</span>
 <span class="sd">        psizes_scaler: Which scaler to use for packet sizes. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`</span>
-<span class="sd">        psizes_max: Max clip packet sizes before scaling. `Default: 1460`</span>
+<span class="sd">        psizes_max: Max clip packet sizes before scaling. `Default: 1500`</span>
 <span class="sd">        ipt_scaler: Which scaler to use for inter-packet times. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`</span>
 <span class="sd">        ipt_min: Min clip inter-packet times before scaling. `Default: 0`</span>
-<span class="sd">        ipt_max: Max clip inter-packet times before scaling. `Default: 15000`</span>
+<span class="sd">        ipt_max: Max clip inter-packet times before scaling. `Default: 65000`</span>
 
 <span class="sd">    # How to configure train, validation, and test sets</span>
 <span class="sd">    There are three options for how to define train/validation/test dates.</span>
@@ -2017,6 +2069,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">database_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span>  <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">servicemap_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">flowstats_features</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">other_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="n">train_period_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">train_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
@@ -2044,6 +2097,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">val_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">192</span>
     <span class="n">test_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span>
+    <span class="n">preload_val</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">preload_test</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">train_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
     <span class="n">val_known_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
@@ -2053,8 +2107,9 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">train_dataloader_order</span><span class="p">:</span> <span class="n">DataLoaderOrder</span> <span class="o">=</span> <span class="n">DataLoaderOrder</span><span class="o">.</span><span class="n">RANDOM</span>
     <span class="n">train_dataloader_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">return_ips</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">return_other_fields</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">return_torch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">raw_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">use_packet_histograms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">normalize_packet_histograms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">use_tcp_features</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
@@ -2064,10 +2119,10 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">flowstats_scaler</span><span class="p">:</span> <span class="n">ScalerEnum</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">ROBUST</span>
     <span class="n">flowstats_clip</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span>
     <span class="n">psizes_scaler</span><span class="p">:</span> <span class="n">ScalerEnum</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">STANDARD</span>
-    <span class="n">psizes_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1460</span>
+    <span class="n">psizes_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1500</span>
     <span class="n">ipt_scaler</span><span class="p">:</span> <span class="n">ScalerEnum</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">STANDARD</span>
     <span class="n">ipt_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">ipt_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15000</span>
+    <span class="n">ipt_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">65000</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">CesnetDataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2078,6 +2133,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="bp">self</span><span class="o">.</span><span class="n">database_filename</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">database_filename</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">database_path</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">database_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">flowstats_features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">other_fields</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">other_fields</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_other_fields</span> <span class="k">else</span> <span class="p">[]</span>
 
         <span class="c1"># Configure train dates</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
@@ -2141,6 +2197,15 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_test_set</span> <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">val_dates</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Some test dates (</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">) are before or equal to the last validation date (</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">val_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">). This might lead to improper evaluation and should be avoided.&quot;</span><span class="p">)</span>
         <span class="c1"># Configure features</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_output</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalize_packet_histograms</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_scaler</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">NO_SCALER</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_clip</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psizes_scaler</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">NO_SCALER</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psizes_max</span> <span class="o">=</span> <span class="mi">1500</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipt_scaler</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">NO_SCALER</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipt_min</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipt_max</span> <span class="o">=</span> <span class="mi">65000</span>
         <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">protocol</span> <span class="o">==</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">TLS</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_tcp_features</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">+</span> <span class="n">SELECTED_TCP_FLAGS</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span> <span class="ow">and</span> <span class="s2">&quot;PUSH_FLAG&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">features_in_packet_sequences</span><span class="p">:</span>
@@ -2367,15 +2432,15 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_features_len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_features_len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the number of flow statistics features.&quot;&quot;&quot;</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">:</span>
@@ -2412,30 +2477,30 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">418</span>
 <span class="normal">419</span>
 <span class="normal">420</span>
 <span class="normal">421</span>
 <span class="normal">422</span>
 <span class="normal">423</span>
 <span class="normal">424</span>
-<span class="normal">425</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets names of flow statistics features. Packet histograms are expanded into bin features.&quot;&quot;&quot;</span>
     <span class="n">name_mapping</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;PHIST_SRC_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
@@ -2485,14 +2550,14 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">427</span>
-<span class="normal">428</span>
-<span class="normal">429</span>
-<span class="normal">430</span>
-<span class="normal">431</span>
-<span class="normal">432</span>
-<span class="normal">433</span>
-<span class="normal">434</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the names of flattened PPI features.&quot;&quot;&quot;</span>
     <span class="n">ppi_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
                            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;DIR_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
@@ -2526,12 +2591,12 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">436</span>
-<span class="normal">437</span>
-<span class="normal">438</span>
-<span class="normal">439</span>
-<span class="normal">440</span>
-<span class="normal">441</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the number of features (channels) in PPI.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TCP_PPI_CHANNELS</span>
@@ -2595,16 +2660,16 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">443</span>
-<span class="normal">444</span>
-<span class="normal">445</span>
-<span class="normal">446</span>
-<span class="normal">447</span>
-<span class="normal">448</span>
-<span class="normal">449</span>
-<span class="normal">450</span>
-<span class="normal">451</span>
-<span class="normal">452</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Gets feature names.</span>
 

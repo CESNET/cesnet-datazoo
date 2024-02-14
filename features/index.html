@@ -847,7 +847,7 @@ The histograms are built from all packets of the entire flow, unlike PPI sequenc
 </tbody>
 </table>
 <h2 id="other-fields">Other fields</h2>
-<p>Most of those fields are not yet available in the <a class="autorefs autorefs-internal" href="../reference_cesnet_dataset/#datasets.cesnet_dataset.CesnetDataset"><code>CesnetDataset</code></a> class. To access them, create an instance of <code>cesnet_datazoo.pytables_data.pytables_dataset.PyTablesDataset</code> and set <code>return_all_fields</code> to true.</p>
+<p>Datasets contain auxiliary information about samples, such as communicating hosts, flow times, and more fields extracted from the ClientHello message. The <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page lists available fields in individual datasets. </p>
 <table>
 <thead>
 <tr>
@@ -860,80 +860,75 @@ The histograms are built from all packets of the entire flow, unlike PPI sequenc
 <tr>
 <td>ID</td>
 <td>Per-dataset unique flow identifier</td>
-<td></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>TIME_FIRST</td>
-<td>Timestamp of the first packet in format <em>YYYY-MM-DDTHH-MM-SS.ffffff</em></td>
-<td></td>
+<td>Timestamp of the first packet</td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>TIME_LAST</td>
-<td>Timestamp of the last packet in format <em>YYYY-MM-DDTHH-MM-SS.ffffff</em></td>
-<td></td>
+<td>Timestamp of the last packet</td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>SRC_IP</td>
 <td>Source IP address</td>
-<td><code>return_ips</code></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>DST_IP</td>
 <td>Destination IP address</td>
-<td><code>return_ips</code></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>DST_ASN</td>
 <td>Destination Autonomous System number</td>
-<td></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>SRC_PORT</td>
 <td>Source port</td>
-<td><code>return_ips</code></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>DST_PORT</td>
 <td>Destination port</td>
-<td><code>return_ips</code></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>PROTOCOL</td>
 <td>Transport protocol</td>
-<td></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>TLS_SNI / QUIC_SNI</td>
 <td>Server Name Indication domain</td>
-<td></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>TLS_JA3</td>
 <td>JA3 fingerprint</td>
-<td></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>QUIC_VERSION</td>
 <td>QUIC protocol version</td>
-<td></td>
+<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>QUIC_USER_AGENT</td>
 <td>User agent string if available in the QUIC Initial Packet</td>
-<td></td>
-</tr>
-<tr>
-<td>APP</td>
-<td>Web service label</td>
-<td></td>
-</tr>
-<tr>
-<td>CATEGORY</td>
-<td>Service category label</td>
-<td></td>
+<td><code>return_other_fields</code></td>
 </tr>
 </tbody>
 </table>
+<!-- 
+| APP                     | Web service label                                                                   |                                 |
+| CATEGORY                | Service category label                                                              |                                 | 
+-->
+
 <h2 id="details-about-packet-histograms-and-ppi">Details about packet histograms and PPI</h2>
 <p>Due to differences in implementation between packet sequences (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/pstats.cpp">pstats.cpp</a>) and packet histogram (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/phists.cpp">phist.cpp</a>) plugins of the ipfixprobe exporter, the number of packets in PPI and histograms can differ (even for flows shorter than 30 packets). The differences are summarized in the following table.
 Note that this is related to TLS over TCP datasets.</p>
