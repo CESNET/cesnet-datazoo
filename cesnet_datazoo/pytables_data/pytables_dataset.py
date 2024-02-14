@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import warnings
+from datetime import datetime
 from typing import Any, Optional
 
 import numpy as np
@@ -10,17 +11,16 @@ import pandas as pd
 import tables as tb
 import torch
 from numpy.lib.recfunctions import drop_fields, structured_to_unstructured
-from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler, LabelEncoder
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler, RobustScaler, StandardScaler
 from torch.utils.data import Dataset
 from typing_extensions import assert_never
 
-from cesnet_datazoo.config import (AppSelection, DatasetConfig, MinTrainSamplesCheck, ScalerEnum,
-                                   TestDataParams, TrainDataParams, Scaler)
+from cesnet_datazoo.config import (AppSelection, DatasetConfig, MinTrainSamplesCheck, Scaler,
+                                   ScalerEnum, TestDataParams, TrainDataParams)
 from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, DIR_POS, FLOWSTATS_NO_CLIP,
-                                      FLOWSTATS_TO_SCALE, IPT_POS, INDICES_INDEX_POS,
-                                      INDICES_LABEL_POS, INDICES_TABLE_POS, IP_FEATURES,
-                                      PHIST_BIN_COUNT, PHISTS_FEATURES, PPI_COLUMN, SIZE_POS,
-                                      UNKNOWN_STR_LABEL)
+                                      FLOWSTATS_TO_SCALE, INDICES_INDEX_POS, INDICES_TABLE_POS,
+                                      IPT_POS, PHIST_BIN_COUNT, PHISTS_FEATURES, PPI_COLUMN,
+                                      SIZE_POS, UNKNOWN_STR_LABEL)
 from cesnet_datazoo.pytables_data.apps_split import (is_background_app,
                                                      split_apps_topx_with_provider_groups)
 from cesnet_datazoo.utils.fileutils import pickle_dump, pickle_load
@@ -30,15 +30,22 @@ log = logging.getLogger(__name__)
 
 
 class PyTablesDataset(Dataset):
-    def __init__(self, database_path: str, tables_paths: list[str], indices: Optional[np.ndarray], flowstats_features: list[str], disabled_apps: Optional[list[str]] = None, preload: bool = False, preload_blob: Optional[str] = None, return_ips: bool = False, return_all_fields: bool = False):
+    def __init__(self, database_path: str,
+                 tables_paths: list[str],
+                 indices: Optional[np.ndarray],
+                 flowstats_features: list[str],
+                 other_fields: Optional[list[str]] = None,
+                 preload: bool = False, preload_blob: Optional[str] = None,
+                 disabled_apps: Optional[list[str]] = None,
+                 return_all_fields: bool = False,):
         self.database_path = database_path
         self.tables_paths = tables_paths
         self.tables = {}
         self.flowstats_features = flowstats_features
+        self.other_fields = other_fields if other_fields is not None else []
         self.preload = preload
         self.preload_blob = preload_blob
         self.return_all_fields = return_all_fields
-        self.return_ips = return_ips
         if indices is None:
             self.set_all_indices(disabled_apps=disabled_apps)
         else:
@@ -52,9 +59,7 @@ class PyTablesDataset(Dataset):
             batch_data = load_data_from_pytables(tables=self.tables, indices=self.indices[batch_idx], data_dtype=self.data_dtype)
         if self.return_all_fields:
             return (batch_data, batch_idx)
-        return_data = (batch_data[PPI_COLUMN].astype("float32"), batch_data[self.flowstats_features], list(map(self.app_enum, batch_data[APP_COLUMN])))
-        if self.return_ips:
-            return_data = (batch_data[IP_FEATURES],) + return_data
+        return_data = (batch_data[self.other_fields], batch_data[PPI_COLUMN].astype("float32"), batch_data[self.flowstats_features], list(map(self.app_enum, batch_data[APP_COLUMN])))
         return return_data
 
     def __len__(self):
@@ -132,17 +137,13 @@ def worker_init_fn(worker_id):
     dataset = worker_info.dataset
     dataset.pytables_worker_init(worker_id)
 
-def pytables_ip_collate_fn(batch):
-    ips, _, _, labels = batch
-    return ips, labels
-
-def pytables_collate_fn(batch: tuple, 
+def pytables_collate_fn(batch: tuple,
                         flowstats_scaler: Scaler, flowstats_quantiles: pd.Series,
                         psizes_scaler: Scaler, psizes_max: int,
                         ipt_scaler: Scaler, ipt_min: int, ipt_max: int,
                         use_push_flags: bool, use_packet_histograms: bool, normalize_packet_histograms: bool, zero_ppi_start: int,
                         encoder: LabelEncoder, known_apps: list[str], return_torch: bool = False):
-    x_ppi, x_flowstats, labels = batch
+    other_fields, x_ppi, x_flowstats, labels = batch
     x_ppi = x_ppi.transpose(0, 2, 1)
     orig_shape = x_ppi.shape
     ppi_channels = x_ppi.shape[-1]
@@ -179,10 +180,17 @@ def pytables_collate_fn(batch: tuple,
     if flowstats_scaler:
         x_flowstats[:, :len(FLOWSTATS_TO_SCALE)] = flowstats_scaler.transform(x_flowstats[:, :len(FLOWSTATS_TO_SCALE)])
 
+    other_fields_df = pd.DataFrame(other_fields) if len(other_fields) > 0 else pd.DataFrame()
+    for column in other_fields_df.columns:
+        if other_fields_df[column].dtype.kind == "O":
+            other_fields_df[column] = other_fields_df[column].astype(str)
+        elif column.startswith("TIME_"):
+            other_fields_df[column] = other_fields_df[column].map(lambda x: datetime.fromtimestamp(x))
+
     labels = encoder.transform(np.where(np.isin(labels, known_apps), labels, UNKNOWN_STR_LABEL)).astype("int64") # type: ignore
     if return_torch:
-        return torch.from_numpy(x_ppi), torch.from_numpy(x_flowstats), torch.from_numpy(labels)
-    return x_ppi, x_flowstats, labels
+        return other_fields_df, torch.from_numpy(x_ppi), torch.from_numpy(x_flowstats), torch.from_numpy(labels)
+    return other_fields_df, x_ppi, x_flowstats, labels
 
 def init_train_indices(train_data_params: TrainDataParams, servicemap: pd.DataFrame, database_path: str, rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray, dict[int, str], dict[int, str]]:
     database, train_tables = load_database(database_path, tables_paths=train_data_params.train_tables_paths)

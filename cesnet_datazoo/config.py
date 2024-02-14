@@ -140,6 +140,7 @@ class DatasetConfig():
         database_path: Taken from the dataset instance
         servicemap_path: Taken from the dataset instance
         flowstats_features: Taken from `dataset.metadata.flowstats_features`
+        other_fields: Taken from `dataset.metadata.other_fields` if `return_other_fields` is true, otherwise an empty list
 
     # Configuration options
 
@@ -179,7 +180,7 @@ class DatasetConfig():
         train_dataloader_order: Whether to load train data in sequential or random order. `Default: RANDOM`
         train_dataloader_seed: Seed for loading train data in random order. `Default: None`
 
-        return_ips: Use for IP-based classification. Dataloaders will return data in this tuple format `((SRC_IP, DST_IP, SRC_PORT, DST_PORT), LABELS)`. Dataframes are not available when this option is used. `Default: False`
+        return_other_fields: Whether to return [auxiliary fields][other-fields], such as communicating hosts, flow times, and more fields extracted from the ClientHello message. `Default: False`
         return_torch: Use for returning `torch.Tensor` from dataloaders. Dataframes are not available when this option is used. `Default: False`
         use_packet_histograms: Whether to use packet histogram features, if available in the dataset. `Default: True`
         normalize_packet_histograms: Whether to normalize packet histograms. If true, bins contain fractions instead of absolute numbers. `Default: True`
@@ -219,6 +220,7 @@ class DatasetConfig():
     database_path: str =  field(init=False)
     servicemap_path: str = field(init=False)
     flowstats_features: list[str] = field(init=False)
+    other_fields: list[str] = field(init=False)
 
     train_period_name: str = ""
     train_dates: list[str] = field(default_factory=list)
@@ -255,7 +257,7 @@ class DatasetConfig():
     train_dataloader_order: DataLoaderOrder = DataLoaderOrder.RANDOM
     train_dataloader_seed: Optional[int] = None
 
-    return_ips: bool = False
+    return_other_fields: bool = False
     return_torch: bool = False
     use_packet_histograms: bool = True
     normalize_packet_histograms: bool = True
@@ -280,6 +282,7 @@ class DatasetConfig():
         self.database_filename = dataset.database_filename
         self.database_path = dataset.database_path
         self.flowstats_features = dataset.metadata.flowstats_features
+        self.other_fields = dataset.metadata.other_fields if self.return_other_fields else []
 
         # Configure train dates
         if len(self.train_dates) > 0 and self.train_period_name == "":

@@ -53,25 +53,27 @@ Datasets with TLS over TCP traffic contain features indicating the presence of i
 | FLAG_{*F*}_REV   | Whether *F* flag was present in the reverse (server to client) direction                   | `use_tcp_features`              |
 
 ## Other fields
-Most of those fields are not yet available in the [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] class. To access them, create an instance of `cesnet_datazoo.pytables_data.pytables_dataset.PyTablesDataset` and set `return_all_fields` to true.
+Datasets contain auxiliary information about samples, such as communicating hosts, flow times, and more fields extracted from the ClientHello message. The [dataset metadata][metadata] page lists available fields in individual datasets. 
 
 | **Name**                | **Description**                                                                     | **Config options**              |
 |-------------------------|-------------------------------------------------------------------------------------|                                 |
-| ID                      | Per-dataset unique flow identifier                                                  |                                 |
-| TIME_FIRST              | Timestamp of the first packet in format *YYYY-MM-DDTHH-MM-SS.ffffff*                |                                 |
-| TIME_LAST               | Timestamp of the last packet in format *YYYY-MM-DDTHH-MM-SS.ffffff*                 |                                 |
-| SRC_IP                  | Source IP address                                                                   | `return_ips`                    |
-| DST_IP                  | Destination IP address                                                              | `return_ips`                    |
-| DST_ASN                 | Destination Autonomous System number                                                |                                 |
-| SRC_PORT                | Source port                                                                         | `return_ips`                    |
-| DST_PORT                | Destination port                                                                    | `return_ips`                    |
-| PROTOCOL                | Transport protocol                                                                  |                                 |
-| TLS_SNI / QUIC_SNI      | Server Name Indication domain                                                       |                                 |
-| TLS_JA3                 | JA3 fingerprint                                                                     |                                 |
-| QUIC_VERSION            | QUIC protocol version                                                               |                                 |
-| QUIC_USER_AGENT         | User agent string if available in the QUIC Initial Packet                           |                                 |
+| ID                      | Per-dataset unique flow identifier                                                  | `return_other_fields`           |
+| TIME_FIRST              | Timestamp of the first packet                                                       | `return_other_fields`           |
+| TIME_LAST               | Timestamp of the last packet                                                        | `return_other_fields`           |
+| SRC_IP                  | Source IP address                                                                   | `return_other_fields`           |
+| DST_IP                  | Destination IP address                                                              | `return_other_fields`           |
+| DST_ASN                 | Destination Autonomous System number                                                | `return_other_fields`           |
+| SRC_PORT                | Source port                                                                         | `return_other_fields`           |
+| DST_PORT                | Destination port                                                                    | `return_other_fields`           |
+| PROTOCOL                | Transport protocol                                                                  | `return_other_fields`           |
+| TLS_SNI / QUIC_SNI      | Server Name Indication domain                                                       | `return_other_fields`           |
+| TLS_JA3                 | JA3 fingerprint                                                                     | `return_other_fields`           |
+| QUIC_VERSION            | QUIC protocol version                                                               | `return_other_fields`           |
+| QUIC_USER_AGENT         | User agent string if available in the QUIC Initial Packet                           | `return_other_fields`           |
+<!-- 
 | APP                     | Web service label                                                                   |                                 |
-| CATEGORY                | Service category label                                                              |                                 |
+| CATEGORY                | Service category label                                                              |                                 | 
+-->
 
 ## Details about packet histograms and PPI
 Due to differences in implementation between packet sequences ([pstats.cpp](https://github.com/CESNET/ipfixprobe/blob/master/process/pstats.cpp)) and packet histogram ([phist.cpp](https://github.com/CESNET/ipfixprobe/blob/master/process/phists.cpp)) plugins of the ipfixprobe exporter, the number of packets in PPI and histograms can differ (even for flows shorter than 30 packets). The differences are summarized in the following table.
@@ -79,8 +81,8 @@ Note that this is related to TLS over TCP datasets.
 
 | *TLS over TCP datasets*                                       | Packet histograms | PPI sequence     | PACKETS and PACKET_REV |
 |---------------------------------------------------------------|-------------------|------------------|------------------------|
-| **Zero-length packets**<br>(without L4 payload, e.g. ACKs)   | Not included      | Not included     | Included               |
-| **Retransmissions**<br>(and out-of-order packets)            | Included          | Not included*\** | Included               |
+| **Zero-length packets**<br>(without L4 payload, e.g. ACKs)    | Not included      | Not included     | Included               |
+| **Retransmissions**<br>(and out-of-order packets)             | Included          | Not included*\** | Included               |
 | **Computed from**                                             | Entire flow       | First 30 packets | Entire flow            |
 
 **The implementation for the detection of TCP retransmissions and out-of-order packets is far from perfect. Packets with a non-increasing SEQ number are skipped.*

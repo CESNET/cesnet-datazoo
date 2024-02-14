@@ -28,8 +28,7 @@ from cesnet_datazoo.pytables_data.indices_setup import (IndicesTuple, compute_kn
                                                         init_or_load_val_indices,
                                                         subset_and_sort_indices)
 from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, fit_or_load_scalers,
-                                                           pytables_collate_fn,
-                                                           pytables_ip_collate_fn, worker_init_fn)
+                                                           pytables_collate_fn, worker_init_fn)
 from cesnet_datazoo.utils.class_info import ClassInfo, create_class_info
 from cesnet_datazoo.utils.download import resumable_download, simple_download
 from cesnet_datazoo.utils.random import RandomizedSection, get_fresh_random_generator
@@ -343,7 +342,10 @@ class CesnetDataset():
         train_dataloader.sampler.sampler = SequentialSampler(self.train_dataset)
         train_dataloader.sampler.drop_last = False
         feature_names = self.dataset_config.get_feature_names(flatten_ppi=flatten_ppi)
-        df = create_df_from_dataloader(dataloader=train_dataloader, feature_names=feature_names, flatten_ppi=flatten_ppi, silent=self.silent)
+        df = create_df_from_dataloader(dataloader=train_dataloader,
+                                       feature_names=feature_names,
+                                       flatten_ppi=flatten_ppi,
+                                       silent=self.silent)
         # Restore the original dataloader sampler and drop_last
         train_dataloader.sampler.sampler = self.train_dataloader_sampler
         train_dataloader.sampler.drop_last = self.train_dataloader_drop_last
@@ -368,7 +370,10 @@ class CesnetDataset():
         if len(self.val_dataset) > DATAFRAME_SAMPLES_WARNING_THRESHOLD:
             warnings.warn(f"Validation set has ({len(self.val_dataset)} samples), consider using get_val_dataloader() instead")
         feature_names = self.dataset_config.get_feature_names(flatten_ppi=flatten_ppi)
-        return create_df_from_dataloader(dataloader=self.get_val_dataloader(), feature_names=feature_names, flatten_ppi=flatten_ppi, silent=self.silent)
+        return create_df_from_dataloader(dataloader=self.get_val_dataloader(),
+                                         feature_names=feature_names,
+                                         flatten_ppi=flatten_ppi,
+                                         silent=self.silent)
 
     def get_test_df(self, flatten_ppi: bool = False) -> pd.DataFrame:
         """
@@ -394,7 +399,10 @@ class CesnetDataset():
         if len(self.test_dataset) > DATAFRAME_SAMPLES_WARNING_THRESHOLD:
             warnings.warn(f"Test set has ({len(self.test_dataset)} samples), consider using get_test_dataloader() instead")
         feature_names = self.dataset_config.get_feature_names(flatten_ppi=flatten_ppi)
-        return create_df_from_dataloader(dataloader=self.get_test_dataloader(), feature_names=feature_names, flatten_ppi=flatten_ppi, silent=self.silent)
+        return create_df_from_dataloader(dataloader=self.get_test_dataloader(),
+                                         feature_names=feature_names,
+                                         flatten_ppi=flatten_ppi,
+                                         silent=self.silent)
 
     def get_num_classes(self) -> int:
         """Returns the number of classes in the current configuration of the dataset."""
@@ -497,8 +505,6 @@ class CesnetDataset():
     def _check_before_dataframe(self, check_no_val: bool = False, check_no_test: bool = False) -> None:
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting a dataframe")
-        if self.dataset_config.return_ips:
-            raise ValueError("Dataframes are not available when return_ips is set. Use a dataloader instead.")
         if self.dataset_config.return_torch:
             raise ValueError("Dataframes are not available when return_torch is set. Use a dataloader instead.")
         if check_no_val and self.dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
@@ -586,7 +592,7 @@ class CesnetDataset():
             tables_paths=dataset_config._get_train_tables_paths(),
             indices=dataset_indices.train_indices,
             flowstats_features=dataset_config.flowstats_features,
-            return_ips=dataset_config.return_ips,)
+            other_fields=self.dataset_config.other_fields,)
         if dataset_config.no_test_set:
             test_dataset = None
         else:
@@ -596,40 +602,36 @@ class CesnetDataset():
                 tables_paths=dataset_config._get_test_tables_paths(),
                 indices=test_combined_indices,
                 flowstats_features=dataset_config.flowstats_features,
+                other_fields=self.dataset_config.other_fields,
                 preload=dataset_config.preload_test,
-                preload_blob=os.path.join(test_data_path, "preload", f"test_dataset-{dataset_config.test_known_size}-{dataset_config.test_unknown_size}.npz"),
-                return_ips=dataset_config.return_ips,)
+                preload_blob=os.path.join(test_data_path, "preload", f"test_dataset-{dataset_config.test_known_size}-{dataset_config.test_unknown_size}.npz"),)
         if dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
             val_dataset = None
         else:
             assert val_data_path is not None
             val_dataset = PyTablesDataset(
-            database_path=dataset_config.database_path,
-            tables_paths=dataset_config._get_train_tables_paths(),
-            indices=dataset_indices.val_known_indices,
-            flowstats_features=dataset_config.flowstats_features,
-            preload=True,
-            preload_blob=os.path.join(val_data_path, "preload", f"val_dataset-{dataset_config.val_known_size}.npz"),
-            return_ips=dataset_config.return_ips,)
-        # Create collate function
-        if dataset_config.return_ips:
-            collate_fn = pytables_ip_collate_fn
-        else:
-            collate_fn = partial(pytables_collate_fn, # type: ignore
-                flowstats_scaler=flowstats_scaler,
-                flowstats_quantiles=flowstats_quantiles,
-                psizes_scaler=psizes_scaler,
-                psizes_max=dataset_config.psizes_max,
-                ipt_scaler=ipt_scaler,
-                ipt_min=dataset_config.ipt_min,
-                ipt_max=dataset_config.ipt_max,
-                use_push_flags=dataset_config.use_push_flags,
-                use_packet_histograms=dataset_config.use_packet_histograms,
-                normalize_packet_histograms=dataset_config.normalize_packet_histograms,
-                zero_ppi_start=dataset_config.zero_ppi_start,
-                encoder=encoder,
-                known_apps=class_info.known_apps,
-                return_torch=dataset_config.return_torch,)
+                database_path=dataset_config.database_path,
+                tables_paths=dataset_config._get_train_tables_paths(),
+                indices=dataset_indices.val_known_indices,
+                flowstats_features=dataset_config.flowstats_features,
+                other_fields=self.dataset_config.other_fields,
+                preload=True,
+                preload_blob=os.path.join(val_data_path, "preload", f"val_dataset-{dataset_config.val_known_size}.npz"),)
+        collate_fn = partial(pytables_collate_fn,
+            flowstats_scaler=flowstats_scaler,
+            flowstats_quantiles=flowstats_quantiles,
+            psizes_scaler=psizes_scaler,
+            psizes_max=dataset_config.psizes_max,
+            ipt_scaler=ipt_scaler,
+            ipt_min=dataset_config.ipt_min,
+            ipt_max=dataset_config.ipt_max,
+            use_push_flags=dataset_config.use_push_flags,
+            use_packet_histograms=dataset_config.use_packet_histograms,
+            normalize_packet_histograms=dataset_config.normalize_packet_histograms,
+            zero_ppi_start=dataset_config.zero_ppi_start,
+            encoder=encoder,
+            known_apps=class_info.known_apps,
+            return_torch=dataset_config.return_torch,)
         self.class_info = class_info
         self.dataset_indices = dataset_indices
         self.train_dataset = train_dataset
