@@ -624,7 +624,7 @@ class CesnetDataset():
                 indices=dataset_indices.val_known_indices,
                 flowstats_features=dataset_config.flowstats_features,
                 other_fields=self.dataset_config.other_fields,
-                preload=True,
+                preload=dataset_config.preload_val,
                 preload_blob=os.path.join(val_data_path, "preload", f"val_dataset-{dataset_config.val_known_size}.npz"),)
         collate_fn = partial(pytables_collate_fn,
             flowstats_scaler=flowstats_scaler,
