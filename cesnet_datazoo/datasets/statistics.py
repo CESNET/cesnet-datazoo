@@ -100,8 +100,8 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
         feature_duration.append(duration)
         feature_packets_total.append(packets_total)
         feature_bytes_total.append(bytes_total)
-        packet_sizes_counter.update(ppi[:, SIZE_POS, :].flatten())
-        ipt_counter.update(ppi[:, IPT_POS, :].flatten())
+        packet_sizes_counter.update(ppi[:, SIZE_POS, :].flatten().astype(int))
+        ipt_counter.update(ppi[:, IPT_POS, :].flatten().astype(int))
         # Aggregating features for value_counts
         app_series = app_series.add(pd.Series(app).value_counts(), fill_value=0)
         # Grouping features per categories

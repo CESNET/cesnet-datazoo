@@ -183,6 +183,7 @@ class DatasetConfig():
 
         return_other_fields: Whether to return [auxiliary fields][other-fields], such as communicating hosts, flow times, and more fields extracted from the ClientHello message. `Default: False`
         return_torch: Use for returning `torch.Tensor` from dataloaders. Dataframes are not available when this option is used. `Default: False`
+        raw_output: Return raw output without data scaling, clipping, and normalization. `Default: False`
         use_packet_histograms: Whether to use packet histogram features, if available in the dataset. `Default: True`
         normalize_packet_histograms: Whether to normalize packet histograms. If true, bins contain fractions instead of absolute numbers. `Default: True`
         use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`
@@ -192,7 +193,7 @@ class DatasetConfig():
         flowstats_scaler: Which scaler to use for flow statistics. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: ROBUST`
         flowstats_clip: Quantile clip before the scaling of flow statistics. Should limit the influence of outliers. Set to `1` to disable. `Default: 0.99`
         psizes_scaler: Which scaler to use for packet sizes. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`
-        psizes_max: Max clip packet sizes before scaling. `Default: 1460`
+        psizes_max: Max clip packet sizes before scaling. `Default: 1500`
         ipt_scaler: Which scaler to use for inter-packet times. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`
         ipt_min: Min clip inter-packet times before scaling. `Default: 0`
         ipt_max: Max clip inter-packet times before scaling. `Default: 65000`
@@ -261,6 +262,7 @@ class DatasetConfig():
 
     return_other_fields: bool = False
     return_torch: bool = False
+    raw_output: bool = False
     use_packet_histograms: bool = True
     normalize_packet_histograms: bool = True
     use_tcp_features: bool = True
@@ -270,7 +272,7 @@ class DatasetConfig():
     flowstats_scaler: ScalerEnum = ScalerEnum.ROBUST
     flowstats_clip: float = 0.99
     psizes_scaler: ScalerEnum = ScalerEnum.STANDARD
-    psizes_max: int = 1460
+    psizes_max: int = 1500
     ipt_scaler: ScalerEnum = ScalerEnum.STANDARD
     ipt_min: int = 0
     ipt_max: int = 65000
@@ -348,6 +350,15 @@ class DatasetConfig():
             if not self.no_test_set and min(test_dates) <= max(val_dates):
                 warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last validation date ({max(val_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
         # Configure features
+        if self.raw_output:
+            self.normalize_packet_histograms = False
+            self.flowstats_scaler = ScalerEnum.NO_SCALER
+            self.flowstats_clip = 1.0
+            self.psizes_scaler = ScalerEnum.NO_SCALER
+            self.psizes_max = 1500
+            self.ipt_scaler = ScalerEnum.NO_SCALER
+            self.ipt_min = 0
+            self.ipt_max = 65000
         if dataset.metadata.protocol == Protocol.TLS and self.use_tcp_features:
             self.flowstats_features = self.flowstats_features + SELECTED_TCP_FLAGS
             if self.use_push_flags and "PUSH_FLAG" not in dataset.metadata.features_in_packet_sequences:
