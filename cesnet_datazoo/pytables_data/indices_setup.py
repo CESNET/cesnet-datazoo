@@ -96,7 +96,7 @@ def compute_unknown_app_counts(dataset_indices: IndicesTuple, database_enum: dic
     df = pd.DataFrame(data={"Validation": val_unknown_app_counts, "Test": test_unknown_app_counts}).fillna(0).astype("int64")
     return df
 
-def init_or_load_train_indices(dataset_config: DatasetConfig, servicemap: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, LabelEncoder, dict[int, str], dict[int, str]]:
+def init_or_load_train_indices(dataset_config: DatasetConfig, servicemap: pd.DataFrame, disable_indices_cache: bool) -> tuple[np.ndarray, np.ndarray, LabelEncoder, dict[int, str], dict[int, str]]:
     train_data_path = dataset_config._get_train_data_path()
     init_train_data(train_data_path)
     if not os.path.isfile(os.path.join(train_data_path, TRAIN_DATA_PARAMS_FILE)):
@@ -109,12 +109,13 @@ def init_or_load_train_indices(dataset_config: DatasetConfig, servicemap: pd.Dat
             rng=get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.INIT_TRAIN_INDICES))
         encoder = LabelEncoder().fit(list(known_apps_database_enum.values()))
         encoder.classes_ = np.append(encoder.classes_, UNKNOWN_STR_LABEL)
-        yaml_dump({k: str(v) if isinstance(v, Enum) else list(v) if isinstance(v, tuple) else v for k, v in dataclasses.asdict(train_data_params).items()}, os.path.join(train_data_path, TRAIN_DATA_PARAMS_FILE))
-        yaml_dump(known_apps_database_enum, os.path.join(train_data_path, "known_apps_database_enum.yaml"))
-        yaml_dump(unknown_apps_database_enum, os.path.join(train_data_path, "unknown_apps_database_enum.yaml"))
-        pickle_dump(encoder, os.path.join(train_data_path, "encoder.pickle"))
-        np.save(os.path.join(train_data_path, "train_known_indices.npy"), train_known_indices)
-        np.save(os.path.join(train_data_path, "train_unknown_indices.npy"), train_unknown_indices)
+        if not disable_indices_cache:
+            yaml_dump({k: str(v) if isinstance(v, Enum) else list(v) if isinstance(v, tuple) else v for k, v in dataclasses.asdict(train_data_params).items()}, os.path.join(train_data_path, TRAIN_DATA_PARAMS_FILE))
+            yaml_dump(known_apps_database_enum, os.path.join(train_data_path, "known_apps_database_enum.yaml"))
+            yaml_dump(unknown_apps_database_enum, os.path.join(train_data_path, "unknown_apps_database_enum.yaml"))
+            pickle_dump(encoder, os.path.join(train_data_path, "encoder.pickle"))
+            np.save(os.path.join(train_data_path, "train_known_indices.npy"), train_known_indices)
+            np.save(os.path.join(train_data_path, "train_unknown_indices.npy"), train_unknown_indices)
     else:
         known_apps_database_enum = yaml_load(os.path.join(train_data_path, "known_apps_database_enum.yaml"))
         unknown_apps_database_enum = yaml_load(os.path.join(train_data_path, "unknown_apps_database_enum.yaml"))
@@ -123,7 +124,7 @@ def init_or_load_train_indices(dataset_config: DatasetConfig, servicemap: pd.Dat
         train_unknown_indices = np.load(os.path.join(train_data_path, "train_unknown_indices.npy"))
     return train_known_indices, train_unknown_indices, encoder, known_apps_database_enum, unknown_apps_database_enum
 
-def init_or_load_val_indices(dataset_config: DatasetConfig, known_apps_database_enum: dict[int, str], unknown_apps_database_enum: dict[int, str]) -> tuple[np.ndarray, np.ndarray, str]:
+def init_or_load_val_indices(dataset_config: DatasetConfig, known_apps_database_enum: dict[int, str], unknown_apps_database_enum: dict[int, str], disable_indices_cache: bool) -> tuple[np.ndarray, np.ndarray, str]:
     val_data_params, val_data_path = dataset_config._get_val_data_params_and_path(known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
     init_test_data(val_data_path)
     if not os.path.isfile(os.path.join(val_data_path, TEST_DATA_PARAMS_FILE)):
@@ -131,15 +132,16 @@ def init_or_load_val_indices(dataset_config: DatasetConfig, known_apps_database_
         val_known_indices, val_unknown_indices = init_test_indices(test_data_params=val_data_params,
                                                                    database_path=dataset_config.database_path,
                                                                    rng=get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.INIT_VAL_INIDICES))
-        yaml_dump(dataclasses.asdict(val_data_params), os.path.join(val_data_path, TEST_DATA_PARAMS_FILE))
-        np.save(os.path.join(val_data_path, "val_known_indices.npy"), val_known_indices)
-        np.save(os.path.join(val_data_path, "val_unknown_indices.npy"), val_unknown_indices)
+        if not disable_indices_cache:
+            yaml_dump(dataclasses.asdict(val_data_params), os.path.join(val_data_path, TEST_DATA_PARAMS_FILE))
+            np.save(os.path.join(val_data_path, "val_known_indices.npy"), val_known_indices)
+            np.save(os.path.join(val_data_path, "val_unknown_indices.npy"), val_unknown_indices)
     else:
         val_known_indices = np.load(os.path.join(val_data_path, "val_known_indices.npu"))
         val_unknown_indices = np.load(os.path.join(val_data_path, "val_unknown_indices.npy"))
     return val_known_indices, val_unknown_indices, val_data_path
 
-def init_or_load_test_indices(dataset_config: DatasetConfig, known_apps_database_enum: dict[int, str], unknown_apps_database_enum: dict[int, str]) -> tuple[np.ndarray, np.ndarray, str]:
+def init_or_load_test_indices(dataset_config: DatasetConfig, known_apps_database_enum: dict[int, str], unknown_apps_database_enum: dict[int, str], disable_indices_cache: bool) -> tuple[np.ndarray, np.ndarray, str]:
     test_data_params, test_data_path = dataset_config._get_test_data_params_and_path(known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
     init_test_data(test_data_path)
     if not os.path.isfile(os.path.join(test_data_path, TEST_DATA_PARAMS_FILE)):
@@ -147,9 +149,10 @@ def init_or_load_test_indices(dataset_config: DatasetConfig, known_apps_database
         test_known_indices, test_unknown_indices = init_test_indices(test_data_params=test_data_params,
                                                                      database_path=dataset_config.database_path,
                                                                      rng=get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.INIT_TEST_INDICES))
-        yaml_dump(dataclasses.asdict(test_data_params), os.path.join(test_data_path, TEST_DATA_PARAMS_FILE))
-        np.save(os.path.join(test_data_path, "test_known_indices.npy"), test_known_indices)
-        np.save(os.path.join(test_data_path, "test_unknown_indices.npy"), test_unknown_indices)
+        if not disable_indices_cache:
+            yaml_dump(dataclasses.asdict(test_data_params), os.path.join(test_data_path, TEST_DATA_PARAMS_FILE))
+            np.save(os.path.join(test_data_path, "test_known_indices.npy"), test_known_indices)
+            np.save(os.path.join(test_data_path, "test_unknown_indices.npy"), test_unknown_indices)
     else:
         test_known_indices = np.load(os.path.join(test_data_path, "test_known_indices.npy"))
         test_unknown_indices = np.load(os.path.join(test_data_path, "test_unknown_indices.npy"))

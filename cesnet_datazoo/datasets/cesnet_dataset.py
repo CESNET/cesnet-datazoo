@@ -175,16 +175,17 @@ class CesnetDataset():
         for d in self.available_dates:
             self.time_periods[d] = [d]
 
-    def set_dataset_config_and_initialize(self, dataset_config: DatasetConfig) -> None:
+    def set_dataset_config_and_initialize(self, dataset_config: DatasetConfig, disable_indices_cache: bool = False) -> None:
         """
         Initialize train, validation, and test sets. Data cannot be accessed before calling this method.
 
         Parameters:
             dataset_config: Desired configuration of the dataset.
+            disable_indices_cache: Whether to disable caching of the dataset indices. This is useful when the dataset is used in many different configurations and you want to save disk space.
         """
         self.dataset_config = dataset_config
         self._clear()
-        self._initialize_train_val_test()
+        self._initialize_train_val_test(disable_indices_cache=disable_indices_cache)
 
     def get_train_dataloader(self) -> DataLoader:
         """
@@ -512,18 +513,23 @@ class CesnetDataset():
         if check_no_test and self.dataset_config.no_test_set:
             raise ValueError("Test dataframe is not available when no_test_set is true")
 
-    def _initialize_train_val_test(self) -> None:
+    def _initialize_train_val_test(self, disable_indices_cache: bool = False) -> None:
         assert self.dataset_config is not None
         dataset_config = self.dataset_config
         servicemap = pd.read_csv(dataset_config.servicemap_path, index_col="Tag")
         # Initialize train and test indices
-        train_indices, train_unknown_indices, encoder, known_apps_database_enum, unknown_apps_database_enum = init_or_load_train_indices(dataset_config=dataset_config, servicemap=servicemap)
+        train_indices, train_unknown_indices, encoder, known_apps_database_enum, unknown_apps_database_enum = init_or_load_train_indices(dataset_config=dataset_config,
+                                                                                                                                         servicemap=servicemap,
+                                                                                                                                         disable_indices_cache=disable_indices_cache,)
         if self.dataset_config.no_test_set:
             test_known_indices = np.empty((0,3), dtype=np.int64)
             test_unknown_indices = np.empty((0,3), dtype=np.int64)
             test_data_path = None
         else:
-            test_known_indices, test_unknown_indices, test_data_path = init_or_load_test_indices(dataset_config=dataset_config, known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
+            test_known_indices, test_unknown_indices, test_data_path = init_or_load_test_indices(dataset_config=dataset_config,
+                                                                                                 known_apps_database_enum=known_apps_database_enum,
+                                                                                                 unknown_apps_database_enum=unknown_apps_database_enum,
+                                                                                                 disable_indices_cache=disable_indices_cache,)
         # Date weight sampling of train indices
         if dataset_config.train_dates_weigths is not None:
             assert dataset_config.train_size != "all"
@@ -538,7 +544,10 @@ class CesnetDataset():
             train_indices = date_weight_sample_train_indices(dataset_config=dataset_config, train_indices=train_indices, num_samples=num_samples)
         # Obtain validation indices based on the selected approach
         if dataset_config.val_approach == ValidationApproach.VALIDATION_DATES:
-            val_known_indices, val_unknown_indices, val_data_path = init_or_load_val_indices(dataset_config=dataset_config, known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
+            val_known_indices, val_unknown_indices, val_data_path = init_or_load_val_indices(dataset_config=dataset_config,
+                                                                                             known_apps_database_enum=known_apps_database_enum,
+                                                                                             unknown_apps_database_enum=unknown_apps_database_enum,
+                                                                                             disable_indices_cache=disable_indices_cache,)
         elif dataset_config.val_approach == ValidationApproach.SPLIT_FROM_TRAIN:
             train_val_rng = get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.TRAIN_VAL_SPLIT)
             val_data_path = dataset_config._get_train_data_path()
