@@ -11,9 +11,14 @@ def simple_download(url: str, file_path: str):
 
 def resumable_download(url: str, file_path: str, chunk_size: int = 1024**2, silent: bool = False):
     r1 = requests.get(url, stream=True)
+    try:
+        r1.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print("The dataset hosting server is unreachable. Please contact us at https://github.com/CESNET/cesnet-datazoo/issues.")
+        raise e
+
     redirected_url = r1.url
     content_size = int(r1.headers["Content-Length"])
-
     if os.path.exists(file_path):
         temp_size = os.path.getsize(file_path)
     else:
