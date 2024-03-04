@@ -30,6 +30,7 @@ from cesnet_datazoo.pytables_data.indices_setup import (IndicesTuple, compute_kn
 from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, fit_or_load_scalers,
                                                            pytables_collate_fn, worker_init_fn)
 from cesnet_datazoo.utils.class_info import ClassInfo, create_class_info
+from cesnet_datazoo.pytables_data.data_scalers import fit_or_load_scalers
 from cesnet_datazoo.utils.download import resumable_download, simple_download
 from cesnet_datazoo.utils.random import RandomizedSection, get_fresh_random_generator
 
@@ -496,6 +497,7 @@ class CesnetDataset():
         self.flowstats_scaler = None
         self.psizes_scaler = None
         self.ipt_scaler = None
+        self.flowstats_quantiles = None
 
         self.train_dataloader = None
         self.train_dataloader_sampler = None
@@ -582,7 +584,7 @@ class CesnetDataset():
         # Create class info
         class_info = create_class_info(servicemap=servicemap, encoder=encoder, known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
         # Load or fit data scalers
-        flowstats_scaler, flowstats_quantiles, ipt_scaler, psizes_scaler = fit_or_load_scalers(dataset_config=dataset_config, train_indices=train_indices)
+        flowstats_scaler, psizes_scaler, ipt_scaler, flowstats_quantiles = fit_or_load_scalers(dataset_config=dataset_config, train_indices=train_indices)
         # Subset dataset indices based on the selected sizes and compute application counts
         dataset_indices = IndicesTuple(train_indices=train_indices, val_known_indices=val_known_indices, val_unknown_indices=val_unknown_indices, test_known_indices=test_known_indices, test_unknown_indices=test_unknown_indices)
         dataset_indices = subset_and_sort_indices(dataset_config=dataset_config, dataset_indices=dataset_indices)
