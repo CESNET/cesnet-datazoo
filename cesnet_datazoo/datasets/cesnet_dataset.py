@@ -15,11 +15,13 @@ from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import BatchSampler, DataLoader, RandomSampler, Sampler, SequentialSampler
 from typing_extensions import assert_never
 
-from cesnet_datazoo.config import DataLoaderOrder, DatasetConfig, Scaler, ValidationApproach
-from cesnet_datazoo.constants import DATASET_SIZES, INDICES_LABEL_POS, SERVICEMAP_FILE
+from cesnet_datazoo.config import DataLoaderOrder, DatasetConfig, ValidationApproach
+from cesnet_datazoo.constants import (DATASET_SIZES, INDICES_LABEL_POS, SERVICEMAP_FILE,
+                                      UNKNOWN_STR_LABEL)
 from cesnet_datazoo.datasets.loaders import create_df_from_dataloader
 from cesnet_datazoo.datasets.metadata.dataset_metadata import DatasetMetadata, load_metadata
 from cesnet_datazoo.datasets.statistics import compute_dataset_statistics
+from cesnet_datazoo.pytables_data.data_scalers import fit_scalers
 from cesnet_datazoo.pytables_data.indices_setup import (IndicesTuple, compute_known_app_counts,
                                                         compute_unknown_app_counts,
                                                         date_weight_sample_train_indices,
@@ -27,10 +29,8 @@ from cesnet_datazoo.pytables_data.indices_setup import (IndicesTuple, compute_kn
                                                         init_or_load_train_indices,
                                                         init_or_load_val_indices,
                                                         subset_and_sort_indices)
-from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, fit_or_load_scalers,
-                                                           pytables_collate_fn, worker_init_fn)
+from cesnet_datazoo.pytables_data.pytables_dataset import PyTablesDataset, worker_init_fn
 from cesnet_datazoo.utils.class_info import ClassInfo, create_class_info
-from cesnet_datazoo.pytables_data.data_scalers import fit_or_load_scalers
 from cesnet_datazoo.utils.download import resumable_download, simple_download
 from cesnet_datazoo.utils.random import RandomizedSection, get_fresh_random_generator
 
@@ -92,17 +92,17 @@ class CesnetDataset():
         unknown_app_counts: Unknown application counts in the validation and test sets.
         collate_fn: Collate function used for creating batches in dataloaders.
         encoder: Scikit-learn [`LabelEncoder`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html) used to encode class names into integers. It is fitted during the initialization of the dataset.
-        flowstats_scaler: Scaler for flow statistics. It is fitted during the initialization of the dataset.
-        psizes_scaler: Scaler for packet sizes.
-        ipt_scaler: Scaler for inter-packet times.
         train_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for training.
         train_dataloader_sampler: Sampler used for iterating the training dataloader. Either [`RandomSampler`](https://pytorch.org/docs/stable/data.html#torch.utils.data.RandomSampler) or [`SequentialSampler`](https://pytorch.org/docs/stable/data.html#torch.utils.data.SequentialSampler).
+        train_dataloader_drop_last: Whether to drop the last incomplete batch when iterating the training dataloader.
         val_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for validation.
         test_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for testing.
     """
-    name: str
-    size: str
     data_root: str
+    size: str
+    silent: bool = False
+
+    name: str
     database_filename: str
     database_path: str
     servicemap_path: str
@@ -111,10 +111,9 @@ class CesnetDataset():
     metadata: DatasetMetadata
     available_dates: list[str]
     time_periods: dict[str, list[str]]
+    time_periods_gen: bool = False
     default_train_period_name: str
     default_test_period_name: str
-    time_periods_gen: bool = False
-    silent: bool = False
 
     dataset_config: Optional[DatasetConfig] = None
     class_info: Optional[ClassInfo] = None
@@ -126,13 +125,8 @@ class CesnetDataset():
     unknown_apps_database_enum: Optional[dict[int, str]] = None
     known_app_counts: Optional[pd.DataFrame] = None
     unknown_app_counts: Optional[pd.DataFrame] = None
-
     collate_fn: Optional[Callable] = None
     encoder: Optional[LabelEncoder] = None
-    flowstats_scaler: Scaler = None
-    psizes_scaler: Scaler = None
-    ipt_scaler: Scaler = None
-
     train_dataloader: Optional[DataLoader] = None
     train_dataloader_sampler: Optional[Sampler] = None
     train_dataloader_drop_last: bool = True
@@ -434,12 +428,12 @@ class CesnetDataset():
             batch_size: Number of samples per batch for loading data.
             disabled_apps: List of applications to exclude from the statistics.
         """
-        flowstats_features = self.metadata.flowstats_features + self.metadata.packet_histogram_features + self.metadata.tcp_features
         if not os.path.exists(self.statistics_path):
             os.mkdir(self.statistics_path)
         compute_dataset_statistics(database_path=self.database_path,
                                    output_dir=self.statistics_path,
-                                   flowstats_features=flowstats_features,
+                                   packet_histograms=self.metadata.packet_histograms,
+                                   flowstats_features_boolean=self.metadata.flowstats_features_boolean,
                                    protocol=self.metadata.protocol,
                                    extra_fields=not self.name.startswith("CESNET-TLS22"),
                                    disabled_apps=disabled_apps if disabled_apps is not None else [],
@@ -491,14 +485,8 @@ class CesnetDataset():
         self.unknown_apps_database_enum = None
         self.known_app_counts = None
         self.unknown_app_counts = None
-
         self.collate_fn = None
         self.encoder = None
-        self.flowstats_scaler = None
-        self.psizes_scaler = None
-        self.ipt_scaler = None
-        self.flowstats_quantiles = None
-
         self.train_dataloader = None
         self.train_dataloader_sampler = None
         self.train_dataloader_drop_last = True
@@ -508,8 +496,8 @@ class CesnetDataset():
     def _check_before_dataframe(self, check_no_val: bool = False, check_no_test: bool = False) -> None:
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting a dataframe")
-        if self.dataset_config.return_torch:
-            raise ValueError("Dataframes are not available when return_torch is set. Use a dataloader instead.")
+        if self.dataset_config.return_tensors:
+            raise ValueError("Dataframes are not available when return_tensors is set. Use a dataloader instead.")
         if check_no_val and self.dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
             raise ValueError("Validation dataframe is not available when using no-validation")
         if check_no_test and self.dataset_config.no_test_set:
@@ -583,8 +571,10 @@ class CesnetDataset():
 
         # Create class info
         class_info = create_class_info(servicemap=servicemap, encoder=encoder, known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
-        # Load or fit data scalers
-        flowstats_scaler, psizes_scaler, ipt_scaler, flowstats_quantiles = fit_or_load_scalers(dataset_config=dataset_config, train_indices=train_indices)
+        # Fit scalers if needed
+        if (dataset_config.ppi_transform is not None and dataset_config.ppi_transform.needs_fitting or
+            dataset_config.flowstats_transform is not None and dataset_config.flowstats_transform.needs_fitting):
+            fit_scalers(dataset_config=dataset_config, train_indices=train_indices)
         # Subset dataset indices based on the selected sizes and compute application counts
         dataset_indices = IndicesTuple(train_indices=train_indices, val_known_indices=val_known_indices, val_unknown_indices=val_unknown_indices, test_known_indices=test_known_indices, test_unknown_indices=test_unknown_indices)
         dataset_indices = subset_and_sort_indices(dataset_config=dataset_config, dataset_indices=dataset_indices)
@@ -597,13 +587,22 @@ class CesnetDataset():
         else:
             test_combined_indices = dataset_indices.test_known_indices
 
+        encode_labels_with_unknown_fn = partial(_encode_labels_with_unknown, encoder=encoder, class_info=class_info)
         # Create train, validation, and test datasets
         train_dataset = PyTablesDataset(
             database_path=dataset_config.database_path,
             tables_paths=dataset_config._get_train_tables_paths(),
             indices=dataset_indices.train_indices,
             flowstats_features=dataset_config.flowstats_features,
-            other_fields=self.dataset_config.other_fields,)
+            flowstats_features_boolean=dataset_config.flowstats_features_boolean,
+            flowstats_features_phist=dataset_config.flowstats_features_phist,
+            other_fields=self.dataset_config.other_fields,
+            ppi_channels=dataset_config.get_ppi_channels(),
+            ppi_transform=dataset_config.ppi_transform,
+            flowstats_transform=dataset_config.flowstats_transform,
+            flowstats_phist_transform=dataset_config.flowstats_phist_transform,
+            target_transform=encode_labels_with_unknown_fn,
+            return_tensors=dataset_config.return_tensors,)
         if dataset_config.no_test_set:
             test_dataset = None
         else:
@@ -613,7 +612,15 @@ class CesnetDataset():
                 tables_paths=dataset_config._get_test_tables_paths(),
                 indices=test_combined_indices,
                 flowstats_features=dataset_config.flowstats_features,
+                flowstats_features_boolean=dataset_config.flowstats_features_boolean,
+                flowstats_features_phist=dataset_config.flowstats_features_phist,
                 other_fields=self.dataset_config.other_fields,
+                ppi_channels=dataset_config.get_ppi_channels(),
+                ppi_transform=dataset_config.ppi_transform,
+                flowstats_transform=dataset_config.flowstats_transform,
+                flowstats_phist_transform=dataset_config.flowstats_phist_transform,
+                target_transform=encode_labels_with_unknown_fn,
+                return_tensors=dataset_config.return_tensors,
                 preload=dataset_config.preload_test,
                 preload_blob=os.path.join(test_data_path, "preload", f"test_dataset-{dataset_config.test_known_size}-{dataset_config.test_unknown_size}.npz"),)
         if dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
@@ -625,24 +632,17 @@ class CesnetDataset():
                 tables_paths=dataset_config._get_train_tables_paths(),
                 indices=dataset_indices.val_known_indices,
                 flowstats_features=dataset_config.flowstats_features,
+                flowstats_features_boolean=dataset_config.flowstats_features_boolean,
+                flowstats_features_phist=dataset_config.flowstats_features_phist,
                 other_fields=self.dataset_config.other_fields,
+                ppi_channels=dataset_config.get_ppi_channels(),
+                ppi_transform=dataset_config.ppi_transform,
+                flowstats_transform=dataset_config.flowstats_transform,
+                flowstats_phist_transform=dataset_config.flowstats_phist_transform,
+                target_transform=encode_labels_with_unknown_fn,
+                return_tensors=dataset_config.return_tensors,
                 preload=dataset_config.preload_val,
                 preload_blob=os.path.join(val_data_path, "preload", f"val_dataset-{dataset_config.val_known_size}.npz"),)
-        collate_fn = partial(pytables_collate_fn,
-            flowstats_scaler=flowstats_scaler,
-            flowstats_quantiles=flowstats_quantiles,
-            psizes_scaler=psizes_scaler,
-            psizes_max=dataset_config.psizes_max,
-            ipt_scaler=ipt_scaler,
-            ipt_min=dataset_config.ipt_min,
-            ipt_max=dataset_config.ipt_max,
-            use_push_flags=dataset_config.use_push_flags,
-            use_packet_histograms=dataset_config.use_packet_histograms,
-            normalize_packet_histograms=dataset_config.normalize_packet_histograms,
-            zero_ppi_start=dataset_config.zero_ppi_start,
-            encoder=encoder,
-            known_apps=class_info.known_apps,
-            return_torch=dataset_config.return_torch,)
         self.class_info = class_info
         self.dataset_indices = dataset_indices
         self.train_dataset = train_dataset
@@ -652,8 +652,11 @@ class CesnetDataset():
         self.unknown_apps_database_enum = unknown_apps_database_enum
         self.known_app_counts = known_app_counts
         self.unknown_app_counts = unknown_app_counts
-        self.collate_fn = collate_fn
+        self.collate_fn = _collate_fn_simple
         self.encoder = encoder
-        self.flowstats_scaler = flowstats_scaler
-        self.psizes_scaler = psizes_scaler
-        self.ipt_scaler = ipt_scaler
+
+def _encode_labels_with_unknown(labels, encoder: LabelEncoder, class_info: ClassInfo):
+    return encoder.transform(np.where(np.isin(labels, class_info.known_apps), labels, UNKNOWN_STR_LABEL))
+
+def _collate_fn_simple(batch):
+    return batch

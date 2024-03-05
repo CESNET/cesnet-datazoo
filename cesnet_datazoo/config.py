@@ -8,12 +8,11 @@ import warnings
 from dataclasses import InitVar, field
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Callable, Literal, Optional
 
 import yaml
 from pydantic import model_validator
 from pydantic.dataclasses import dataclass
-from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
 from cesnet_datazoo.constants import (PHIST_BIN_COUNT, PPI_MAX_LEN, SELECTED_TCP_FLAGS,
                                       TCP_PPI_CHANNELS, UDP_PPI_CHANNELS)
@@ -21,19 +20,6 @@ from cesnet_datazoo.constants import (PHIST_BIN_COUNT, PPI_MAX_LEN, SELECTED_TCP
 if TYPE_CHECKING:
     from cesnet_datazoo.datasets.cesnet_dataset import CesnetDataset
 
-Scaler = RobustScaler | StandardScaler | MinMaxScaler | None
-
-class ScalerEnum(Enum):
-    """Available scalers for flow statistics, packet sizes, and inter-packet times."""
-    STANDARD = "standard"
-    """Standardize features by removing the mean and scaling to unit variance - [`sklearn.preprocessing.StandardScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)."""
-    ROBUST = "robust"
-    """Robust scaling with the median and the interquartile range - [`sklearn.preprocessing.RobustScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html)."""
-    MINMAX = "minmax"
-    """Scaling to a (0, 1) range - [`sklearn.preprocessing.MinMaxScaler`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html)."""
-    NO_SCALER = "no-scaler"
-    """No scaling."""
-    def __str__(self): return self.value
 
 class Protocol(Enum):
     TLS = "TLS"
@@ -140,6 +126,8 @@ class DatasetConfig():
         database_path: Taken from the dataset instance
         servicemap_path: Taken from the dataset instance
         flowstats_features: Taken from `dataset.metadata.flowstats_features`
+        flowstats_features_boolean: Taken from `dataset.metadata.flowstats_features_boolean`
+        flowstats_features_phist: Taken from `dataset.metadata.packet_histograms` if `use_packet_histograms` is true, otherwise an empty list
         other_fields: Taken from `dataset.metadata.other_fields` if `return_other_fields` is true, otherwise an empty list
 
     # Configuration options
@@ -182,21 +170,14 @@ class DatasetConfig():
         train_dataloader_seed: Seed for loading train data in random order. `Default: None`
 
         return_other_fields: Whether to return [auxiliary fields][other-fields], such as communicating hosts, flow times, and more fields extracted from the ClientHello message. `Default: False`
-        return_torch: Use for returning `torch.Tensor` from dataloaders. Dataframes are not available when this option is used. `Default: False`
-        raw_output: Return raw output without data scaling, clipping, and normalization. `Default: False`
+        return_tensors: Use for returning `torch.Tensor` from dataloaders. Dataframes are not available when this option is used. `Default: False`
         use_packet_histograms: Whether to use packet histogram features, if available in the dataset. `Default: True`
-        normalize_packet_histograms: Whether to normalize packet histograms. If true, bins contain fractions instead of absolute numbers. `Default: True`
         use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`
         use_push_flags: Whether to use push flags in packet sequences, if available in the dataset. `Default: False`
-        zero_ppi_start: Zeroing out the first N packets of each packet sequence. `Default: 0`
         fit_scalers_samples: Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. `Default: 0.25`
-        flowstats_scaler: Which scaler to use for flow statistics. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: ROBUST`
-        flowstats_clip: Quantile clip before the scaling of flow statistics. Should limit the influence of outliers. Set to `1` to disable. `Default: 0.99`
-        psizes_scaler: Which scaler to use for packet sizes. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`
-        psizes_max: Max clip packet sizes before scaling. `Default: 1500`
-        ipt_scaler: Which scaler to use for inter-packet times. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`
-        ipt_min: Min clip inter-packet times before scaling. `Default: 0`
-        ipt_max: Max clip inter-packet times before scaling. `Default: 65000`
+        ppi_transform: Transform function for PPI sequences. `Default: None`
+        flowstats_transform: Transform function for flow statistics. `Default: None`
+        flowstats_phist_transform: Transform function for packet histograms. `Default: None`
 
     # How to configure train, validation, and test sets
     There are three options for how to define train/validation/test dates.
@@ -222,6 +203,8 @@ class DatasetConfig():
     database_path: str =  field(init=False)
     servicemap_path: str = field(init=False)
     flowstats_features: list[str] = field(init=False)
+    flowstats_features_boolean: list[str] = field(init=False)
+    flowstats_features_phist: list[str] = field(init=False)
     other_fields: list[str] = field(init=False)
 
     train_period_name: str = ""
@@ -261,21 +244,14 @@ class DatasetConfig():
     train_dataloader_seed: Optional[int] = None
 
     return_other_fields: bool = False
-    return_torch: bool = False
-    raw_output: bool = False
-    use_packet_histograms: bool = True
-    normalize_packet_histograms: bool = True
-    use_tcp_features: bool = True
+    return_tensors: bool = False
+    use_packet_histograms: bool = False
+    use_tcp_features: bool = False
     use_push_flags: bool = False
-    zero_ppi_start: int = 0
     fit_scalers_samples: int | float = 0.25
-    flowstats_scaler: ScalerEnum = ScalerEnum.ROBUST
-    flowstats_clip: float = 0.99
-    psizes_scaler: ScalerEnum = ScalerEnum.STANDARD
-    psizes_max: int = 1500
-    ipt_scaler: ScalerEnum = ScalerEnum.STANDARD
-    ipt_min: int = 0
-    ipt_max: int = 65000
+    ppi_transform: Optional[Callable] = None
+    flowstats_transform: Optional[Callable] = None
+    flowstats_phist_transform: Optional[Callable] = None
 
     def __post_init__(self, dataset: CesnetDataset):
         """
@@ -285,8 +261,6 @@ class DatasetConfig():
         self.servicemap_path = dataset.servicemap_path
         self.database_filename = dataset.database_filename
         self.database_path = dataset.database_path
-        self.flowstats_features = dataset.metadata.flowstats_features
-        self.other_fields = dataset.metadata.other_fields if self.return_other_fields else []
 
         # Configure train dates
         if len(self.train_dates) > 0 and self.train_period_name == "":
@@ -350,26 +324,25 @@ class DatasetConfig():
             if not self.no_test_set and min(test_dates) <= max(val_dates):
                 warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last validation date ({max(val_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
         # Configure features
-        if self.raw_output:
-            self.normalize_packet_histograms = False
-            self.flowstats_scaler = ScalerEnum.NO_SCALER
-            self.flowstats_clip = 1.0
-            self.psizes_scaler = ScalerEnum.NO_SCALER
-            self.psizes_max = 1500
-            self.ipt_scaler = ScalerEnum.NO_SCALER
-            self.ipt_min = 0
-            self.ipt_max = 65000
-        if dataset.metadata.protocol == Protocol.TLS and self.use_tcp_features:
-            self.flowstats_features = self.flowstats_features + SELECTED_TCP_FLAGS
-            if self.use_push_flags and "PUSH_FLAG" not in dataset.metadata.features_in_packet_sequences:
-                raise ValueError("This TLS dataset does not support use_push_flags")
+        self.flowstats_features = dataset.metadata.flowstats_features
+        self.flowstats_features_boolean = dataset.metadata.flowstats_features_boolean
+        self.other_fields = dataset.metadata.other_fields if self.return_other_fields else []
         if self.use_packet_histograms:
-            if len(dataset.metadata.packet_histogram_features) > 0:
-                self.flowstats_features = self.flowstats_features + dataset.metadata.packet_histogram_features
-            else:
-                self.use_packet_histograms = False
+            if len(dataset.metadata.packet_histograms) == 0:
+                raise ValueError("This dataset does not support use_packet_histograms")
+            self.flowstats_features_phist = dataset.metadata.packet_histograms
+        else:
+            self.flowstats_features_phist = []
+            if self.flowstats_phist_transform is not None:
+                raise ValueError("flowstats_phist_transform cannot be specified when use_packet_histograms is false")
+        if dataset.metadata.protocol == Protocol.TLS:
+            if self.use_tcp_features:
+                self.flowstats_features_boolean = self.flowstats_features_boolean + SELECTED_TCP_FLAGS
+            if self.use_push_flags and "PUSH_FLAG" not in dataset.metadata.ppi_features:
+                raise ValueError("This TLS dataset does not support use_push_flags")
         if dataset.metadata.protocol == Protocol.QUIC:
-            self.use_tcp_features = False
+            if self.use_tcp_features:
+                raise ValueError("QUIC datasets do not support use_tcp_features")
             if self.use_push_flags:
                 raise ValueError("QUIC datasets do not support use_push_flags")
         # When train_dates_weigths are used, train_size and val_known_size have to be specified
@@ -400,43 +373,44 @@ class DatasetConfig():
         if sum((self.apps_selection_topx != 0, len(self.apps_selection_explicit_unknown) > 0, self.apps_selection_fixed_longterm is not None)) > 1:
             raise ValueError("apps_selection_topx, apps_selection_explicit_unknown, and apps_selection_fixed_longterm should not be specified at the same time")
         # More asserts
-        if self.zero_ppi_start > PPI_MAX_LEN:
-            raise ValueError(f"zero_ppi_start has to be <= {PPI_MAX_LEN}")
         if isinstance(self.fit_scalers_samples, float) and (self.fit_scalers_samples <= 0 or self.fit_scalers_samples > 1):
             raise ValueError("fit_scalers_samples has to be either float between 0 and 1 (giving the fraction of training samples used for fitting scalers) or an integer")
 
     def get_flowstats_features_len(self) -> int:
         """Gets the number of flow statistics features."""
-        n = 0
-        for f in self.flowstats_features:
-            if f.startswith("PHIST_"):
-                n += PHIST_BIN_COUNT
-            else:
-                n += 1
-        return n
+        return len(self.flowstats_features) + len(self.flowstats_features_boolean) + PHIST_BIN_COUNT * len(self.flowstats_features_phist)
 
     def get_flowstats_feature_names_expanded(self, shorter_names: bool = False) -> list[str]:
         """Gets names of flow statistics features. Packet histograms are expanded into bin features."""
-        name_mapping = {
+        phist_mapping = {
             "PHIST_SRC_SIZES": [f"PSIZE_BIN{i}" for i in range(1, PHIST_BIN_COUNT + 1)],
             "PHIST_DST_SIZES": [f"PSIZE_BIN{i}_REV" for i in range(1, PHIST_BIN_COUNT + 1)],
             "PHIST_SRC_IPT": [f"IPT_BIN{i}" for i in range(1, PHIST_BIN_COUNT + 1)],
             "PHIST_DST_IPT": [f"IPT_BIN{i}_REV" for i in range(1, PHIST_BIN_COUNT + 1)],
-            "FLOW_ENDREASON_IDLE": "FEND_IDLE" if shorter_names else "FLOW_ENDREASON_IDLE",
-            "FLOW_ENDREASON_ACTIVE": "FEND_ACTIVE" if shorter_names else "FLOW_ENDREASON_ACTIVE",
-            "FLOW_ENDREASON_END": "FEND_END" if shorter_names else "FLOW_ENDREASON_END",
-            "FLOW_ENDREASON_OTHER": "FEND_OTHER" if shorter_names else "FLOW_ENDREASON_OTHER",
         }
-        feature_names = []
-        for f in self.flowstats_features:
-            if f not in name_mapping:
-                if shorter_names and f.startswith("FLAG"):
-                    f = "F" + f.lstrip("FLAG")
-                feature_names.append(f)
-            elif isinstance(name_mapping[f], list):
-                feature_names.extend(name_mapping[f])
+        short_names_mapping = {
+            "FLOW_ENDREASON_IDLE": "FEND_IDLE",
+            "FLOW_ENDREASON_ACTIVE": "FEND_ACTIVE",
+            "FLOW_ENDREASON_END": "FEND_END",
+            "FLOW_ENDREASON_OTHER": "FEND_OTHER",
+            "FLAG_CWR": "F_CWR",
+            "FLAG_CWR_REV": "F_CWR_REV",
+            "FLAG_ECE": "F_ECE",
+            "FLAG_ECE_REV": "F_ECE_REV",
+            "FLAG_PSH_REV": "F_PSH_REV",
+            "FLAG_RST": "F_RST",
+            "FLAG_RST_REV": "F_RST_REV",
+            "FLAG_FIN": "F_FIN",
+            "FLAG_FIN_REV": "F_FIN_REV",
+        }
+        feature_names = self.flowstats_features[:]
+        for f in self.flowstats_features_boolean:
+            if shorter_names and f in short_names_mapping:
+                feature_names.append(short_names_mapping[f])
             else:
-                feature_names.append(name_mapping[f])
+                feature_names.append(f)
+        for f in self.flowstats_features_phist:
+            feature_names.extend(phist_mapping[f])
         assert len(feature_names) == self.get_flowstats_features_len()
         return feature_names
 
@@ -449,7 +423,7 @@ class DatasetConfig():
             ppi_feature_names += [f"PUSH_{i}" for i in range(1, PPI_MAX_LEN + 1)]
         return ppi_feature_names
 
-    def get_ppi_channels(self) -> int:
+    def get_ppi_channels(self) -> list[int]:
         """Gets the number of features (channels) in PPI."""
         if self.use_push_flags:
             return TCP_PPI_CHANNELS
@@ -526,7 +500,7 @@ class DatasetConfig():
         test_data_path = os.path.join(self.data_root, "test-data", f"{params_hash}_{self.random_state}")
         return test_data_params, test_data_path
 
-    @model_validator(mode="before")
+    @model_validator(mode="before") # type: ignore
     @classmethod
     def check_deprecated_args(cls, values):
         kwargs = values.kwargs

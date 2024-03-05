@@ -4,45 +4,47 @@ import os
 import time
 import warnings
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import numpy as np
 import pandas as pd
 import tables as tb
 import torch
-from numpy.lib.recfunctions import drop_fields, structured_to_unstructured
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler, RobustScaler, StandardScaler
+from numpy.lib.recfunctions import structured_to_unstructured
 from torch.utils.data import Dataset
 from typing_extensions import assert_never
 
-from cesnet_datazoo.config import (AppSelection, DatasetConfig, MinTrainSamplesCheck, Scaler,
-                                   ScalerEnum, TestDataParams, TrainDataParams)
-from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, DIR_POS, FLOWSTATS_NO_CLIP,
-                                      FLOWSTATS_TO_SCALE, INDICES_INDEX_POS, INDICES_TABLE_POS,
-                                      IPT_POS, PHIST_BIN_COUNT, PHISTS_FEATURES, PPI_COLUMN,
-                                      SIZE_POS, UNKNOWN_STR_LABEL)
+from cesnet_datazoo.config import (AppSelection, MinTrainSamplesCheck, TestDataParams,
+                                   TrainDataParams)
+from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, INDICES_INDEX_POS,
+                                      INDICES_TABLE_POS, PPI_COLUMN)
 from cesnet_datazoo.pytables_data.apps_split import (is_background_app,
                                                      split_apps_topx_with_provider_groups)
-from cesnet_datazoo.utils.fileutils import pickle_dump, pickle_load
-from cesnet_datazoo.utils.random import RandomizedSection, get_fresh_random_generator
 
 log = logging.getLogger(__name__)
 
 
 class PyTablesDataset(Dataset):
-    def __init__(self, database_path: str,
+    def __init__(self,
+                 database_path: str,
                  tables_paths: list[str],
                  indices: Optional[np.ndarray],
                  flowstats_features: list[str],
-                 other_fields: Optional[list[str]] = None,
+                 flowstats_features_boolean: list[str],
+                 flowstats_features_phist: list[str],
+                 other_fields: list[str],
+                 ppi_channels: list[int],
+                 ppi_transform: Optional[Callable] = None,
+                 flowstats_transform: Optional[Callable] = None,
+                 flowstats_phist_transform: Optional[Callable] = None,
+                 target_transform: Optional[Callable] = None,
+                 return_tensors: bool = False,
                  preload: bool = False, preload_blob: Optional[str] = None,
                  disabled_apps: Optional[list[str]] = None,
                  return_all_fields: bool = False,):
         self.database_path = database_path
         self.tables_paths = tables_paths
         self.tables = {}
-        self.flowstats_features = flowstats_features
-        self.other_fields = other_fields if other_fields is not None else []
         self.preload = preload
         self.preload_blob = preload_blob
         self.return_all_fields = return_all_fields
@@ -50,16 +52,63 @@ class PyTablesDataset(Dataset):
             self.set_all_indices(disabled_apps=disabled_apps)
         else:
             self.indices = indices
+        self.flowstats_features = flowstats_features
+        self.flowstats_features_boolean = flowstats_features_boolean
+        self.flowstats_features_phist = flowstats_features_phist
+        self.other_fields = other_fields
+        self.ppi_channels = ppi_channels
+        self.ppi_transform = ppi_transform
+        self.flowstats_transform = flowstats_transform
+        self.flowstats_phist_transform = flowstats_phist_transform
+        self.target_transform = target_transform
+        self.return_tensors = return_tensors
 
     def __getitem__(self, batch_idx):
         # log.debug(f"worker {self.worker_id}: __getitem__")
         if self.preload:
             batch_data = self.data[batch_idx]
         else:
-            batch_data = load_data_from_pytables(tables=self.tables, indices=self.indices[batch_idx], data_dtype=self.data_dtype)
+            batch_data = load_data_from_tables(tables=self.tables, indices=self.indices[batch_idx], data_dtype=self.data_dtype)
         if self.return_all_fields:
             return (batch_data, batch_idx)
-        return_data = (batch_data[self.other_fields], batch_data[PPI_COLUMN].astype("float32"), batch_data[self.flowstats_features], list(map(self.app_enum, batch_data[APP_COLUMN])))
+
+        # Prepare data
+        x_ppi = batch_data[PPI_COLUMN].astype("float32")
+        x_ppi = x_ppi[:, self.ppi_channels, :]
+        x_flowstats = structured_to_unstructured(batch_data[self.flowstats_features], dtype="float32")
+        if self.flowstats_features_boolean:
+            x_flowstats_boolean = structured_to_unstructured(batch_data[self.flowstats_features_boolean], dtype="float32")
+        else:
+            x_flowstats_boolean = np.empty(shape=(x_flowstats.shape[0], 0), dtype="float32")
+        if self.flowstats_features_phist:
+            x_flowstats_phist = structured_to_unstructured(batch_data[self.flowstats_features_phist], dtype="float32")
+        else:
+            x_flowstats_phist = np.empty(shape=(x_flowstats.shape[0], 0), dtype="float32")
+        # Feature transformations
+        if self.ppi_transform:
+            x_ppi = self.ppi_transform(x_ppi)
+        if self.flowstats_transform:
+            x_flowstats = self.flowstats_transform(x_flowstats)
+        if self.flowstats_phist_transform:
+            x_flowstats_phist = self.flowstats_phist_transform(x_flowstats_phist)
+        x_flowstats = np.concatenate([x_flowstats, x_flowstats_boolean, x_flowstats_phist], axis=1).astype("float32")
+        # Labels transformation
+        labels = list(map(self.app_enum, batch_data[APP_COLUMN]))
+        if self.target_transform:
+            labels = self.target_transform(labels)
+        # Prepare dataframe with other fields
+        other_fields_df = pd.DataFrame(batch_data[self.other_fields]) if len(self.other_fields) > 0 else pd.DataFrame()
+        for column in other_fields_df.columns:
+            if other_fields_df[column].dtype.kind == "O":
+                other_fields_df[column] = other_fields_df[column].astype(str)
+            elif column.startswith("TIME_"):
+                other_fields_df[column] = other_fields_df[column].map(lambda x: datetime.fromtimestamp(x))
+        
+        if self.return_tensors:
+            x_ppi = torch.from_numpy(x_ppi)
+            x_flowstats = torch.from_numpy(x_flowstats)
+            labels = torch.from_numpy(labels).long() # PyTorch loss functions require long type for labels
+        return_data = (other_fields_df, x_ppi, x_flowstats, labels)
         return return_data
 
     def __len__(self):
@@ -82,7 +131,7 @@ class PyTablesDataset(Dataset):
                 except:
                     pass # ignore if the file is corrupted (or being written at the moment)
             if data is None:
-                data = load_data_from_pytables(tables=self.tables, indices=self.indices, data_dtype=self.data_dtype)
+                data = load_data_from_tables(tables=self.tables, indices=self.indices, data_dtype=self.data_dtype)
             self.data = data
             if self.preload_blob and not os.path.isfile(self.preload_blob):
                 np.savez_compressed(self.preload_blob, data=self.data)
@@ -136,61 +185,6 @@ def worker_init_fn(worker_id):
     worker_info = torch.utils.data.get_worker_info() # type: ignore
     dataset = worker_info.dataset
     dataset.pytables_worker_init(worker_id)
-
-def pytables_collate_fn(batch: tuple,
-                        flowstats_scaler: Scaler, flowstats_quantiles: pd.Series,
-                        psizes_scaler: Scaler, psizes_max: int,
-                        ipt_scaler: Scaler, ipt_min: int, ipt_max: int,
-                        use_push_flags: bool, use_packet_histograms: bool, normalize_packet_histograms: bool, zero_ppi_start: int,
-                        encoder: LabelEncoder, known_apps: list[str], return_torch: bool = False):
-    other_fields, x_ppi, x_flowstats, labels = batch
-    x_ppi = x_ppi.transpose(0, 2, 1)
-    orig_shape = x_ppi.shape
-    ppi_channels = x_ppi.shape[-1]
-    x_ppi = x_ppi.reshape(-1, ppi_channels)
-    x_ppi[:, IPT_POS] = x_ppi[:, IPT_POS].clip(max=ipt_max, min=ipt_min)
-    x_ppi[:, SIZE_POS] = x_ppi[:, SIZE_POS].clip(max=psizes_max, min=1)
-    padding_mask = x_ppi[:, DIR_POS] == 0 # mask of zero padding
-    if ipt_scaler:
-        x_ppi[:, IPT_POS] = ipt_scaler.transform(x_ppi[:, IPT_POS].reshape(-1, 1)).reshape(-1) # type: ignore
-    if psizes_scaler:
-        x_ppi[:, SIZE_POS] = psizes_scaler.transform(x_ppi[:, SIZE_POS].reshape(-1, 1)).reshape(-1) # type: ignore
-    x_ppi[padding_mask, IPT_POS] = 0
-    x_ppi[padding_mask, SIZE_POS] = 0
-    x_ppi = x_ppi.reshape(orig_shape).transpose(0, 2, 1)
-    if not use_push_flags:
-        x_ppi = x_ppi[:, (IPT_POS, DIR_POS, SIZE_POS), :]
-    if zero_ppi_start > 0:
-        x_ppi[:,:,:zero_ppi_start] = 0
-
-    if use_packet_histograms:
-        x_phist = structured_to_unstructured(x_flowstats[PHISTS_FEATURES], dtype="float32")
-        if normalize_packet_histograms:
-            src_sizes_pkt_count = x_phist[:, :PHIST_BIN_COUNT].sum(axis=1)[:, np.newaxis]
-            dst_sizes_pkt_count = x_phist[:, PHIST_BIN_COUNT:(2*PHIST_BIN_COUNT)].sum(axis=1)[:, np.newaxis]
-            np.divide(x_phist[:, :PHIST_BIN_COUNT], src_sizes_pkt_count, out=x_phist[:, :PHIST_BIN_COUNT], where=src_sizes_pkt_count != 0)
-            np.divide(x_phist[:, PHIST_BIN_COUNT:(2*PHIST_BIN_COUNT)], dst_sizes_pkt_count, out=x_phist[:, PHIST_BIN_COUNT:(2*PHIST_BIN_COUNT)], where=dst_sizes_pkt_count != 0)
-            np.divide(x_phist[:, (2*PHIST_BIN_COUNT):(3*PHIST_BIN_COUNT)], src_sizes_pkt_count - 1, out=x_phist[:, (2*PHIST_BIN_COUNT):(3*PHIST_BIN_COUNT)], where=src_sizes_pkt_count > 1)
-            np.divide(x_phist[:, (3*PHIST_BIN_COUNT):(4*PHIST_BIN_COUNT)], dst_sizes_pkt_count - 1, out=x_phist[:, (3*PHIST_BIN_COUNT):(4*PHIST_BIN_COUNT)], where=dst_sizes_pkt_count > 1)
-        x_flowstats = structured_to_unstructured(drop_fields(x_flowstats, PHISTS_FEATURES), dtype="float32")
-        x_flowstats = np.concatenate([x_flowstats, x_phist], axis=1)
-    else:
-        x_flowstats = structured_to_unstructured(x_flowstats, dtype="float32")
-    np.clip(x_flowstats[:, :len(FLOWSTATS_TO_SCALE)], a_max=flowstats_quantiles, a_min=0, out=x_flowstats[:, :len(FLOWSTATS_TO_SCALE)])
-    if flowstats_scaler:
-        x_flowstats[:, :len(FLOWSTATS_TO_SCALE)] = flowstats_scaler.transform(x_flowstats[:, :len(FLOWSTATS_TO_SCALE)])
-
-    other_fields_df = pd.DataFrame(other_fields) if len(other_fields) > 0 else pd.DataFrame()
-    for column in other_fields_df.columns:
-        if other_fields_df[column].dtype.kind == "O":
-            other_fields_df[column] = other_fields_df[column].astype(str)
-        elif column.startswith("TIME_"):
-            other_fields_df[column] = other_fields_df[column].map(lambda x: datetime.fromtimestamp(x))
-
-    labels = encoder.transform(np.where(np.isin(labels, known_apps), labels, UNKNOWN_STR_LABEL)).astype("int64") # type: ignore
-    if return_torch:
-        return other_fields_df, torch.from_numpy(x_ppi), torch.from_numpy(x_flowstats), torch.from_numpy(labels)
-    return other_fields_df, x_ppi, x_flowstats, labels
 
 def init_train_indices(train_data_params: TrainDataParams, servicemap: pd.DataFrame, database_path: str, rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray, dict[int, str], dict[int, str]]:
     database, train_tables = load_database(database_path, tables_paths=train_data_params.train_tables_paths)
@@ -309,7 +303,7 @@ def convert_dict_indices(base_indices: dict[int, np.ndarray], base_labels: dict[
         np.concatenate(list(unknown_labels_dict.values()))))
     return known_indices, unknown_indices
 
-def load_data_from_pytables(tables, indices: np.ndarray, data_dtype: np.dtype) -> np.ndarray:
+def load_data_from_tables(tables, indices: np.ndarray, data_dtype: np.dtype) -> np.ndarray:
     sorted_indices = indices[indices[:, INDICES_TABLE_POS].argsort(kind="stable")]
     unique_tables, split_bounderies = np.unique(sorted_indices[:, INDICES_TABLE_POS], return_index=True)
     indices_per_table = np.split(sorted_indices, split_bounderies[1:])

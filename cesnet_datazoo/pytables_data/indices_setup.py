@@ -160,7 +160,7 @@ def init_or_load_test_indices(dataset_config: DatasetConfig, known_apps_database
 
 def init_train_data(train_data_path: str):
     os.makedirs(train_data_path, exist_ok=True)
-    os.makedirs(os.path.join(train_data_path, "stand"), exist_ok=True)
+    os.makedirs(os.path.join(train_data_path, "transforms"), exist_ok=True)
     os.makedirs(os.path.join(train_data_path, "preload"), exist_ok=True)
 
 def init_test_data(test_data_path: str):

@@ -19,17 +19,18 @@ class DatasetMetadata():
     missing_dates_in_collection_period: list[str]
     application_count: int
     background_traffic: list[str]
-    features_in_packet_sequences: list[str]
-    packet_histogram_features: list[str]
+    ppi_features: list[str]
     flowstats_features: list[str]
+    flowstats_features_boolean: list[str]
+    packet_histograms: list[str]
     tcp_features: list[str]
     other_fields: list[str]
     cite: str
     zenodo_url: str
     related_papers: list[str]
 
-    @field_validator("available_dataset_sizes", "missing_dates_in_collection_period", "background_traffic", "features_in_packet_sequences",
-                     "packet_histogram_features", "flowstats_features", "tcp_features", "other_fields", "related_papers", mode="before")
+    @field_validator("available_dataset_sizes", "missing_dates_in_collection_period", "background_traffic", "ppi_features",
+                     "flowstats_features", "flowstats_features_boolean", "packet_histograms", "tcp_features", "other_fields", "related_papers", mode="before")
     @classmethod
     def parse_string_to_list(cls, v: str, info: ValidationInfo) -> list[str]:
         l = list(map(str.strip, v.split(","))) if v else []

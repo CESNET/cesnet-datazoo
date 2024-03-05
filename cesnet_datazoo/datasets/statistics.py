@@ -1,4 +1,3 @@
-import logging
 import os
 from collections import Counter
 from typing import Any, Literal
@@ -12,8 +11,8 @@ from torch.utils.data import BatchSampler, DataLoader, SequentialSampler
 from tqdm import tqdm
 
 from cesnet_datazoo.config import Protocol
-from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, FLOWEND_REASON_FEATURES, IPT_POS,
-                                      PHISTS_FEATURES, PPI_COLUMN, SIZE_POS)
+from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, IPT_POS, PPI_COLUMN, SIZE_POS,
+                                      UDP_PPI_CHANNELS)
 from cesnet_datazoo.pytables_data.indices_setup import sort_indices
 from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, list_all_tables,
                                                            load_database, worker_init_fn)
@@ -36,17 +35,23 @@ def pick_stats_fields(batch):
         batch[CATEGORY_COLUMN],
     )
 
-def pick_extra_fields(batch, flowstats_features: list[str]):
+def pick_extra_fields(batch, packet_histograms: list[str], flow_endreason_features: list[str]):
     return (
         batch["DST_ASN"],
-        batch[PHISTS_FEATURES],
-        batch[[f for f in FLOWEND_REASON_FEATURES if f in flowstats_features]],
+        batch[packet_histograms],
+        batch[flow_endreason_features],
     )
 
-def simple_collate_fn(batch):
-    return batch
-
-def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_features: list[str], protocol: Protocol, extra_fields: bool, disabled_apps: list[str], num_samples: int | Literal["all"] = 10_000_000, num_workers: int = 4, batch_size: int = 4096, silent: bool = False):
+def compute_dataset_statistics(database_path: str,
+                               output_dir: str,
+                               packet_histograms: list[str],
+                               flowstats_features_boolean: list[str],
+                               protocol: Protocol, extra_fields: bool,
+                               disabled_apps: list[str],
+                               num_samples: int | Literal["all"] = 10_000_000,
+                               num_workers: int = 4,
+                               batch_size: int = 4096,
+                               silent: bool = False):
     stats_pdf_path = os.path.join(output_dir, "dataset-statistics.pdf")
     stats_csv_path = os.path.join(output_dir, "dataset-statistics.csv")
     categories_csv_path = os.path.join(output_dir, "categories.csv")
@@ -74,10 +79,20 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
     feature_bytes_total = []
     packet_sizes_counter = Counter()
     ipt_counter = Counter()
+    flow_endreason_features = [f for f in flowstats_features_boolean if f.startswith("FLOW_ENDREASON")]
     if not silent:
         print(f"Reading data from {database_path} for statistics")
     table_paths = list_all_tables(database_path)
-    stats_dataset = PyTablesDataset(database_path=database_path, tables_paths=table_paths, flowstats_features=flowstats_features, disabled_apps=disabled_apps, indices=None, return_all_fields=True)
+    stats_dataset = PyTablesDataset(database_path=database_path,
+                                    tables_paths=table_paths,
+                                    indices=None,
+                                    disabled_apps=disabled_apps,
+                                    return_all_fields=True,
+                                    flowstats_features=[],
+                                    flowstats_features_boolean=[],
+                                    flowstats_features_phist=[],
+                                    other_fields=[],
+                                    ppi_channels=UDP_PPI_CHANNELS,)
     if num_samples != "all":
         subset_indices = np.random.randint(low=0, high=len(stats_dataset.indices), size=num_samples)
         stats_dataset.indices = sort_indices(stats_dataset.indices[subset_indices])
@@ -87,7 +102,7 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
         pin_memory=False,
         num_workers=num_workers,
         worker_init_fn=worker_init_fn,
-        collate_fn=simple_collate_fn,
+        collate_fn=_collate_fn_simple,
         persistent_workers=False,
         batch_size=None,
         sampler=stats_batch_sampler)
@@ -116,10 +131,10 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
             quic_ua_series = quic_ua_series.add(pd.Series(user_agent).str.decode("utf-8").value_counts(), fill_value=0)
             quic_version_series = quic_version_series.add(pd.Series(quic_version).value_counts(), fill_value=0)
         if extra_fields:
-            asn, phist, flowend_reason = pick_extra_fields(batch, flowstats_features=flowstats_features)
+            asn, phist, flowend_reason = pick_extra_fields(batch, packet_histograms=packet_histograms, flow_endreason_features=flow_endreason_features)
             asn_series = asn_series.add(pd.Series(asn).value_counts(), fill_value=0)
             flow_endreason_series = flow_endreason_series.add(pd.Series(structured_to_unstructured(flowend_reason).sum(axis=0)), fill_value=0)
-            df2 = pd.DataFrame(data=zip(*np.split(structured_to_unstructured(phist).sum(axis=0), 4)), columns=PHISTS_FEATURES)
+            df2 = pd.DataFrame(data=zip(*np.split(structured_to_unstructured(phist).sum(axis=0), 4)), columns=packet_histograms)
             df_phist = df_phist.add(df2, fill_value=0)
     feature_duration = np.concatenate(feature_duration)
     feature_packets_total = np.concatenate(feature_packets_total)
@@ -183,11 +198,11 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
         flow_endreason_df = pd.DataFrame({"COUNT": flow_endreason_series.astype("int64")})
         flow_endreason_df["PERC"] = (flow_endreason_df["COUNT"] / flow_endreason_df["COUNT"].sum() * 100).round(3)
         flow_endreason_df.index.name = "FLOW ENDREASON"
-        flow_endreason_df.index = pd.Index([f for f in FLOWEND_REASON_FEATURES if f in flowstats_features])
+        flow_endreason_df.index = pd.Index(flow_endreason_features)
         flow_endreason_df.to_csv(flow_endreason_path)
         # PHIST output
         df_phist.index.name = "BINS"
-        df_phist.columns = list(map(lambda x: x.upper().replace("_", " "), PHISTS_FEATURES))
+        df_phist.columns = list(map(lambda x: x.upper().replace("_", " "), packet_histograms))
         df_phist = df_phist.astype("int64")
         for i, column in zip((1, 3, 5, 7), df_phist.columns):
             df_phist.insert(i, column + " PERC", (df_phist[column] / df_phist[column].sum() * 100).round(3))
@@ -249,3 +264,6 @@ def compute_dataset_statistics(database_path: str, output_dir: str, flowstats_fe
 
     plt.tight_layout()
     fig.savefig(stats_pdf_path, bbox_inches="tight")
+
+def _collate_fn_simple(batch):
+    return batch
