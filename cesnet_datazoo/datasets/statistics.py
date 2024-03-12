@@ -43,6 +43,8 @@ def pick_extra_fields(batch, packet_histograms: list[str], flow_endreason_featur
     )
 
 def compute_dataset_statistics(database_path: str,
+                               pytables_app_enum: dict[int, str],
+                               pytables_category_enum: dict[int, str],
                                output_dir: str,
                                packet_histograms: list[str],
                                flowstats_features_boolean: list[str],
@@ -84,6 +86,8 @@ def compute_dataset_statistics(database_path: str,
         print(f"Reading data from {database_path} for statistics")
     table_paths = list_all_tables(database_path)
     stats_dataset = PyTablesDataset(database_path=database_path,
+                                    pytables_app_enum=pytables_app_enum,
+                                    pytables_category_enum=pytables_category_enum,
                                     tables_paths=table_paths,
                                     indices=None,
                                     disabled_apps=disabled_apps,

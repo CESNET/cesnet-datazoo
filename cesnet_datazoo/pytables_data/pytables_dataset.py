@@ -29,6 +29,8 @@ class PyTablesDataset(Dataset):
                  database_path: str,
                  tables_paths: list[str],
                  indices: Optional[np.ndarray],
+                 pytables_app_enum: dict[int, str],
+                 pytables_category_enum: dict[int, str],
                  flowstats_features: list[str],
                  flowstats_features_boolean: list[str],
                  flowstats_features_phist: list[str],
@@ -39,19 +41,20 @@ class PyTablesDataset(Dataset):
                  flowstats_phist_transform: Optional[Callable] = None,
                  target_transform: Optional[Callable] = None,
                  return_tensors: bool = False,
-                 preload: bool = False, preload_blob: Optional[str] = None,
-                 disabled_apps: Optional[list[str]] = None,
-                 return_all_fields: bool = False,):
+                 return_all_fields: bool = False,
+                 preload: bool = False,
+                 preload_blob: Optional[str] = None,
+                 disabled_apps: Optional[list[str]] = None,):
         self.database_path = database_path
         self.tables_paths = tables_paths
         self.tables = {}
-        self.preload = preload
-        self.preload_blob = preload_blob
-        self.return_all_fields = return_all_fields
+        self.pytables_app_enum = pytables_app_enum
+        self.pytables_category_enum = pytables_category_enum
         if indices is None:
             self.set_all_indices(disabled_apps=disabled_apps)
         else:
             self.indices = indices
+
         self.flowstats_features = flowstats_features
         self.flowstats_features_boolean = flowstats_features_boolean
         self.flowstats_features_phist = flowstats_features_phist
@@ -62,6 +65,10 @@ class PyTablesDataset(Dataset):
         self.flowstats_phist_transform = flowstats_phist_transform
         self.target_transform = target_transform
         self.return_tensors = return_tensors
+        self.return_all_fields = return_all_fields
+
+        self.preload = preload
+        self.preload_blob = preload_blob
 
     def __getitem__(self, batch_idx):
         # log.debug(f"worker {self.worker_id}: __getitem__")
@@ -93,7 +100,7 @@ class PyTablesDataset(Dataset):
             x_flowstats_phist = self.flowstats_phist_transform(x_flowstats_phist)
         x_flowstats = np.concatenate([x_flowstats, x_flowstats_boolean, x_flowstats_phist], axis=1).astype("float32")
         # Labels transformation
-        labels = list(map(self.app_enum, batch_data[APP_COLUMN]))
+        labels = list(map(self.pytables_app_enum.get, batch_data[APP_COLUMN]))
         if self.target_transform:
             labels = self.target_transform(labels)
         # Prepare dataframe with other fields
@@ -103,7 +110,7 @@ class PyTablesDataset(Dataset):
                 other_fields_df[column] = other_fields_df[column].astype(str)
             elif column.startswith("TIME_"):
                 other_fields_df[column] = other_fields_df[column].map(lambda x: datetime.fromtimestamp(x))
-        
+
         if self.return_tensors:
             x_ppi = torch.from_numpy(x_ppi)
             x_flowstats = torch.from_numpy(x_flowstats)
@@ -119,8 +126,6 @@ class PyTablesDataset(Dataset):
         log.debug(f"Initializing dataloader worker id {self.worker_id}")
         self.database, self.tables = load_database(database_path=self.database_path, tables_paths=self.tables_paths)
         atexit.register(self.cleanup)
-        self.app_enum = self.tables[0].get_enum(APP_COLUMN)
-        self.cat_enum = self.tables[0].get_enum(CATEGORY_COLUMN)
         self.data_dtype = self.tables[0].dtype
         if self.preload:
             data = None
@@ -137,34 +142,13 @@ class PyTablesDataset(Dataset):
                 np.savez_compressed(self.preload_blob, data=self.data)
         log.debug(f"Finish initialization worker id {self.worker_id}")
 
-    def get_app_enum(self) -> tb.Enum:
-        if self.app_enum:
-            return self.app_enum
-        database, tables = load_database(database_path=self.database_path, tables_paths=self.tables_paths)
-        app_enum = tables[0].get_enum(APP_COLUMN)
-        cat_enum = tables[0].get_enum(CATEGORY_COLUMN)
-        self.app_enum, self.cat_enum = app_enum, cat_enum
-        database.close()
-        return app_enum
-
-    def get_cat_enum(self) -> tb.Enum:
-        if self.cat_enum:
-            return self.cat_enum
-        database, tables = load_database(database_path=self.database_path, tables_paths=self.tables_paths)
-        app_enum = tables[0].get_enum(APP_COLUMN)
-        cat_enum = tables[0].get_enum(CATEGORY_COLUMN)
-        self.app_enum, self.cat_enum = app_enum, cat_enum
-        database.close()
-        return cat_enum
-
     def set_all_indices(self, disabled_apps: Optional[list[str]] = None):
         """
         This should be called from the main process, before dataloader workers split the work.
         Does no filter apps with not enough samples.
         """
         database, tables = load_database(database_path=self.database_path, tables_paths=self.tables_paths)
-        app_enum = tables[0].get_enum(APP_COLUMN)
-        disabled_apps_ids = list(map(lambda x: app_enum[x], disabled_apps)) if disabled_apps is not None else []
+        disabled_apps_ids = [app_id for app_id, app_name in self.pytables_app_enum.items() if app_name in disabled_apps] if disabled_apps is not None else []
         base_labels = {}
         base_indices = {}
         for i in range(len(tables)):

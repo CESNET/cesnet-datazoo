@@ -16,8 +16,8 @@ from torch.utils.data import BatchSampler, DataLoader, RandomSampler, Sampler, S
 from typing_extensions import assert_never
 
 from cesnet_datazoo.config import DataLoaderOrder, DatasetConfig, ValidationApproach
-from cesnet_datazoo.constants import (DATASET_SIZES, INDICES_LABEL_POS, SERVICEMAP_FILE,
-                                      UNKNOWN_STR_LABEL)
+from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, DATASET_SIZES, INDICES_LABEL_POS,
+                                      SERVICEMAP_FILE, UNKNOWN_STR_LABEL)
 from cesnet_datazoo.datasets.loaders import create_df_from_dataloader
 from cesnet_datazoo.datasets.metadata.dataset_metadata import DatasetMetadata, load_metadata
 from cesnet_datazoo.datasets.statistics import compute_dataset_statistics
@@ -111,7 +111,6 @@ class CesnetDataset():
     metadata: DatasetMetadata
     available_dates: list[str]
     time_periods: dict[str, list[str]]
-    time_periods_gen: bool = False
     default_train_period_name: str
     default_test_period_name: str
 
@@ -133,7 +132,10 @@ class CesnetDataset():
     val_dataloader: Optional[DataLoader] = None
     test_dataloader: Optional[DataLoader] = None
 
-    def __init__(self, data_root: str, size: str = "S", skip_dataset_read_at_init: bool = False, silent: bool = False) -> None:
+    _pytables_app_enum: dict[int, str]
+    _pytables_category_enum: dict[int, str]
+
+    def __init__(self, data_root: str, size: str = "S", database_checks_at_init: bool = False, silent: bool = False) -> None:
         self.silent = silent
         self.metadata = load_metadata(self.name)
         self.size = size
@@ -151,21 +153,23 @@ class CesnetDataset():
             os.makedirs(self.data_root)
         if not self._is_downloaded():
             self._download()
-        if not skip_dataset_read_at_init:
+        if database_checks_at_init:
             with tb.open_file(self.database_path, mode="r") as database:
                 tables_paths = list(map(lambda x: x._v_pathname, iter(database.get_node(f"/flows"))))
                 num_samples = 0
                 for p in tables_paths:
-                    num_samples += len(database.get_node(p))
+                    table = database.get_node(p)
+                    if self._pytables_app_enum != {v: k for k, v in dict(table.get_enum(APP_COLUMN)).items()}: # type: ignore
+                        raise ValueError(f"Found mismatch between _pytables_app_enum and the PyTables database enum in table {p}. Please report this issue.")
+                    if self._pytables_category_enum != {v: k for k, v in dict(table.get_enum(CATEGORY_COLUMN)).items()}: # type: ignore
+                        raise ValueError(f"Found mismatch between _pytables_category_enum and the PyTables database enum in table {p}. Please report this issue.")
+                    num_samples += len(table)
                 if self.size == "ORIG" and num_samples != self.metadata.available_samples:
                     raise ValueError(f"Expected {self.metadata.available_samples} samples, but got {num_samples} in the database. Please delete the data root folder, update cesnet-datazoo, and redownload the dataset.")
                 if self.size != "ORIG" and num_samples != DATASET_SIZES[self.size]:
                     raise ValueError(f"Expected {DATASET_SIZES[self.size]} samples, but got {num_samples} in the database. Please delete the data root folder, update cesnet-datazoo, and redownload the dataset.")
-                self.available_dates = list(map(lambda x: x.removeprefix("/flows/D"), tables_paths))
-        else:
-            self.available_dates = []
-        if self.time_periods_gen:
-            self._generate_time_periods()
+                if self.available_dates != list(map(lambda x: x.removeprefix("/flows/D"), tables_paths)):
+                    raise ValueError(f"Found mismatch between available_dates and the dates available in the PyTables database. Please report this issue.")
         # Add all available dates as single date time periods
         for d in self.available_dates:
             self.time_periods[d] = [d]
@@ -431,6 +435,8 @@ class CesnetDataset():
         if not os.path.exists(self.statistics_path):
             os.mkdir(self.statistics_path)
         compute_dataset_statistics(database_path=self.database_path,
+                                   pytables_app_enum=self._pytables_app_enum,
+                                   pytables_category_enum=self._pytables_category_enum,
                                    output_dir=self.statistics_path,
                                    packet_histograms=self.metadata.packet_histograms,
                                    flowstats_features_boolean=self.metadata.flowstats_features_boolean,
@@ -593,6 +599,8 @@ class CesnetDataset():
             database_path=dataset_config.database_path,
             tables_paths=dataset_config._get_train_tables_paths(),
             indices=dataset_indices.train_indices,
+            pytables_app_enum=self._pytables_app_enum,
+            pytables_category_enum=self._pytables_category_enum,
             flowstats_features=dataset_config.flowstats_features,
             flowstats_features_boolean=dataset_config.flowstats_features_boolean,
             flowstats_features_phist=dataset_config.flowstats_features_phist,
@@ -611,6 +619,8 @@ class CesnetDataset():
                 database_path=dataset_config.database_path,
                 tables_paths=dataset_config._get_test_tables_paths(),
                 indices=test_combined_indices,
+                pytables_app_enum=self._pytables_app_enum,
+                pytables_category_enum=self._pytables_category_enum,
                 flowstats_features=dataset_config.flowstats_features,
                 flowstats_features_boolean=dataset_config.flowstats_features_boolean,
                 flowstats_features_phist=dataset_config.flowstats_features_phist,
@@ -631,6 +641,8 @@ class CesnetDataset():
                 database_path=dataset_config.database_path,
                 tables_paths=dataset_config._get_train_tables_paths(),
                 indices=dataset_indices.val_known_indices,
+                pytables_app_enum=self._pytables_app_enum,
+                pytables_category_enum=self._pytables_category_enum,
                 flowstats_features=dataset_config.flowstats_features,
                 flowstats_features_boolean=dataset_config.flowstats_features_boolean,
                 flowstats_features_phist=dataset_config.flowstats_features_phist,
