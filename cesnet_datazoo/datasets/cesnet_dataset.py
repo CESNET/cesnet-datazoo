@@ -15,12 +15,13 @@ from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import BatchSampler, DataLoader, RandomSampler, Sampler, SequentialSampler
 from typing_extensions import assert_never
 
-from cesnet_datazoo.config import DataLoaderOrder, DatasetConfig, ValidationApproach
+from cesnet_datazoo.config import AppSelection, DataLoaderOrder, DatasetConfig, ValidationApproach
 from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, DATASET_SIZES, INDICES_LABEL_POS,
                                       SERVICEMAP_FILE, UNKNOWN_STR_LABEL)
 from cesnet_datazoo.datasets.loaders import create_df_from_dataloader
 from cesnet_datazoo.datasets.metadata.dataset_metadata import DatasetMetadata, load_metadata
 from cesnet_datazoo.datasets.statistics import compute_dataset_statistics
+from cesnet_datazoo.pytables_data.apps_split import is_background_app
 from cesnet_datazoo.pytables_data.data_scalers import fit_scalers
 from cesnet_datazoo.pytables_data.indices_setup import (IndicesTuple, compute_known_app_counts,
                                                         compute_unknown_app_counts,
@@ -72,6 +73,7 @@ class CesnetDataset():
         statistics_path: Path to the dataset statistics.
         bucket_url: URL of the bucket where the database is stored.
         metadata: Additional [dataset metadata][metadata].
+        available_classes: List of all available classes in the dataset.
         available_dates: List of all available dates in the dataset.
         time_periods: Predefined time periods. Each time period is a list of dates.
         default_train_period_name: Default time period for training.
@@ -86,12 +88,9 @@ class CesnetDataset():
         train_dataset: Train set in the form of `PyTablesDataset` instance wrapping the PyTables database.
         val_dataset: Validation set in the form of `PyTablesDataset` instance wrapping the PyTables database.
         test_dataset: Test set in the form of `PyTablesDataset` instance wrapping the PyTables database.
-        known_apps_database_enum: Dictionary that maps the database integer labels (different to those from `encoder`) of known applications to their names.
-        unknown_apps_database_enum: Dictionary that maps the database integer labels (different to those from `encoder`) of unknown applications to their names.
         known_app_counts: Known application counts in the train, validation, and test sets.
         unknown_app_counts: Unknown application counts in the validation and test sets.
         collate_fn: Collate function used for creating batches in dataloaders.
-        encoder: Scikit-learn [`LabelEncoder`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html) used to encode class names into integers. It is fitted during the initialization of the dataset.
         train_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for training.
         train_dataloader_sampler: Sampler used for iterating the training dataloader. Either [`RandomSampler`](https://pytorch.org/docs/stable/data.html#torch.utils.data.RandomSampler) or [`SequentialSampler`](https://pytorch.org/docs/stable/data.html#torch.utils.data.SequentialSampler).
         train_dataloader_drop_last: Whether to drop the last incomplete batch when iterating the training dataloader.
@@ -109,6 +108,7 @@ class CesnetDataset():
     statistics_path: str
     bucket_url: str
     metadata: DatasetMetadata
+    available_classes: list[str]
     available_dates: list[str]
     time_periods: dict[str, list[str]]
     default_train_period_name: str
@@ -120,20 +120,17 @@ class CesnetDataset():
     train_dataset: Optional[PyTablesDataset] = None
     val_dataset: Optional[PyTablesDataset] = None
     test_dataset: Optional[PyTablesDataset] = None
-    known_apps_database_enum: Optional[dict[int, str]] = None
-    unknown_apps_database_enum: Optional[dict[int, str]] = None
     known_app_counts: Optional[pd.DataFrame] = None
     unknown_app_counts: Optional[pd.DataFrame] = None
     collate_fn: Optional[Callable] = None
-    encoder: Optional[LabelEncoder] = None
     train_dataloader: Optional[DataLoader] = None
     train_dataloader_sampler: Optional[Sampler] = None
     train_dataloader_drop_last: bool = True
     val_dataloader: Optional[DataLoader] = None
     test_dataloader: Optional[DataLoader] = None
 
-    _pytables_app_enum: dict[int, str]
-    _pytables_category_enum: dict[int, str]
+    _tables_app_enum: dict[int, str]
+    _tables_cat_enum: dict[int, str]
 
     def __init__(self, data_root: str, size: str = "S", database_checks_at_init: bool = False, silent: bool = False) -> None:
         self.silent = silent
@@ -159,10 +156,11 @@ class CesnetDataset():
                 num_samples = 0
                 for p in tables_paths:
                     table = database.get_node(p)
-                    if self._pytables_app_enum != {v: k for k, v in dict(table.get_enum(APP_COLUMN)).items()}: # type: ignore
-                        raise ValueError(f"Found mismatch between _pytables_app_enum and the PyTables database enum in table {p}. Please report this issue.")
-                    if self._pytables_category_enum != {v: k for k, v in dict(table.get_enum(CATEGORY_COLUMN)).items()}: # type: ignore
-                        raise ValueError(f"Found mismatch between _pytables_category_enum and the PyTables database enum in table {p}. Please report this issue.")
+                    assert isinstance(table, tb.Table)
+                    if self._tables_app_enum != {v: k for k, v in dict(table.get_enum(APP_COLUMN)).items()}:
+                        raise ValueError(f"Found mismatch between _tables_app_enum and the PyTables database enum in table {p}. Please report this issue.")
+                    if self._tables_cat_enum != {v: k for k, v in dict(table.get_enum(CATEGORY_COLUMN)).items()}:
+                        raise ValueError(f"Found mismatch between _tables_cat_enum and the PyTables database enum in table {p}. Please report this issue.")
                     num_samples += len(table)
                 if self.size == "ORIG" and num_samples != self.metadata.available_samples:
                     raise ValueError(f"Expected {self.metadata.available_samples} samples, but got {num_samples} in the database. Please delete the data root folder, update cesnet-datazoo, and redownload the dataset.")
@@ -173,6 +171,10 @@ class CesnetDataset():
         # Add all available dates as single date time periods
         for d in self.available_dates:
             self.time_periods[d] = [d]
+        available_applications = sorted([app for app in pd.read_csv(self.servicemap_path, index_col="Tag").index if not is_background_app(app)])
+        if len(available_applications) != self.metadata.application_count:
+            raise ValueError(f"Found {len(available_applications)} applications in the servicemap (omitting background traffic classes), but expected {self.metadata.application_count}. Please report this issue.")
+        self.available_classes = available_applications + self.metadata.background_traffic_classes
 
     def set_dataset_config_and_initialize(self, dataset_config: DatasetConfig, disable_indices_cache: bool = False) -> None:
         """
@@ -204,6 +206,8 @@ class CesnetDataset():
         """
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting train dataloader")
+        if not self.dataset_config.need_train_set:
+            raise ValueError("Train dataloader is not available when need_train_set is false")
         assert self.train_dataset
         if self.train_dataloader:
             return self.train_dataloader
@@ -251,8 +255,8 @@ class CesnetDataset():
         """
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting validaion dataloader")
-        if self.dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
-            raise ValueError("Validation dataloader is not available when using no-validation")
+        if not self.dataset_config.need_val_set:
+            raise ValueError("Validation dataloader is not available when need_val_set is false")
         assert self.val_dataset is not None
         if self.val_dataloader:
             return self.val_dataloader
@@ -290,8 +294,8 @@ class CesnetDataset():
         """
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting test dataloader")
-        if self.dataset_config.no_test_set:
-            raise ValueError("Test dataloader is not available when no_test_set is true")
+        if not self.dataset_config.need_test_set:
+            raise ValueError("Test dataloader is not available when need_test_set is false")
         assert self.test_dataset is not None
         if self.test_dataloader:
             return self.test_dataloader
@@ -332,7 +336,7 @@ class CesnetDataset():
         Returns:
             Train data as a dataframe.
         """
-        self._check_before_dataframe()
+        self._check_before_dataframe(check_train=True)
         assert self.dataset_config is not None and self.train_dataset is not None
         if len(self.train_dataset) > DATAFRAME_SAMPLES_WARNING_THRESHOLD:
             warnings.warn(f"Train set has ({len(self.train_dataset)} samples), consider using get_train_dataloader() instead")
@@ -365,7 +369,7 @@ class CesnetDataset():
         Returns:
             Validation data as a dataframe.
         """
-        self._check_before_dataframe(check_no_val=True)
+        self._check_before_dataframe(check_val=True)
         assert self.dataset_config is not None and self.val_dataset is not None
         if len(self.val_dataset) > DATAFRAME_SAMPLES_WARNING_THRESHOLD:
             warnings.warn(f"Validation set has ({len(self.val_dataset)} samples), consider using get_val_dataloader() instead")
@@ -394,7 +398,7 @@ class CesnetDataset():
         Returns:
             Test data as a dataframe.
         """
-        self._check_before_dataframe(check_no_test=True)
+        self._check_before_dataframe(check_test=True)
         assert self.dataset_config is not None and self.test_dataset is not None
         if len(self.test_dataset) > DATAFRAME_SAMPLES_WARNING_THRESHOLD:
             warnings.warn(f"Test set has ({len(self.test_dataset)} samples), consider using get_test_dataloader() instead")
@@ -432,11 +436,15 @@ class CesnetDataset():
             batch_size: Number of samples per batch for loading data.
             disabled_apps: List of applications to exclude from the statistics.
         """
+        if disabled_apps:
+            bad_disabled_apps = [a for a in disabled_apps if a not in self.available_classes]
+            if len(bad_disabled_apps) > 0:
+                raise ValueError(f"Bad applications in disabled_apps {bad_disabled_apps}. Use applications available in dataset.available_classes")
         if not os.path.exists(self.statistics_path):
             os.mkdir(self.statistics_path)
         compute_dataset_statistics(database_path=self.database_path,
-                                   pytables_app_enum=self._pytables_app_enum,
-                                   pytables_category_enum=self._pytables_category_enum,
+                                   tables_app_enum=self._tables_app_enum,
+                                   tables_cat_enum=self._tables_cat_enum,
                                    output_dir=self.statistics_path,
                                    packet_histograms=self.metadata.packet_histograms,
                                    flowstats_features_boolean=self.metadata.flowstats_features_boolean,
@@ -487,140 +495,135 @@ class CesnetDataset():
         self.train_dataset = None
         self.val_dataset = None
         self.test_dataset = None
-        self.known_apps_database_enum = None
-        self.unknown_apps_database_enum = None
         self.known_app_counts = None
         self.unknown_app_counts = None
         self.collate_fn = None
-        self.encoder = None
         self.train_dataloader = None
         self.train_dataloader_sampler = None
         self.train_dataloader_drop_last = True
         self.val_dataloader = None
         self.test_dataloader = None
 
-    def _check_before_dataframe(self, check_no_val: bool = False, check_no_test: bool = False) -> None:
+    def _check_before_dataframe(self, check_train: bool = False, check_val: bool = False, check_test: bool = False) -> None:
         if self.dataset_config is None:
             raise ValueError("Dataset is not initialized, use set_dataset_config_and_initialize() before getting a dataframe")
         if self.dataset_config.return_tensors:
             raise ValueError("Dataframes are not available when return_tensors is set. Use a dataloader instead.")
-        if check_no_val and self.dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
-            raise ValueError("Validation dataframe is not available when using no-validation")
-        if check_no_test and self.dataset_config.no_test_set:
-            raise ValueError("Test dataframe is not available when no_test_set is true")
+        if check_train and not self.dataset_config.need_train_set:
+            raise ValueError("Train dataframe is not available when need_train_set is false")
+        if check_val and not self.dataset_config.need_val_set:
+            raise ValueError("Validation dataframe is not available when need_val_set is false")
+        if check_test and not self.dataset_config.need_test_set:
+            raise ValueError("Test dataframe is not available when need_test_set is false")
 
     def _initialize_train_val_test(self, disable_indices_cache: bool = False) -> None:
         assert self.dataset_config is not None
         dataset_config = self.dataset_config
         servicemap = pd.read_csv(dataset_config.servicemap_path, index_col="Tag")
-        # Initialize train and test indices
-        train_indices, train_unknown_indices, encoder, known_apps_database_enum, unknown_apps_database_enum = init_or_load_train_indices(dataset_config=dataset_config,
-                                                                                                                                         servicemap=servicemap,
-                                                                                                                                         disable_indices_cache=disable_indices_cache,)
-        if self.dataset_config.no_test_set:
-            test_known_indices = np.empty((0,3), dtype=np.int64)
-            test_unknown_indices = np.empty((0,3), dtype=np.int64)
-            test_data_path = None
-        else:
-            test_known_indices, test_unknown_indices, test_data_path = init_or_load_test_indices(dataset_config=dataset_config,
-                                                                                                 known_apps_database_enum=known_apps_database_enum,
-                                                                                                 unknown_apps_database_enum=unknown_apps_database_enum,
-                                                                                                 disable_indices_cache=disable_indices_cache,)
-        # Date weight sampling of train indices
-        if dataset_config.train_dates_weigths is not None:
-            assert dataset_config.train_size != "all"
-            if dataset_config.val_approach == ValidationApproach.SPLIT_FROM_TRAIN:
-                # requested number of samples is train_size + val_known_size when using the split-from-train validation approach
-                assert dataset_config.val_known_size != "all"
-                num_samples = dataset_config.train_size + dataset_config.val_known_size
-            else:
-                num_samples = dataset_config.train_size
-            if num_samples > len(train_indices):
-                raise ValueError(f"Requested number of samples for weight sampling ({num_samples}) is larger than the number of available train samples ({len(train_indices)})")
-            train_indices = date_weight_sample_train_indices(dataset_config=dataset_config, train_indices=train_indices, num_samples=num_samples)
-        # Obtain validation indices based on the selected approach
-        if dataset_config.val_approach == ValidationApproach.VALIDATION_DATES:
-            val_known_indices, val_unknown_indices, val_data_path = init_or_load_val_indices(dataset_config=dataset_config,
-                                                                                             known_apps_database_enum=known_apps_database_enum,
-                                                                                             unknown_apps_database_enum=unknown_apps_database_enum,
-                                                                                             disable_indices_cache=disable_indices_cache,)
-        elif dataset_config.val_approach == ValidationApproach.SPLIT_FROM_TRAIN:
-            train_val_rng = get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.TRAIN_VAL_SPLIT)
-            val_data_path = dataset_config._get_train_data_path()
-            val_unknown_indices = train_unknown_indices
-            train_labels = train_indices[:, INDICES_LABEL_POS]
+        # Initialize train set
+        if dataset_config.need_train_set:
+            train_indices, train_unknown_indices, known_apps, unknown_apps = init_or_load_train_indices(dataset_config=dataset_config,
+                                                                                                        tables_app_enum=self._tables_app_enum,
+                                                                                                        servicemap=servicemap,
+                                                                                                        disable_indices_cache=disable_indices_cache,)
+            # Date weight sampling of train indices
             if dataset_config.train_dates_weigths is not None:
-                assert dataset_config.val_known_size != "all"
-                # When weight sampling is used, val_known_size is kept but the resulting train size can be smaller due to no enough samples in some train dates
-                if dataset_config.val_known_size > len(train_indices):
-                    raise ValueError(f"Requested validation size ({dataset_config.val_known_size}) is larger than the number of available train samples after weight sampling ({len(train_indices)})")
-                train_indices, val_known_indices = train_test_split(train_indices, test_size=dataset_config.val_known_size, stratify=train_labels, shuffle=True, random_state=train_val_rng)
-                dataset_config.train_size = len(train_indices)
-            elif dataset_config.train_size == "all" and dataset_config.val_known_size == "all":
-                train_indices, val_known_indices = train_test_split(train_indices, test_size=dataset_config.train_val_split_fraction, stratify=train_labels, shuffle=True, random_state=train_val_rng)
-            else:
-                if dataset_config.val_known_size != "all" and  dataset_config.train_size != "all" and dataset_config.train_size + dataset_config.val_known_size > len(train_indices):
-                    raise ValueError(f"Requested train size + validation size ({dataset_config.train_size + dataset_config.val_known_size}) is larger than the number of available train samples ({len(train_indices)})")
-                if dataset_config.train_size != "all" and dataset_config.train_size > len(train_indices):
-                    raise ValueError(f"Requested train size ({dataset_config.train_size}) is larger than the number of available train samples ({len(train_indices)})")
-                if dataset_config.val_known_size != "all" and dataset_config.val_known_size > len(train_indices):
-                    raise ValueError(f"Requested validation size ({dataset_config.val_known_size}) is larger than the number of available train samples ({len(train_indices)})")
-                train_indices, val_known_indices = train_test_split(train_indices,
-                                                                          train_size=dataset_config.train_size if dataset_config.train_size != "all" else None,
-                                                                          test_size=dataset_config.val_known_size if dataset_config.val_known_size != "all" else None,
-                                                                          stratify=train_labels, shuffle=True, random_state=train_val_rng)
-        elif dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
-            val_known_indices = np.empty((0,3), dtype=np.int64)
-            val_unknown_indices = np.empty((0,3), dtype=np.int64)
+                assert dataset_config.train_size != "all"
+                if dataset_config.val_approach == ValidationApproach.SPLIT_FROM_TRAIN:
+                    # requested number of samples is train_size + val_known_size when using the split-from-train validation approach
+                    assert dataset_config.val_known_size != "all"
+                    num_samples = dataset_config.train_size + dataset_config.val_known_size
+                else:
+                    num_samples = dataset_config.train_size
+                if num_samples > len(train_indices):
+                    raise ValueError(f"Requested number of samples for weight sampling ({num_samples}) is larger than the number of available train samples ({len(train_indices)})")
+                train_indices = date_weight_sample_train_indices(dataset_config=dataset_config, train_indices=train_indices, num_samples=num_samples)
+        elif dataset_config.apps_selection == AppSelection.FIXED:
+            known_apps = dataset_config.apps_selection_fixed_known
+            unknown_apps = dataset_config.apps_selection_fixed_unknown
+            train_indices = np.zeros((0,3), dtype=np.int64)
+            train_unknown_indices = np.zeros((0,3), dtype=np.int64)
+        else:
+            raise ValueError("Either need train set or the fixed application selection")
+        # Initialize validation set
+        if dataset_config.need_val_set:
+            if dataset_config.val_approach == ValidationApproach.VALIDATION_DATES:
+                val_known_indices, val_unknown_indices, val_data_path = init_or_load_val_indices(dataset_config=dataset_config,
+                                                                                                 known_apps=known_apps,
+                                                                                                 unknown_apps=unknown_apps,
+                                                                                                 tables_app_enum=self._tables_app_enum,
+                                                                                                 disable_indices_cache=disable_indices_cache,)
+            elif dataset_config.val_approach == ValidationApproach.SPLIT_FROM_TRAIN:
+                train_val_rng = get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.TRAIN_VAL_SPLIT)
+                val_data_path = dataset_config._get_train_data_path()
+                val_unknown_indices = train_unknown_indices
+                train_labels = train_indices[:, INDICES_LABEL_POS]
+                if dataset_config.train_dates_weigths is not None:
+                    assert dataset_config.val_known_size != "all"
+                    # When weight sampling is used, val_known_size is kept but the resulting train size can be smaller due to no enough samples in some train dates
+                    if dataset_config.val_known_size > len(train_indices):
+                        raise ValueError(f"Requested validation size ({dataset_config.val_known_size}) is larger than the number of available train samples after weight sampling ({len(train_indices)})")
+                    train_indices, val_known_indices = train_test_split(train_indices, test_size=dataset_config.val_known_size, stratify=train_labels, shuffle=True, random_state=train_val_rng)
+                    dataset_config.train_size = len(train_indices)
+                elif dataset_config.train_size == "all" and dataset_config.val_known_size == "all":
+                    train_indices, val_known_indices = train_test_split(train_indices, test_size=dataset_config.train_val_split_fraction, stratify=train_labels, shuffle=True, random_state=train_val_rng)
+                else:
+                    if dataset_config.val_known_size != "all" and  dataset_config.train_size != "all" and dataset_config.train_size + dataset_config.val_known_size > len(train_indices):
+                        raise ValueError(f"Requested train size + validation size ({dataset_config.train_size + dataset_config.val_known_size}) is larger than the number of available train samples ({len(train_indices)})")
+                    if dataset_config.train_size != "all" and dataset_config.train_size > len(train_indices):
+                        raise ValueError(f"Requested train size ({dataset_config.train_size}) is larger than the number of available train samples ({len(train_indices)})")
+                    if dataset_config.val_known_size != "all" and dataset_config.val_known_size > len(train_indices):
+                        raise ValueError(f"Requested validation size ({dataset_config.val_known_size}) is larger than the number of available train samples ({len(train_indices)})")
+                    train_indices, val_known_indices = train_test_split(train_indices,
+                                                                        train_size=dataset_config.train_size if dataset_config.train_size != "all" else None,
+                                                                        test_size=dataset_config.val_known_size if dataset_config.val_known_size != "all" else None,
+                                                                        stratify=train_labels, shuffle=True, random_state=train_val_rng)
+        else:
+            val_known_indices = np.zeros((0,3), dtype=np.int64)
+            val_unknown_indices = np.zeros((0,3), dtype=np.int64)
             val_data_path = None
-        else: assert_never(dataset_config.val_approach)
-
-        # Create class info
-        class_info = create_class_info(servicemap=servicemap, encoder=encoder, known_apps_database_enum=known_apps_database_enum, unknown_apps_database_enum=unknown_apps_database_enum)
+        # Initialize test set
+        if dataset_config.need_test_set:
+            test_known_indices, test_unknown_indices, test_data_path = init_or_load_test_indices(dataset_config=dataset_config,
+                                                                                                 known_apps=known_apps,
+                                                                                                 unknown_apps=unknown_apps,
+                                                                                                 tables_app_enum=self._tables_app_enum,
+                                                                                                 disable_indices_cache=disable_indices_cache,)
+        else:
+            test_known_indices = np.zeros((0,3), dtype=np.int64)
+            test_unknown_indices = np.zeros((0,3), dtype=np.int64)
+            test_data_path = None
         # Fit scalers if needed
         if (dataset_config.ppi_transform is not None and dataset_config.ppi_transform.needs_fitting or
             dataset_config.flowstats_transform is not None and dataset_config.flowstats_transform.needs_fitting):
+            if not dataset_config.need_train_set:
+                raise ValueError("Train set is needed to fit the scalers. Provide pre-fitted scalers.")
             fit_scalers(dataset_config=dataset_config, train_indices=train_indices)
         # Subset dataset indices based on the selected sizes and compute application counts
         dataset_indices = IndicesTuple(train_indices=train_indices, val_known_indices=val_known_indices, val_unknown_indices=val_unknown_indices, test_known_indices=test_known_indices, test_unknown_indices=test_unknown_indices)
         dataset_indices = subset_and_sort_indices(dataset_config=dataset_config, dataset_indices=dataset_indices)
-        known_app_counts = compute_known_app_counts(dataset_indices=dataset_indices, database_enum=known_apps_database_enum)
-        unknown_app_counts = compute_unknown_app_counts(dataset_indices=dataset_indices, database_enum=unknown_apps_database_enum)
+        known_app_counts = compute_known_app_counts(dataset_indices=dataset_indices, tables_app_enum=self._tables_app_enum)
+        unknown_app_counts = compute_unknown_app_counts(dataset_indices=dataset_indices, tables_app_enum=self._tables_app_enum)
         # Combine known and unknown test indicies to create a single dataloader
         assert isinstance(dataset_config.test_unknown_size, int)
-        if dataset_config.test_unknown_size > 0 and len(unknown_apps_database_enum) > 0:
+        if dataset_config.test_unknown_size > 0 and len(unknown_apps) > 0:
             test_combined_indices = np.concatenate((dataset_indices.test_known_indices, dataset_indices.test_unknown_indices))
         else:
             test_combined_indices = dataset_indices.test_known_indices
-
+        # Create encoder the class info structure
+        encoder = LabelEncoder().fit(known_apps)
+        encoder.classes_ = np.append(encoder.classes_, UNKNOWN_STR_LABEL)
+        class_info = create_class_info(servicemap=servicemap, encoder=encoder, known_apps=known_apps, unknown_apps=unknown_apps)
         encode_labels_with_unknown_fn = partial(_encode_labels_with_unknown, encoder=encoder, class_info=class_info)
         # Create train, validation, and test datasets
-        train_dataset = PyTablesDataset(
-            database_path=dataset_config.database_path,
-            tables_paths=dataset_config._get_train_tables_paths(),
-            indices=dataset_indices.train_indices,
-            pytables_app_enum=self._pytables_app_enum,
-            pytables_category_enum=self._pytables_category_enum,
-            flowstats_features=dataset_config.flowstats_features,
-            flowstats_features_boolean=dataset_config.flowstats_features_boolean,
-            flowstats_features_phist=dataset_config.flowstats_features_phist,
-            other_fields=self.dataset_config.other_fields,
-            ppi_channels=dataset_config.get_ppi_channels(),
-            ppi_transform=dataset_config.ppi_transform,
-            flowstats_transform=dataset_config.flowstats_transform,
-            flowstats_phist_transform=dataset_config.flowstats_phist_transform,
-            target_transform=encode_labels_with_unknown_fn,
-            return_tensors=dataset_config.return_tensors,)
-        if dataset_config.no_test_set:
-            test_dataset = None
-        else:
-            assert test_data_path is not None
-            test_dataset = PyTablesDataset(
+        train_dataset = val_dataset = test_dataset = None
+        if dataset_config.need_train_set:
+            train_dataset = PyTablesDataset(
                 database_path=dataset_config.database_path,
-                tables_paths=dataset_config._get_test_tables_paths(),
-                indices=test_combined_indices,
-                pytables_app_enum=self._pytables_app_enum,
-                pytables_category_enum=self._pytables_category_enum,
+                tables_paths=dataset_config._get_train_tables_paths(),
+                indices=dataset_indices.train_indices,
+                tables_app_enum=self._tables_app_enum,
+                tables_cat_enum=self._tables_cat_enum,
                 flowstats_features=dataset_config.flowstats_features,
                 flowstats_features_boolean=dataset_config.flowstats_features_boolean,
                 flowstats_features_phist=dataset_config.flowstats_features_phist,
@@ -630,19 +633,15 @@ class CesnetDataset():
                 flowstats_transform=dataset_config.flowstats_transform,
                 flowstats_phist_transform=dataset_config.flowstats_phist_transform,
                 target_transform=encode_labels_with_unknown_fn,
-                return_tensors=dataset_config.return_tensors,
-                preload=dataset_config.preload_test,
-                preload_blob=os.path.join(test_data_path, "preload", f"test_dataset-{dataset_config.test_known_size}-{dataset_config.test_unknown_size}.npz"),)
-        if dataset_config.val_approach == ValidationApproach.NO_VALIDATION:
-            val_dataset = None
-        else:
+                return_tensors=dataset_config.return_tensors,)
+        if dataset_config.need_val_set:
             assert val_data_path is not None
             val_dataset = PyTablesDataset(
                 database_path=dataset_config.database_path,
                 tables_paths=dataset_config._get_train_tables_paths(),
                 indices=dataset_indices.val_known_indices,
-                pytables_app_enum=self._pytables_app_enum,
-                pytables_category_enum=self._pytables_category_enum,
+                tables_app_enum=self._tables_app_enum,
+                tables_cat_enum=self._tables_cat_enum,
                 flowstats_features=dataset_config.flowstats_features,
                 flowstats_features_boolean=dataset_config.flowstats_features_boolean,
                 flowstats_features_phist=dataset_config.flowstats_features_phist,
@@ -655,17 +654,34 @@ class CesnetDataset():
                 return_tensors=dataset_config.return_tensors,
                 preload=dataset_config.preload_val,
                 preload_blob=os.path.join(val_data_path, "preload", f"val_dataset-{dataset_config.val_known_size}.npz"),)
+        if dataset_config.need_test_set:
+            assert test_data_path is not None
+            test_dataset = PyTablesDataset(
+                database_path=dataset_config.database_path,
+                tables_paths=dataset_config._get_test_tables_paths(),
+                indices=test_combined_indices,
+                tables_app_enum=self._tables_app_enum,
+                tables_cat_enum=self._tables_cat_enum,
+                flowstats_features=dataset_config.flowstats_features,
+                flowstats_features_boolean=dataset_config.flowstats_features_boolean,
+                flowstats_features_phist=dataset_config.flowstats_features_phist,
+                other_fields=self.dataset_config.other_fields,
+                ppi_channels=dataset_config.get_ppi_channels(),
+                ppi_transform=dataset_config.ppi_transform,
+                flowstats_transform=dataset_config.flowstats_transform,
+                flowstats_phist_transform=dataset_config.flowstats_phist_transform,
+                target_transform=encode_labels_with_unknown_fn,
+                return_tensors=dataset_config.return_tensors,
+                preload=dataset_config.preload_test,
+                preload_blob=os.path.join(test_data_path, "preload", f"test_dataset-{dataset_config.test_known_size}-{dataset_config.test_unknown_size}.npz"),)
         self.class_info = class_info
         self.dataset_indices = dataset_indices
         self.train_dataset = train_dataset
         self.val_dataset = val_dataset
         self.test_dataset = test_dataset
-        self.known_apps_database_enum = known_apps_database_enum
-        self.unknown_apps_database_enum = unknown_apps_database_enum
         self.known_app_counts = known_app_counts
         self.unknown_app_counts = unknown_app_counts
         self.collate_fn = _collate_fn_simple
-        self.encoder = encoder
 
 def _encode_labels_with_unknown(labels, encoder: LabelEncoder, class_info: ClassInfo):
     return encoder.transform(np.where(np.isin(labels, class_info.known_apps), labels, UNKNOWN_STR_LABEL))

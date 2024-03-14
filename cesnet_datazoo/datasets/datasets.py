@@ -1,13 +1,13 @@
 from cesnet_datazoo.datasets.cesnet_dataset import CesnetDataset
 from cesnet_datazoo.datasets.datasets_constants import (_CESNET_QUIC22_AVAILABLE_DATES,
-                                                        _CESNET_QUIC22_PYTABLES_APP_ENUM,
-                                                        _CESNET_QUIC22_PYTABLES_CATEGORY_ENUM,
+                                                        _CESNET_QUIC22_TABLES_APP_ENUM,
+                                                        _CESNET_QUIC22_TABLES_CATEGORY_ENUM,
                                                         _CESNET_TLS22_AVAILABLE_DATES,
-                                                        _CESNET_TLS22_PYTABLES_APP_ENUM,
-                                                        _CESNET_TLS22_PYTABLES_CATEGORY_ENUM,
+                                                        _CESNET_TLS22_TABLES_APP_ENUM,
+                                                        _CESNET_TLS22_TABLES_CATEGORY_ENUM,
                                                         _CESNET_TLS_YEAR22_AVAILABLE_DATES,
-                                                        _CESNET_TLS_YEAR22_PYTABLES_APP_ENUM,
-                                                        _CESNET_TLS_YEAR22_PYTABLES_CATEGORY_ENUM,
+                                                        _CESNET_TLS_YEAR22_TABLES_APP_ENUM,
+                                                        _CESNET_TLS_YEAR22_TABLES_CATEGORY_ENUM,
                                                         _CESNET_TLS_YEAR22_TIME_PERIODS)
 
 
@@ -23,8 +23,8 @@ class CESNET_TLS22(CesnetDataset):
     }
     default_train_period_name = "W-2021-40"
     default_test_period_name = "W-2021-41"
-    _pytables_app_enum = _CESNET_TLS22_PYTABLES_APP_ENUM
-    _pytables_category_enum = _CESNET_TLS22_PYTABLES_CATEGORY_ENUM
+    _tables_app_enum = _CESNET_TLS22_TABLES_APP_ENUM
+    _tables_cat_enum = _CESNET_TLS22_TABLES_CATEGORY_ENUM
 
 class CESNET_QUIC22(CesnetDataset):
     """Dataset class for [CESNET-QUIC22][cesnet-quic22]."""
@@ -43,8 +43,8 @@ class CESNET_QUIC22(CesnetDataset):
     }
     default_train_period_name = "W-2022-44"
     default_test_period_name = "W-2022-45"
-    _pytables_app_enum = _CESNET_QUIC22_PYTABLES_APP_ENUM
-    _pytables_category_enum = _CESNET_QUIC22_PYTABLES_CATEGORY_ENUM
+    _tables_app_enum = _CESNET_QUIC22_TABLES_APP_ENUM
+    _tables_cat_enum = _CESNET_QUIC22_TABLES_CATEGORY_ENUM
 
 class CESNET_TLS_Year22(CesnetDataset):
     """Dataset class for [CESNET-TLS-Year22][cesnet-tls-year22]."""
@@ -55,7 +55,7 @@ class CESNET_TLS_Year22(CesnetDataset):
     time_periods = _CESNET_TLS_YEAR22_TIME_PERIODS
     default_train_period_name = "M-2022-9"
     default_test_period_name = "M-2022-10"
-    _pytables_app_enum = _CESNET_TLS_YEAR22_PYTABLES_APP_ENUM
-    _pytables_category_enum = _CESNET_TLS_YEAR22_PYTABLES_CATEGORY_ENUM
+    _tables_app_enum = _CESNET_TLS_YEAR22_TABLES_APP_ENUM
+    _tables_cat_enum = _CESNET_TLS_YEAR22_TABLES_CATEGORY_ENUM
 
 

@@ -34,25 +34,23 @@ class ValidationApproach(Enum):
     is used to create a random stratified validation set. The fraction of validation samples is defined in `train_val_split_fraction`."""
     VALIDATION_DATES = "validation-dates"
     """Use separate validation dates to create a validation set. Validation dates need to be specified in `val_dates`, and the name of the validation period in `val_period_name`."""
-    NO_VALIDATION = "no-validation"
-    """Do not use validation. The validation dataloader and dataframe will not be available."""
     def __str__(self): return self.value
 
 class AppSelection(Enum):
     """
     Applications can be divided into *known* and *unknown* classes. To use a dataset in the standard closed-world setting, use `ALL_KNOWN ` to select all the applications as *known*.
-    Use `TOPX_KNOWN` or `EXPLICIT_UNKNOWN` for the open-world setting and evaluation of out-of-distribution or open-set recognition methods.
-    The `LONGTERM_FIXED` is for long-term measurements when it is desired to use the same applications for multiple subsequent train and test periods.
+    Use `TOPX_KNOWN` or `BACKGROUND_UNKNOWN` for the open-world setting and evaluation of out-of-distribution or open-set recognition methods.
+    The `FIXED` is for manual selection of *known* and *unknown* applications.
     """
     ALL_KNOWN = "all-known"
     """Use all applications as *known*."""
     TOPX_KNOWN = "topx-known"
     """Use the first X (`apps_selection_topx`) most frequent (with the most samples) applications as *known*, and the rest as *unknown*.
     Applications with the same provider are never separated, i.e., all applications of a given provider are either *known* or *unknown*."""
-    EXPLICIT_UNKNOWN = "explicit-unknown"
-    """Use the provided list of applications (`apps_selection_explicit_unknown`) as *unknown*, and the rest as *known*."""
-    LONGTERM_FIXED = "longterm-fixed"
-    """Use fixed application selection. Provide a tuple of `(known_apps_database_enum, unknown_apps_database_enum)` in `apps_selection_fixed_longterm`."""
+    BACKGROUND_UNKNOWN = "background-unknown"
+    """Use the list of background applications (`apps_selection_background_unknown`) as *unknown*, and the rest as *known*."""
+    FIXED = "fixed"
+    """Manual application selection. Provide lists of *known* applications (`apps_selection_fixed_known`) and *unknown* applications (`apps_selection_fixed_unknown`)."""
     def __str__(self): return self.value
 
 class MinTrainSamplesCheck(Enum):
@@ -89,8 +87,9 @@ class TrainDataParams():
     train_tables_paths: list[str]
     apps_selection: AppSelection
     apps_selection_topx: int
-    apps_selection_explicit_unknown: list[str]
-    apps_selection_fixed_longterm: Optional[tuple[dict[int, str], dict[int, str]]]
+    apps_selection_background_unknown: list[str]
+    apps_selection_fixed_known: list[str]
+    apps_selection_fixed_unknown: list[str]
     disabled_apps: list[str]
     min_train_samples_check: MinTrainSamplesCheck
     min_train_samples_per_app: int
@@ -100,8 +99,8 @@ class TestDataParams():
     database_filename: str
     test_period_name: str
     test_tables_paths: list[str]
-    known_apps_database_enum: dict[int, str]
-    unknown_apps_database_enum: dict[int, str]
+    known_apps: list[str]
+    unknown_apps: list[str]
 
 class C:
     arbitrary_types_allowed = True
@@ -133,6 +132,9 @@ class DatasetConfig():
     # Configuration options
 
     Attributes:
+        need_train_set: Use to disable the train set. `Default: True`
+        need_val_set: Use to disable the validation set. When need_train_set is false, the validation set will also be disabled. `Default: True`
+        need_test_set: Use to disable the test set. `Default: True`
         train_period_name: Name of the train period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
         train_dates: Dates used for creating a train set.
         train_dates_weigths: To use a non-uniform distribution of samples across train dates.
@@ -140,14 +142,14 @@ class DatasetConfig():
         train_val_split_fraction: The fraction of validation samples when splitting from the train set. `Default: 0.2`
         val_period_name: Name of the validation period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
         val_dates: Dates used for creating a validation set.
-        no_test_set: Disable the test set. `Default: False`
         test_period_name: Name of the test period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
         test_dates: Dates used for creating a test set.
 
         apps_selection: How to select application classes. `Default: ALL_KNOWN`
         apps_selection_topx: Take top X as known.
-        apps_selection_explicit_unknown: Provide a list of unknown applications.
-        apps_selection_fixed_longterm: Provide enums of known and unknown applications. This is suitable for long-term measurements.
+        apps_selection_background_unknown: Provide a list of background applications to be used as unknown.
+        apps_selection_fixed_known: Provide a list of known applications for the fixed application selection.
+        apps_selection_fixed_unknown: Provide a list of unknown applications for the fixed application selection.
         disabled_apps: List of applications to be disabled and not used at all.
         min_train_samples_check: How to handle applications with *not enough* training samples. `Default: DISABLE_APPS`
         min_train_samples_per_app: Defines the threshold for *not enough*. `Default: 100`
@@ -207,6 +209,9 @@ class DatasetConfig():
     flowstats_features_phist: list[str] = field(init=False)
     other_fields: list[str] = field(init=False)
 
+    need_train_set: bool = True
+    need_val_set: bool = True
+    need_test_set: bool = True
     train_period_name: str = ""
     train_dates: list[str] = field(default_factory=list)
     train_dates_weigths: Optional[list[int]] = None
@@ -214,14 +219,14 @@ class DatasetConfig():
     train_val_split_fraction: float = 0.2
     val_period_name: str = ""
     val_dates: list[str] = field(default_factory=list)
-    no_test_set: bool = False
     test_period_name: str = ""
     test_dates: list[str] = field(default_factory=list)
 
     apps_selection: AppSelection = AppSelection.ALL_KNOWN
     apps_selection_topx: int = 0
-    apps_selection_explicit_unknown: list[str] = field(default_factory=list)
-    apps_selection_fixed_longterm: Optional[tuple[dict[int, str], dict[int, str]]] = None
+    apps_selection_background_unknown: list[str] = field(default_factory=list)
+    apps_selection_fixed_known: list[str] = field(default_factory=list)
+    apps_selection_fixed_unknown: list[str] = field(default_factory=list)
     disabled_apps: list[str] = field(default_factory=list)
     min_train_samples_check: MinTrainSamplesCheck = MinTrainSamplesCheck.DISABLE_APPS
     min_train_samples_per_app: int = 100
@@ -262,20 +267,27 @@ class DatasetConfig():
         self.database_filename = dataset.database_filename
         self.database_path = dataset.database_path
 
-        # Configure train dates
-        if len(self.train_dates) > 0 and self.train_period_name == "":
-            raise ValueError("train_period_name has to be specified when train_dates are set")
-        if len(self.train_dates) == 0 and self.train_period_name != "":
-            if self.train_period_name not in dataset.time_periods:
-                raise ValueError(f"Unknown train_period_name {self.train_period_name}. Use time period available in dataset.time_periods")
-            self.train_dates = dataset.time_periods[self.train_period_name]
-        if len(self.train_dates) == 0 and self.test_period_name == "":
-            self.train_period_name = dataset.default_train_period_name
-            self.train_dates = dataset.time_periods[dataset.default_train_period_name]
+        if not self.need_train_set:
+            self.need_val_set = False
+            if self.apps_selection != AppSelection.FIXED:
+                raise ValueError("Application selection has to be fixed when need_train_set is false")
+            if (len(self.train_dates) > 0 or self.train_period_name != ""):
+                raise ValueError("train_dates and train_period_name cannot be specified when need_train_set is false")
+        else:
+            # Configure train dates
+            if len(self.train_dates) > 0 and self.train_period_name == "":
+                raise ValueError("train_period_name has to be specified when train_dates are set")
+            if len(self.train_dates) == 0 and self.train_period_name != "":
+                if self.train_period_name not in dataset.time_periods:
+                    raise ValueError(f"Unknown train_period_name {self.train_period_name}. Use time period available in dataset.time_periods")
+                self.train_dates = dataset.time_periods[self.train_period_name]
+            if len(self.train_dates) == 0 and self.test_period_name == "":
+                self.train_period_name = dataset.default_train_period_name
+                self.train_dates = dataset.time_periods[dataset.default_train_period_name]
         # Configure test dates
-        if self.no_test_set:
+        if not self.need_test_set:
             if (len(self.test_dates) > 0 or self.test_period_name != ""):
-                raise ValueError("test_dates and test_period_name cannot be specified when no_test_set is true")
+                raise ValueError("test_dates and test_period_name cannot be specified when need_test_set is false")
         else:
             if len(self.test_dates) > 0 and self.test_period_name == "":
                 raise ValueError("test_period_name has to be specified when test_dates are set")
@@ -287,8 +299,8 @@ class DatasetConfig():
                 self.test_period_name = dataset.default_test_period_name
                 self.test_dates = dataset.time_periods[dataset.default_test_period_name]
         # Configure val dates
-        if (self.val_approach == ValidationApproach.NO_VALIDATION or self.val_approach == ValidationApproach.SPLIT_FROM_TRAIN) and (len(self.val_dates) > 0 or self.val_period_name != ""):
-            raise ValueError("val_dates and val_period_name cannot be specified when val_approach is no-validation or split-from-train")
+        if (not self.need_val_set or self.val_approach == ValidationApproach.SPLIT_FROM_TRAIN) and (len(self.val_dates) > 0 or self.val_period_name != ""):
+            raise ValueError("val_dates and val_period_name cannot be specified when need_val_set is false or the validation approach is split-from-train")
         if self.val_approach == ValidationApproach.VALIDATION_DATES:
             if len(self.val_dates) > 0 and self.val_period_name == "":
                 raise ValueError("val_period_name has to be specified when val_dates are set")
@@ -297,31 +309,31 @@ class DatasetConfig():
                     raise ValueError(f"Unknown val_period_name {self.val_period_name}. Use time period available in dataset.time_periods")
                 self.val_dates = dataset.time_periods[self.val_period_name]
             if len(self.val_dates) == 0 and self.val_period_name == "":
-                raise ValueError("val_period_name and val_dates (or val_period_name from dataset.time_periods) have to be specified when val_approach is validation-dates")
+                raise ValueError("val_period_name and val_dates (or val_period_name from dataset.time_periods) have to be specified when the validation approach is validation-dates")
         # Check if train, val, and test dates are available in the dataset
-        if dataset.available_dates:
-            unknown_train_dates = [t for t in self.train_dates if t not in dataset.available_dates]
-            unknown_val_dates = [t for t in self.val_dates if t not in dataset.available_dates]
-            unknown_test_dates = [t for t in self.test_dates if t not in dataset.available_dates]
-            if len(unknown_train_dates) > 0:
-                raise ValueError(f"Unknown train dates {unknown_train_dates}. Use dates available in dataset.available_dates (collection period {dataset.metadata.collection_period})" \
-                                + (f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else ""))
-            if len(unknown_val_dates) > 0:
-                raise ValueError(f"Unknown validation dates {unknown_val_dates}. Use dates available in dataset.available_dates (collection period {dataset.metadata.collection_period})" \
-                                + (f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else ""))
-            if len(unknown_test_dates) > 0:
-                raise ValueError(f"Unknown test dates {unknown_test_dates}. Use dates available in dataset.available_dates (collection period {dataset.metadata.collection_period})" \
-                                + (f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else ""))
+        bad_train_dates = [t for t in self.train_dates if t not in dataset.available_dates]
+        bad_val_dates = [t for t in self.val_dates if t not in dataset.available_dates]
+        bad_test_dates = [t for t in self.test_dates if t not in dataset.available_dates]
+        if len(bad_train_dates) > 0:
+            raise ValueError(f"Bad train dates {bad_train_dates}. Use dates available in dataset.available_dates (collection period {dataset.metadata.collection_period})" \
+                            + (f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else ""))
+        if len(bad_val_dates) > 0:
+            raise ValueError(f"Bad validation dates {bad_val_dates}. Use dates available in dataset.available_dates (collection period {dataset.metadata.collection_period})" \
+                            + (f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else ""))
+        if len(bad_test_dates) > 0:
+            raise ValueError(f"Bad test dates {bad_test_dates}. Use dates available in dataset.available_dates (collection period {dataset.metadata.collection_period})" \
+                            + (f". These dates are missing from the dataset collection period {dataset.metadata.missing_dates_in_collection_period}" if dataset.metadata.missing_dates_in_collection_period else ""))
         # Check time order of train, val, and test periods
         train_dates = [datetime.strptime(date_str, "%Y%m%d").date() for date_str in self.train_dates]
         test_dates = [datetime.strptime(date_str, "%Y%m%d").date() for date_str in self.test_dates]
-        if not self.no_test_set and min(test_dates) <= max(train_dates):
+        if len(train_dates) > 0 and len(test_dates) > 0  and min(test_dates) <= max(train_dates):
             warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last train date ({max(train_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
         if self.val_approach == ValidationApproach.VALIDATION_DATES:
+            # Train dates are guaranteed to be set
             val_dates = [datetime.strptime(date_str, "%Y%m%d").date() for date_str in self.val_dates]
             if min(val_dates) <= max(train_dates):
                 warnings.warn(f"Some validation dates ({min(val_dates).strftime('%Y%m%d')}) are before or equal to the last train date ({max(train_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
-            if not self.no_test_set and min(test_dates) <= max(val_dates):
+            if len(test_dates) > 0 and min(test_dates) <= max(val_dates):
                 warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last validation date ({max(val_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
         # Configure features
         self.flowstats_features = dataset.metadata.flowstats_features
@@ -347,6 +359,8 @@ class DatasetConfig():
                 raise ValueError("QUIC datasets do not support use_push_flags")
         # When train_dates_weigths are used, train_size and val_known_size have to be specified
         if self.train_dates_weigths is not None:
+            if not self.need_train_set:
+                raise ValueError("train_dates_weigths cannot be specified when need_train_set is false")
             if len(self.train_dates_weigths) != len(self.train_dates):
                 raise ValueError("train_dates_weigths has to have the same length as train_dates")
             if self.train_size == "all":
@@ -357,22 +371,37 @@ class DatasetConfig():
         if self.apps_selection == AppSelection.ALL_KNOWN:
             self.val_unknown_size = 0
             self.test_unknown_size = 0
-            if self.apps_selection_topx != 0 or len(self.apps_selection_explicit_unknown) > 0 or self.apps_selection_fixed_longterm is not None:
-                raise ValueError("apps_selection_topx, apps_selection_explicit_unknown, and apps_selection_fixed_longterm cannot be specified when apps_selection is all-known")
-        if self.apps_selection == AppSelection.TOPX_KNOWN and self.apps_selection_topx == 0:
-            raise ValueError("apps_selection_topx has to be greater than 0 when apps_selection is top-x-known")
-        if self.apps_selection == AppSelection.EXPLICIT_UNKNOWN and len(self.apps_selection_explicit_unknown) == 0:
-            raise ValueError("apps_selection_explicit_unknown has to be specified when apps_selection is explicit-unknown")
-        if self.apps_selection == AppSelection.LONGTERM_FIXED:
-            if self.apps_selection_fixed_longterm is None:
-                raise ValueError("apps_selection_fixed_longterm, a tuple of (known_apps_database_enum, unknown_apps_database_enum), has to be specified when apps_selection is longterm-fixed")
+            if self.apps_selection_topx != 0 or len(self.apps_selection_background_unknown) > 0 or len(self.apps_selection_fixed_known) > 0 or len(self.apps_selection_fixed_unknown) > 0:
+                raise ValueError("apps_selection_topx, apps_selection_background_unknown, apps_selection_fixed_known, and apps_selection_fixed_unknown cannot be specified when application selection is all-known")
+        if self.apps_selection == AppSelection.TOPX_KNOWN:
+            if self.apps_selection_topx == 0:
+                raise ValueError("apps_selection_topx has to be greater than 0 when application selection is top-x-known")
+            if len(self.apps_selection_background_unknown) > 0 or len(self.apps_selection_fixed_known) > 0 or len(self.apps_selection_fixed_unknown) > 0:
+                raise ValueError("apps_selection_background_unknown, apps_selection_fixed_known, and apps_selection_fixed_unknown cannot be specified when application selection is top-x-known")
+        if self.apps_selection == AppSelection.BACKGROUND_UNKNOWN:
+            if len(self.apps_selection_background_unknown) == 0:
+                raise ValueError("apps_selection_background_unknown has to be specified when application selection is background-unknown")
+            bad_apps = [a for a in self.apps_selection_background_unknown if a not in dataset.available_classes]
+            if len(bad_apps) > 0:
+                raise ValueError(f"Bad applications in apps_selection_background_unknown {bad_apps}. Use applications available in dataset.available_classes")
+            if self.apps_selection_topx != 0 or len(self.apps_selection_fixed_known) > 0 or len(self.apps_selection_fixed_unknown) > 0:
+                raise ValueError("apps_selection_topx, apps_selection_fixed_known, and apps_selection_fixed_unknown cannot be specified when application selection is background-unknown")
+        if self.apps_selection == AppSelection.FIXED:
+            if len(self.apps_selection_fixed_known) == 0:
+                raise ValueError("apps_selection_fixed_known has to be specified when application selection is fixed")
+            bad_apps = [a for a in self.apps_selection_fixed_known + self.apps_selection_fixed_unknown if a not in dataset.available_classes]
+            if len(bad_apps) > 0:
+                raise ValueError(f"Bad applications in apps_selection_fixed_known or apps_selection_fixed_unknown {bad_apps}. Use applications available in dataset.available_classes")
             if len(self.disabled_apps) > 0:
-                raise ValueError("disabled_apps cannot be specified when apps_selection is longterm-fixed")
-            if self.min_train_samples_per_app != 0:
-                raise ValueError("min_train_samples_per_app has to be 0 when apps_selection is longterm-fixed")
-        if sum((self.apps_selection_topx != 0, len(self.apps_selection_explicit_unknown) > 0, self.apps_selection_fixed_longterm is not None)) > 1:
-            raise ValueError("apps_selection_topx, apps_selection_explicit_unknown, and apps_selection_fixed_longterm should not be specified at the same time")
+                raise ValueError("disabled_apps cannot be specified when application selection is fixed")
+            if self.min_train_samples_per_app != 0 and self.min_train_samples_per_app != 100:
+                warnings.warn("min_train_samples_per_app is not used when application selection is fixed")
+            if self.apps_selection_topx != 0 or len(self.apps_selection_background_unknown) > 0:
+                raise ValueError("apps_selection_topx and apps_selection_background_unknown cannot be specified when application selection is fixed")
         # More asserts
+        bad_disabled_apps = [a for a in self.disabled_apps if a not in dataset.available_classes]
+        if len(bad_disabled_apps) > 0:
+            raise ValueError(f"Bad applications in disabled_apps {bad_disabled_apps}. Use applications available in dataset.available_classes")
         if isinstance(self.fit_scalers_samples, float) and (self.fit_scalers_samples <= 0 or self.fit_scalers_samples > 1):
             raise ValueError("fit_scalers_samples has to be either float between 0 and 1 (giving the fraction of training samples used for fitting scalers) or an integer")
 
@@ -459,8 +488,11 @@ class DatasetConfig():
         return params_hash
 
     def _get_train_data_path(self) -> str:
-        params_hash = self._get_train_data_hash()
-        return os.path.join(self.data_root, "train-data", f"{params_hash}_{self.random_state}", f"fold_{self.fold_id}")
+        if self.need_train_set:
+            params_hash = self._get_train_data_hash()
+            return os.path.join(self.data_root, "train-data", f"{params_hash}_{self.random_state}", f"fold_{self.fold_id}")
+        else:
+            return os.path.join(self.data_root, "train-data", "default")
 
     def _get_train_data_params(self) -> TrainDataParams:
         return TrainDataParams(
@@ -469,32 +501,33 @@ class DatasetConfig():
             train_tables_paths=self._get_train_tables_paths(),
             apps_selection=self.apps_selection,
             apps_selection_topx=self.apps_selection_topx,
-            apps_selection_explicit_unknown=self.apps_selection_explicit_unknown,
-            apps_selection_fixed_longterm=self.apps_selection_fixed_longterm,
+            apps_selection_background_unknown=self.apps_selection_background_unknown,
+            apps_selection_fixed_known=self.apps_selection_fixed_known,
+            apps_selection_fixed_unknown=self.apps_selection_fixed_unknown,
             disabled_apps=self.disabled_apps,
             min_train_samples_per_app=self.min_train_samples_per_app,
             min_train_samples_check=self.min_train_samples_check,)
 
-    def _get_val_data_params_and_path(self, known_apps_database_enum: dict[int, str], unknown_apps_database_enum: dict[int, str]) -> tuple[TestDataParams, str]:
+    def _get_val_data_params_and_path(self, known_apps: list[str], unknown_apps: list[str]) -> tuple[TestDataParams, str]:
         assert self.val_approach == ValidationApproach.VALIDATION_DATES
         val_data_params = TestDataParams(
             database_filename=self.database_filename,
             test_period_name=self.val_period_name,
             test_tables_paths=self._get_val_tables_paths(),
-            known_apps_database_enum=known_apps_database_enum,
-            unknown_apps_database_enum=unknown_apps_database_enum,)
+            known_apps=known_apps,
+            unknown_apps=unknown_apps,)
         params_hash = hashlib.sha256(json.dumps(dataclasses.asdict(val_data_params), sort_keys=True).encode()).hexdigest()
         params_hash = params_hash[:10]
         val_data_path = os.path.join(self.data_root, "val-data", f"{params_hash}_{self.random_state}")
         return val_data_params, val_data_path
 
-    def _get_test_data_params_and_path(self, known_apps_database_enum: dict[int, str], unknown_apps_database_enum: dict[int, str]) -> tuple[TestDataParams, str]:
+    def _get_test_data_params_and_path(self, known_apps: list[str], unknown_apps: list[str]) -> tuple[TestDataParams, str]:
         test_data_params = TestDataParams(
             database_filename=self.database_filename,
             test_period_name=self.test_period_name,
             test_tables_paths=self._get_test_tables_paths(),
-            known_apps_database_enum=known_apps_database_enum,
-            unknown_apps_database_enum=unknown_apps_database_enum,)
+            known_apps=known_apps,
+            unknown_apps=unknown_apps,)
         params_hash = hashlib.sha256(json.dumps(dataclasses.asdict(test_data_params), sort_keys=True).encode()).hexdigest()
         params_hash = params_hash[:10]
         test_data_path = os.path.join(self.data_root, "test-data", f"{params_hash}_{self.random_state}")

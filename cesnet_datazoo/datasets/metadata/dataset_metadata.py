@@ -18,7 +18,7 @@ class DatasetMetadata():
     collection_period: str
     missing_dates_in_collection_period: list[str]
     application_count: int
-    background_traffic: list[str]
+    background_traffic_classes: list[str]
     ppi_features: list[str]
     flowstats_features: list[str]
     flowstats_features_boolean: list[str]
@@ -29,7 +29,7 @@ class DatasetMetadata():
     zenodo_url: str
     related_papers: list[str]
 
-    @field_validator("available_dataset_sizes", "missing_dates_in_collection_period", "background_traffic", "ppi_features",
+    @field_validator("available_dataset_sizes", "missing_dates_in_collection_period", "background_traffic_classes", "ppi_features",
                      "flowstats_features", "flowstats_features_boolean", "packet_histograms", "tcp_features", "other_fields", "related_papers", mode="before")
     @classmethod
     def parse_string_to_list(cls, v: str, info: ValidationInfo) -> list[str]:

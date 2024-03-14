@@ -16,8 +16,7 @@ from typing_extensions import assert_never
 
 from cesnet_datazoo.config import (AppSelection, MinTrainSamplesCheck, TestDataParams,
                                    TrainDataParams)
-from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, INDICES_INDEX_POS,
-                                      INDICES_TABLE_POS, PPI_COLUMN)
+from cesnet_datazoo.constants import APP_COLUMN, INDICES_INDEX_POS, INDICES_TABLE_POS, PPI_COLUMN
 from cesnet_datazoo.pytables_data.apps_split import (is_background_app,
                                                      split_apps_topx_with_provider_groups)
 
@@ -29,8 +28,8 @@ class PyTablesDataset(Dataset):
                  database_path: str,
                  tables_paths: list[str],
                  indices: Optional[np.ndarray],
-                 pytables_app_enum: dict[int, str],
-                 pytables_category_enum: dict[int, str],
+                 tables_app_enum: dict[int, str],
+                 tables_cat_enum: dict[int, str],
                  flowstats_features: list[str],
                  flowstats_features_boolean: list[str],
                  flowstats_features_phist: list[str],
@@ -48,8 +47,9 @@ class PyTablesDataset(Dataset):
         self.database_path = database_path
         self.tables_paths = tables_paths
         self.tables = {}
-        self.pytables_app_enum = pytables_app_enum
-        self.pytables_category_enum = pytables_category_enum
+        self.tables_app_enum = tables_app_enum
+        self.tables_app_arr = np.array(list(tables_app_enum.values()))
+        self.tables_cat_enum = tables_cat_enum
         if indices is None:
             self.set_all_indices(disabled_apps=disabled_apps)
         else:
@@ -86,11 +86,11 @@ class PyTablesDataset(Dataset):
         if self.flowstats_features_boolean:
             x_flowstats_boolean = structured_to_unstructured(batch_data[self.flowstats_features_boolean], dtype="float32")
         else:
-            x_flowstats_boolean = np.empty(shape=(x_flowstats.shape[0], 0), dtype="float32")
+            x_flowstats_boolean = np.zeros(shape=(x_flowstats.shape[0], 0), dtype="float32")
         if self.flowstats_features_phist:
             x_flowstats_phist = structured_to_unstructured(batch_data[self.flowstats_features_phist], dtype="float32")
         else:
-            x_flowstats_phist = np.empty(shape=(x_flowstats.shape[0], 0), dtype="float32")
+            x_flowstats_phist = np.zeros(shape=(x_flowstats.shape[0], 0), dtype="float32")
         # Feature transformations
         if self.ppi_transform:
             x_ppi = self.ppi_transform(x_ppi)
@@ -100,7 +100,7 @@ class PyTablesDataset(Dataset):
             x_flowstats_phist = self.flowstats_phist_transform(x_flowstats_phist)
         x_flowstats = np.concatenate([x_flowstats, x_flowstats_boolean, x_flowstats_phist], axis=1).astype("float32")
         # Labels transformation
-        labels = list(map(self.pytables_app_enum.get, batch_data[APP_COLUMN]))
+        labels = self.tables_app_arr[batch_data[APP_COLUMN]]
         if self.target_transform:
             labels = self.target_transform(labels)
         # Prepare dataframe with other fields
@@ -148,7 +148,8 @@ class PyTablesDataset(Dataset):
         Does no filter apps with not enough samples.
         """
         database, tables = load_database(database_path=self.database_path, tables_paths=self.tables_paths)
-        disabled_apps_ids = [app_id for app_id, app_name in self.pytables_app_enum.items() if app_name in disabled_apps] if disabled_apps is not None else []
+        inverted_tables_app_enum = {v: k for k, v in self.tables_app_enum.items()}
+        disabled_apps_ids = [inverted_tables_app_enum[app] for app in disabled_apps] if disabled_apps is not None else []
         base_labels = {}
         base_indices = {}
         for i in range(len(tables)):
@@ -170,9 +171,9 @@ def worker_init_fn(worker_id):
     dataset = worker_info.dataset
     dataset.pytables_worker_init(worker_id)
 
-def init_train_indices(train_data_params: TrainDataParams, servicemap: pd.DataFrame, database_path: str, rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray, dict[int, str], dict[int, str]]:
+def init_train_indices(train_data_params: TrainDataParams, database_path: str, tables_app_enum: dict[int, str], servicemap: pd.DataFrame, rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray, list[str], list[str]]:
     database, train_tables = load_database(database_path, tables_paths=train_data_params.train_tables_paths)
-    app_enum = train_tables[0].get_enum(APP_COLUMN)
+    inverted_tables_app_enum = {v: k for k, v in tables_app_enum.items()}
     all_app_labels = {}
     app_counts = pd.Series(dtype="int64")
     start_time = time.time()
@@ -184,15 +185,16 @@ def init_train_indices(train_data_params: TrainDataParams, servicemap: pd.DataFr
     # Handle disabled apps and apps with less than min_samples_per_app samples
     if len(train_data_params.disabled_apps) > 0:
         log.info(f"Disabled applications in dataset config: {sorted(train_data_params.disabled_apps)}")
-    disabled_apps_ids = list(map(lambda x: app_enum[x], train_data_params.disabled_apps))
+    disabled_apps_ids = [inverted_tables_app_enum[app] for app in train_data_params.disabled_apps]
     min_samples_apps_ids = set(app_counts[app_counts<train_data_params.min_train_samples_per_app].index.tolist())
     if len(min_samples_apps_ids) > 0:
+        min_samples_apps_names = sorted([tables_app_enum[app_id] for app_id in min_samples_apps_ids])
         if train_data_params.min_train_samples_check == MinTrainSamplesCheck.WARN_AND_EXIT:
-            warnings.warn(f"Found applications with less than {train_data_params.min_train_samples_per_app} train samples: {sorted(map(app_enum, min_samples_apps_ids))}. " +
+            warnings.warn(f"Found applications with less than {train_data_params.min_train_samples_per_app} train samples: {min_samples_apps_names}. " +
                             "To disable these applications, add them to config.disabled_apps or set config.min_train_samples_check to disable-apps. To turn off this check, set config.min_train_samples_per_app to zero. Exiting")
             exit()
         elif train_data_params.min_train_samples_check == MinTrainSamplesCheck.DISABLE_APPS:
-            log.info(f"Found applications with less than {train_data_params.min_train_samples_per_app} train samples: {sorted(map(app_enum, min_samples_apps_ids))}. " +
+            log.info(f"Found applications with less than {train_data_params.min_train_samples_per_app} train samples: {min_samples_apps_names}. " +
                        "Disabling these applications")
             disabled_apps_ids.extend(min_samples_apps_ids)
     # Base indices are indices of samples that are not disabled and have enough samples
@@ -201,9 +203,9 @@ def init_train_indices(train_data_params: TrainDataParams, servicemap: pd.DataFr
         base_indices[i] = np.nonzero(np.isin(all_app_labels[i], disabled_apps_ids, invert=True))[0]
     base_labels = {table_id: arr[base_indices[table_id]] for table_id, arr in all_app_labels.items()}
     # Apps selection
-    if train_data_params.apps_selection != AppSelection.LONGTERM_FIXED:
+    if train_data_params.apps_selection != AppSelection.FIXED:
         app_counts = app_counts[[app for app in app_counts.index.tolist() if app not in disabled_apps_ids]]
-        app_counts.index = app_counts.index.map(app_enum)
+        app_counts.index = app_counts.index.map(tables_app_enum)
         app_counts = app_counts.sort_values(ascending=False).astype("int64")
         sorted_apps = app_counts.index.to_list()
         if train_data_params.apps_selection == AppSelection.ALL_KNOWN:
@@ -213,31 +215,26 @@ def init_train_indices(train_data_params: TrainDataParams, servicemap: pd.DataFr
             known_apps, unknown_apps = split_apps_topx_with_provider_groups(sorted_apps=sorted_apps, known_count=train_data_params.apps_selection_topx, servicemap=servicemap)
             if len(known_apps) < train_data_params.apps_selection_topx:
                 warnings.warn(f"The number of known applications ({len(known_apps)}) is lower than requested in config.apps_selection_topx ({train_data_params.apps_selection_topx}).")
-        elif train_data_params.apps_selection == AppSelection.EXPLICIT_UNKNOWN:
-                unknown_apps = train_data_params.apps_selection_explicit_unknown
-                missing_unknown_apps = [app for app in unknown_apps if app not in sorted_apps]
-                if len(missing_unknown_apps) > 0:
-                    raise ValueError(f"Applications configured in config.apps_selection_explicit_unknown are not present in the dataset (or might be disabled): {sorted(missing_unknown_apps)}")
+        elif train_data_params.apps_selection == AppSelection.BACKGROUND_UNKNOWN:
+                unknown_apps = train_data_params.apps_selection_background_unknown
                 known_apps = [app for app in sorted_apps if not (is_background_app(app) or app in unknown_apps)]
         else: assert_never(train_data_params.apps_selection)
-
         log.info(f"Selected {len(known_apps)} known applications and {len(unknown_apps)} unknown applications")
-        known_apps_database_enum: dict[int, str] = {int(app_enum[app]): app for app in known_apps}
-        unknown_apps_database_enum: dict[int, str] = {int(app_enum[app]): app for app in unknown_apps}
     else:
-        assert train_data_params.apps_selection_fixed_longterm is not None
-        known_apps_database_enum, unknown_apps_database_enum = train_data_params.apps_selection_fixed_longterm
-    known_apps_ids = list(known_apps_database_enum)
-    unknown_apps_ids = list(unknown_apps_database_enum)
+        known_apps = train_data_params.apps_selection_fixed_known
+        unknown_apps = train_data_params.apps_selection_fixed_unknown
+    known_apps_ids = [inverted_tables_app_enum[app] for app in known_apps]
+    unknown_apps_ids = [inverted_tables_app_enum[app] for app in unknown_apps]
 
     train_known_indices, train_unknown_indices = convert_dict_indices(base_indices=base_indices, base_labels=base_labels, known_apps_ids=known_apps_ids, unknown_apps_ids=unknown_apps_ids)
     rng.shuffle(train_known_indices)
     rng.shuffle(train_unknown_indices)
     log.info(f"Processing train indices took {time.time() - start_time:.2f} seconds"); start_time = time.time()
-    return train_known_indices, train_unknown_indices, known_apps_database_enum, unknown_apps_database_enum
+    return train_known_indices, train_unknown_indices, known_apps, unknown_apps
 
-def init_test_indices(test_data_params: TestDataParams, database_path: str, rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray]:
+def init_test_indices(test_data_params: TestDataParams, database_path: str, tables_app_enum: dict[int, str], rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray]:
     database, test_tables = load_database(database_path, tables_paths=test_data_params.test_tables_paths)
+    inverted_tables_app_enum = {v: k for k, v in tables_app_enum.items()}
     base_labels = {}
     base_indices = {}
     start_time = time.time()
@@ -246,8 +243,8 @@ def init_test_indices(test_data_params: TestDataParams, database_path: str, rng:
         log.info(f"Reading app column for test table {table_path} took {time.time() - start_time:.2f} seconds"); start_time = time.time()
         base_indices[i] = np.arange(len(test_tables[i]))
     database.close()
-    known_apps_ids = list(test_data_params.known_apps_database_enum)
-    unknown_apps_ids = list(test_data_params.unknown_apps_database_enum)
+    known_apps_ids = [inverted_tables_app_enum[app] for app in test_data_params.known_apps]
+    unknown_apps_ids = [inverted_tables_app_enum[app] for app in test_data_params.unknown_apps]
     test_known_indices, test_unknown_indices = convert_dict_indices(base_indices=base_indices, base_labels=base_labels, known_apps_ids=known_apps_ids, unknown_apps_ids=unknown_apps_ids)
     rng.shuffle(test_known_indices)
     rng.shuffle(test_unknown_indices)
@@ -291,7 +288,7 @@ def load_data_from_tables(tables, indices: np.ndarray, data_dtype: np.dtype) -> 
     sorted_indices = indices[indices[:, INDICES_TABLE_POS].argsort(kind="stable")]
     unique_tables, split_bounderies = np.unique(sorted_indices[:, INDICES_TABLE_POS], return_index=True)
     indices_per_table = np.split(sorted_indices, split_bounderies[1:])
-    data = np.empty(len(indices), dtype=data_dtype)
+    data = np.zeros(len(indices), dtype=data_dtype)
     for table_id, table_indices in zip(unique_tables, indices_per_table):
         data[np.where(indices[:, INDICES_TABLE_POS] == table_id)[0]] = tables[table_id].read_coordinates(table_indices[:, INDICES_INDEX_POS])
     return data
