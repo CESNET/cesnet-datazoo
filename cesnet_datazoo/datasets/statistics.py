@@ -13,6 +13,7 @@ from tqdm import tqdm
 from cesnet_datazoo.config import Protocol
 from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, IPT_POS, PPI_COLUMN, SIZE_POS,
                                       UDP_PPI_CHANNELS)
+from cesnet_datazoo.datasets.loaders import collate_fn_simple
 from cesnet_datazoo.pytables_data.indices_setup import sort_indices
 from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, list_all_tables,
                                                            load_database, worker_init_fn)
@@ -106,7 +107,7 @@ def compute_dataset_statistics(database_path: str,
         pin_memory=False,
         num_workers=num_workers,
         worker_init_fn=worker_init_fn,
-        collate_fn=_collate_fn_simple,
+        collate_fn=collate_fn_simple,
         persistent_workers=False,
         batch_size=None,
         sampler=stats_batch_sampler)
@@ -268,6 +269,3 @@ def compute_dataset_statistics(database_path: str,
 
     plt.tight_layout()
     fig.savefig(stats_pdf_path, bbox_inches="tight")
-
-def _collate_fn_simple(batch):
-    return batch

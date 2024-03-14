@@ -18,7 +18,7 @@ from typing_extensions import assert_never
 from cesnet_datazoo.config import AppSelection, DataLoaderOrder, DatasetConfig, ValidationApproach
 from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, DATASET_SIZES, INDICES_LABEL_POS,
                                       SERVICEMAP_FILE, UNKNOWN_STR_LABEL)
-from cesnet_datazoo.datasets.loaders import create_df_from_dataloader
+from cesnet_datazoo.datasets.loaders import collate_fn_simple, create_df_from_dataloader
 from cesnet_datazoo.datasets.metadata.dataset_metadata import DatasetMetadata, load_metadata
 from cesnet_datazoo.datasets.statistics import compute_dataset_statistics
 from cesnet_datazoo.pytables_data.apps_split import is_background_app
@@ -90,7 +90,6 @@ class CesnetDataset():
         test_dataset: Test set in the form of `PyTablesDataset` instance wrapping the PyTables database.
         known_app_counts: Known application counts in the train, validation, and test sets.
         unknown_app_counts: Unknown application counts in the validation and test sets.
-        collate_fn: Collate function used for creating batches in dataloaders.
         train_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for training.
         train_dataloader_sampler: Sampler used for iterating the training dataloader. Either [`RandomSampler`](https://pytorch.org/docs/stable/data.html#torch.utils.data.RandomSampler) or [`SequentialSampler`](https://pytorch.org/docs/stable/data.html#torch.utils.data.SequentialSampler).
         train_dataloader_drop_last: Whether to drop the last incomplete batch when iterating the training dataloader.
@@ -122,13 +121,13 @@ class CesnetDataset():
     test_dataset: Optional[PyTablesDataset] = None
     known_app_counts: Optional[pd.DataFrame] = None
     unknown_app_counts: Optional[pd.DataFrame] = None
-    collate_fn: Optional[Callable] = None
     train_dataloader: Optional[DataLoader] = None
     train_dataloader_sampler: Optional[Sampler] = None
     train_dataloader_drop_last: bool = True
     val_dataloader: Optional[DataLoader] = None
     test_dataloader: Optional[DataLoader] = None
 
+    _collate_fn: Optional[Callable] = None
     _tables_app_enum: dict[int, str]
     _tables_cat_enum: dict[int, str]
 
@@ -230,7 +229,7 @@ class CesnetDataset():
             self.train_dataset,
             num_workers=self.dataset_config.train_workers,
             worker_init_fn=worker_init_fn,
-            collate_fn=self.collate_fn,
+            collate_fn=self._collate_fn,
             persistent_workers=self.dataset_config.train_workers > 0,
             batch_size=None,
             sampler=batch_sampler,)
@@ -265,7 +264,7 @@ class CesnetDataset():
             self.val_dataset,
             num_workers=self.dataset_config.val_workers,
             worker_init_fn=worker_init_fn,
-            collate_fn=self.collate_fn,
+            collate_fn=self._collate_fn,
             persistent_workers=self.dataset_config.val_workers > 0,
             batch_size=None,
             sampler=batch_sampler,)
@@ -304,7 +303,7 @@ class CesnetDataset():
             self.test_dataset,
             num_workers=self.dataset_config.test_workers,
             worker_init_fn=worker_init_fn,
-            collate_fn=self.collate_fn,
+            collate_fn=self._collate_fn,
             persistent_workers=False,
             batch_size=None,
             sampler=batch_sampler,)
@@ -497,12 +496,12 @@ class CesnetDataset():
         self.test_dataset = None
         self.known_app_counts = None
         self.unknown_app_counts = None
-        self.collate_fn = None
         self.train_dataloader = None
         self.train_dataloader_sampler = None
         self.train_dataloader_drop_last = True
         self.val_dataloader = None
         self.test_dataloader = None
+        self._collate_fn = None
 
     def _check_before_dataframe(self, check_train: bool = False, check_val: bool = False, check_test: bool = False) -> None:
         if self.dataset_config is None:
@@ -681,10 +680,7 @@ class CesnetDataset():
         self.test_dataset = test_dataset
         self.known_app_counts = known_app_counts
         self.unknown_app_counts = unknown_app_counts
-        self.collate_fn = _collate_fn_simple
+        self._collate_fn = collate_fn_simple
 
 def _encode_labels_with_unknown(labels, encoder: LabelEncoder, class_info: ClassInfo):
     return encoder.transform(np.where(np.isin(labels, class_info.known_apps), labels, UNKNOWN_STR_LABEL))
-
-def _collate_fn_simple(batch):
-    return batch

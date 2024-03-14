@@ -6,6 +6,9 @@ from tqdm import tqdm
 from cesnet_datazoo.constants import APP_COLUMN
 
 
+def collate_fn_simple(batch):
+    return batch
+
 def load_from_dataloader(dataloader: DataLoader, silent: bool = False) -> tuple[pd.DataFrame, np.ndarray, np.ndarray, np.ndarray]:
     other_fields = []
     data_ppi = []
