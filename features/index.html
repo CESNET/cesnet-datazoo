@@ -685,37 +685,30 @@
 <h1 id="features">Features</h1>
 <p>This page provides a description of individual data features in the datasets. Features available in each dataset are listed on the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page.</p>
 <h2 id="ppi-sequence">PPI sequence</h2>
-<p>A per-packet information (PPI) sequence is a 2D matrix describing the first 30 packets of a flow. For flows shorter than 30 packets, the PPI sequence is padded with zeros.
-When data scalers (<code>psizes_scaler</code> and <code>ipt_scaler</code> config options) are enabled, this padding is ignored during the scaling transformation, and padding zeroes are kept in the final scaled data.
-The <code>zero_ppi_start</code> config option can be used to zero out the first <em>N</em> packets of PPI sequences, which is useful when evaluating the importance of handshake packets that are transmitted at the start of each connection.</p>
+<p>A per-packet information (PPI) sequence is a 2D matrix describing the first 30 packets of a flow. For flows shorter than 30 packets, the PPI sequence is padded with zeros.</p>
 <table>
 <thead>
 <tr>
 <th><strong>Name</strong></th>
 <th><strong>Description</strong></th>
-<th><strong>Config options</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>SIZE</td>
 <td>Size of the transport payload</td>
-<td><code>psizes_scaler</code>, <code>psizes_max</code></td>
 </tr>
 <tr>
 <td>IPT</td>
 <td>Inter-packet time in milliseconds. The IPT of the first packet is set to zero</td>
-<td><code>ipt_scaler</code>, <code>ipt_min</code>, <code>ipt_max</code></td>
 </tr>
 <tr>
 <td>DIR</td>
 <td>Direction of the packet encoded as ±1</td>
-<td></td>
 </tr>
 <tr>
 <td>PUSH_FLAG</td>
 <td>Whether the push flag was set in the TCP packet</td>
-<td><code>use_push_flags</code></td>
 </tr>
 </tbody>
 </table>
@@ -726,64 +719,52 @@ The <code>zero_ppi_start</code> config option can be used to zero out the first 
 <tr>
 <th><strong>Name</strong></th>
 <th><strong>Description</strong></th>
-<th><strong>Config options</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>DURATION</td>
 <td>Duration of the flow in seconds</td>
-<td><code>flowstats_scaler</code></td>
 </tr>
 <tr>
 <td>BYTES</td>
 <td>Number of transmitted bytes from client to server</td>
-<td><code>flowstats_scaler</code>, <code>flowstats_clip</code></td>
 </tr>
 <tr>
 <td>BYTES_REV</td>
 <td>Number of transmitted bytes from server to client</td>
-<td><code>flowstats_scaler</code>, <code>flowstats_clip</code></td>
 </tr>
 <tr>
 <td>PACKETS</td>
 <td>Number of packets transmitted from client to server</td>
-<td><code>flowstats_scaler</code>, <code>flowstats_clip</code></td>
 </tr>
 <tr>
 <td>PACKETS_REV</td>
 <td>Number of packets transmitted from server to client</td>
-<td><code>flowstats_scaler</code>, <code>flowstats_clip</code></td>
 </tr>
 <tr>
 <td>PPI_LEN</td>
 <td>Number of packets in the PPI sequence</td>
-<td><code>flowstats_scaler</code></td>
 </tr>
 <tr>
 <td>PPI_DURATION</td>
 <td>Duration of the PPI sequence in seconds</td>
-<td><code>flowstats_scaler</code></td>
 </tr>
 <tr>
 <td>PPI_ROUNDTRIPS</td>
 <td>Number of roundtrips in the PPI sequence</td>
-<td><code>flowstats_scaler</code></td>
 </tr>
 <tr>
 <td>FLOW_ENDREASON_IDLE</td>
 <td>Flow was terminated because it was idle</td>
-<td></td>
 </tr>
 <tr>
 <td>FLOW_ENDREASON_ACTIVE</td>
 <td>Flow was terminated because it reached the active timeout</td>
-<td></td>
 </tr>
 <tr>
 <td>FLOW_ENDREASON_OTHER</td>
 <td>Flow was terminated for other reasons</td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -796,29 +777,24 @@ The histograms are built from all packets of the entire flow, unlike PPI sequenc
 <tr>
 <th><strong>Name</strong></th>
 <th><strong>Description</strong></th>
-<th><strong>Config options</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>PSIZE_BIN{<em>x</em>}</td>
 <td>Packet sizes histogram <em>x</em>-th bin for the forward direction</td>
-<td><code>use_packet_histograms</code>, <code>normalize_packet_histograms</code></td>
 </tr>
 <tr>
 <td>PSIZE_BIN{<em>x</em>}_REV</td>
 <td>Packet sizes histogram <em>x</em>-th bin for the reverse direction</td>
-<td><code>use_packet_histograms</code>, <code>normalize_packet_histograms</code></td>
 </tr>
 <tr>
 <td>IPT_BIN{<em>x</em>}</td>
 <td>Inter-packet times histogram <em>x</em>-th bin for the forward direction</td>
-<td><code>use_packet_histograms</code>, <code>normalize_packet_histograms</code></td>
 </tr>
 <tr>
 <td>IPT_BIN{<em>x</em>}_REV</td>
 <td>Inter-packet times histogram <em>x</em>-th bin for the reverse direction</td>
-<td><code>use_packet_histograms</code>, <code>normalize_packet_histograms</code></td>
 </tr>
 </tbody>
 </table>
@@ -830,19 +806,16 @@ The histograms are built from all packets of the entire flow, unlike PPI sequenc
 <tr>
 <th><strong>Name</strong></th>
 <th><strong>Description</strong></th>
-<th><strong>Config options</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>FLAG_{<em>F</em>}</td>
 <td>Whether <em>F</em> flag was present in the forward (client to server) direction</td>
-<td><code>use_tcp_features</code></td>
 </tr>
 <tr>
 <td>FLAG_{<em>F</em>}_REV</td>
 <td>Whether <em>F</em> flag was present in the reverse (server to client) direction</td>
-<td><code>use_tcp_features</code></td>
 </tr>
 </tbody>
 </table>
@@ -853,80 +826,66 @@ The histograms are built from all packets of the entire flow, unlike PPI sequenc
 <tr>
 <th><strong>Name</strong></th>
 <th><strong>Description</strong></th>
-<th><strong>Config options</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>ID</td>
 <td>Per-dataset unique flow identifier</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>TIME_FIRST</td>
 <td>Timestamp of the first packet</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>TIME_LAST</td>
 <td>Timestamp of the last packet</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>SRC_IP</td>
 <td>Source IP address</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>DST_IP</td>
 <td>Destination IP address</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>DST_ASN</td>
 <td>Destination Autonomous System number</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>SRC_PORT</td>
 <td>Source port</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>DST_PORT</td>
 <td>Destination port</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>PROTOCOL</td>
 <td>Transport protocol</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>TLS_SNI / QUIC_SNI</td>
 <td>Server Name Indication domain</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>TLS_JA3</td>
 <td>JA3 fingerprint</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>QUIC_VERSION</td>
 <td>QUIC protocol version</td>
-<td><code>return_other_fields</code></td>
 </tr>
 <tr>
 <td>QUIC_USER_AGENT</td>
 <td>User agent string if available in the QUIC Initial Packet</td>
-<td><code>return_other_fields</code></td>
 </tr>
 </tbody>
 </table>
 <!-- 
-| APP                     | Web service label                                                                   |                                 |
-| CATEGORY                | Service category label                                                              |                                 | 
+| APP                     | Web service label                                                                   |
+| CATEGORY                | Service category label                                                              | 
 -->
 
 <h2 id="details-about-packet-histograms-and-ppi">Details about packet histograms and PPI</h2>

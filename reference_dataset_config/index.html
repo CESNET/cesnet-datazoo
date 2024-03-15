@@ -611,13 +611,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#config.ScalerEnum" class="md-nav__link">
-    ScalerEnum
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -816,13 +809,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#config.ScalerEnum" class="md-nav__link">
-    ScalerEnum
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -868,7 +854,7 @@
 <ul>
 <li>Train, validation, test sets (dates, sizes, validation approach).</li>
 <li>Application selection — either the standard closed-world setting (only <em>known</em> classes) or the open-world setting (<em>known</em> and <em>unknown</em> classes).</li>
-<li>Feature scaling. See the <a class="autorefs autorefs-internal" href="../features/#features">data features</a> page for more information.</li>
+<li>Feature scaling. See the <a class="autorefs autorefs-internal" href="../features/#features">data features</a> page for more information. DOCS_TODO</li>
 <li>Dataloader options like batch sizes, order of loading, or number of workers.</li>
 </ul>
 <p>When initializing this class, pass a <a class="autorefs autorefs-internal" href="../reference_cesnet_dataset/#datasets.cesnet_dataset.CesnetDataset"><code>CesnetDataset</code></a> instance to be configured and the desired configuration. Available options are <a class="autorefs autorefs-internal" href="#config.DatasetConfig--configuration-options">here</a>.</p>
@@ -892,7 +878,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>The dataset instance to be configured</p>
+              <p>The dataset instance to be configured.</p>
             </div>
           </td>
         </tr>
@@ -903,7 +889,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Taken from the dataset instance</p>
+              <p>Taken from the dataset instance.</p>
             </div>
           </td>
         </tr>
@@ -914,7 +900,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Taken from the dataset instance</p>
+              <p>Taken from the dataset instance.</p>
             </div>
           </td>
         </tr>
@@ -925,7 +911,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Taken from the dataset instance</p>
+              <p>Taken from the dataset instance.</p>
             </div>
           </td>
         </tr>
@@ -936,7 +922,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Taken from the dataset instance</p>
+              <p>Taken from the dataset instance.</p>
             </div>
           </td>
         </tr>
@@ -947,7 +933,29 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Taken from <code>dataset.metadata.flowstats_features</code></p>
+              <p>Taken from <code>dataset.metadata.flowstats_features</code>.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>flowstats_features_boolean</code></td>
+          <td>
+                <code>list[str]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Taken from <code>dataset.metadata.flowstats_features_boolean</code>.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>flowstats_features_phist</code></td>
+          <td>
+                <code>list[str]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Taken from <code>dataset.metadata.packet_histograms</code> if <code>use_packet_histograms</code> is true, otherwise an empty list.</p>
             </div>
           </td>
         </tr>
@@ -958,7 +966,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Taken from <code>dataset.metadata.other_fields</code> if <code>return_other_fields</code> is true, otherwise an empty list</p>
+              <p>Taken from <code>dataset.metadata.other_fields</code> if <code>return_other_fields</code> is true, otherwise an empty list.</p>
             </div>
           </td>
         </tr>
@@ -978,6 +986,39 @@
       </tr>
     </thead>
     <tbody>
+        <tr>
+          <td><code>need_train_set</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use to disable the train set. <code>Default: True</code></p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>need_val_set</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use to disable the validation set. When <code>need_train_set</code> is false, the validation set will also be disabled. <code>Default: True</code></p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>need_test_set</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use to disable the test set. <code>Default: True</code></p>
+            </div>
+          </td>
+        </tr>
         <tr>
           <td><code>train_period_name</code></td>
           <td>
@@ -1018,7 +1059,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>How a validation set should be created. Either split train data into train and validation, have a separate validation period, or no validation at all. <code>Default: SPLIT_FROM_TRAIN</code></p>
+              <p>How a validation set should be created. Either split train data into train and validation or have a separate validation period. <code>Default: SPLIT_FROM_TRAIN</code></p>
             </div>
           </td>
         </tr>
@@ -1052,17 +1093,6 @@
           <td>
             <div class="doc-md-description">
               <p>Dates used for creating a validation set.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>no_test_set</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Disable the test set. <code>Default: False</code></p>
             </div>
           </td>
         </tr>
@@ -1111,24 +1141,35 @@
           </td>
         </tr>
         <tr>
-          <td><code>apps_selection_explicit_unknown</code></td>
+          <td><code>apps_selection_background_unknown</code></td>
           <td>
                 <code>list[str]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Provide a list of unknown applications.</p>
+              <p>Provide a list of background traffic classes to be used as unknown.</p>
             </div>
           </td>
         </tr>
         <tr>
-          <td><code>apps_selection_fixed_longterm</code></td>
+          <td><code>apps_selection_fixed_known</code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[tuple[dict[int, str], dict[int, str]]]</code>
+                <code>list[str]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Provide enums of known and unknown applications. This is suitable for long-term measurements.</p>
+              <p>Provide a list of manually selected known applications.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>apps_selection_fixed_unknown</code></td>
+          <td>
+                <code>list[str]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Provide a list of manually selected unknown applications.</p>
             </div>
           </td>
         </tr>
@@ -1353,24 +1394,13 @@
           </td>
         </tr>
         <tr>
-          <td><code>return_torch</code></td>
+          <td><code>return_tensors</code></td>
           <td>
                 <code>bool</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>Use for returning <code>torch.Tensor</code> from dataloaders. Dataframes are not available when this option is used. <code>Default: False</code></p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>raw_output</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Return raw output without data scaling, clipping, and normalization. <code>Default: False</code></p>
             </div>
           </td>
         </tr>
@@ -1382,17 +1412,6 @@
           <td>
             <div class="doc-md-description">
               <p>Whether to use packet histogram features, if available in the dataset. <code>Default: True</code></p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>normalize_packet_histograms</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Whether to normalize packet histograms. If true, bins contain fractions instead of absolute numbers. <code>Default: True</code></p>
             </div>
           </td>
         </tr>
@@ -1419,112 +1438,46 @@
           </td>
         </tr>
         <tr>
-          <td><code>zero_ppi_start</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Zeroing out the first N packets of each packet sequence. <code>Default: 0</code></p>
-            </div>
-          </td>
-        </tr>
-        <tr>
           <td><code>fit_scalers_samples</code></td>
           <td>
                 <code>int | float</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. <code>Default: 0.25</code></p>
+              <p>Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. <code>Default: 0.25</code> DOCS_TODO</p>
             </div>
           </td>
         </tr>
         <tr>
-          <td><code>flowstats_scaler</code></td>
+          <td><code>ppi_transform</code></td>
           <td>
-                <code><a class="autorefs autorefs-internal" title="config.ScalerEnum" href="#config.ScalerEnum">ScalerEnum</a></code>
+                <code><span title="typing.Optional">Optional</span>[<span title="typing.Callable">Callable</span>]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Which scaler to use for flow statistics. Options are <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html"><code>ROBUST</code></a> | <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html"><code>STANDARD</code></a> | <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html"><code>MINMAX</code></a> | <code>NO_SCALER</code>. <code>Default: ROBUST</code></p>
+              <p>Transform function for PPI sequences. <code>Default: None</code> DOCS_TODO</p>
             </div>
           </td>
         </tr>
         <tr>
-          <td><code>psizes_scaler</code></td>
+          <td><code>flowstats_transform</code></td>
           <td>
-                <code><a class="autorefs autorefs-internal" title="config.ScalerEnum" href="#config.ScalerEnum">ScalerEnum</a></code>
+                <code><span title="typing.Optional">Optional</span>[<span title="typing.Callable">Callable</span>]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Which scaler to use for packet sizes. Options are <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html"><code>ROBUST</code></a> | <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html"><code>STANDARD</code></a> | <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html"><code>MINMAX</code></a> | <code>NO_SCALER</code>. <code>Default: STANDARD</code></p>
+              <p>Transform function for flow statistics. <code>Default: None</code></p>
             </div>
           </td>
         </tr>
         <tr>
-          <td><code>ipt_scaler</code></td>
+          <td><code>flowstats_phist_transform</code></td>
           <td>
-                <code><a class="autorefs autorefs-internal" title="config.ScalerEnum" href="#config.ScalerEnum">ScalerEnum</a></code>
+                <code><span title="typing.Optional">Optional</span>[<span title="typing.Callable">Callable</span>]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Which scaler to use for inter-packet times. Options are <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html"><code>ROBUST</code></a> | <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html"><code>STANDARD</code></a> | <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html"><code>MINMAX</code></a> | <code>NO_SCALER</code>. <code>Default: STANDARD</code></p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>scalers_attrs</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[dict]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Load data scalers from numeric values in this dict rather than from pickled files. <code>Default: None</code></p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>flowstats_clip</code></td>
-          <td>
-                <code>float</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Quantile clip before the scaling of flow statistics. Should limit the influence of outliers. Set to <code>1</code> to disable. <code>Default: 0.99</code></p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>psizes_max</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Max clip packet sizes before scaling. <code>Default: 1500</code></p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>ipt_min</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Min clip inter-packet times before scaling. <code>Default: 0</code></p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>ipt_max</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Max clip inter-packet times before scaling. <code>Default: 65000</code></p>
+              <p>Transform function for packet histograms. <code>Default: None</code></p>
             </div>
           </td>
         </tr>
@@ -1551,7 +1504,22 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
             <details class="quote">
               <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
 <span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
@@ -1981,45 +1949,55 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="normal">551</span>
 <span class="normal">552</span>
 <span class="normal">553</span>
-<span class="normal">554</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">C</span><span class="p">)</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">C</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">DatasetConfig</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The main class for the configuration of:</span>
 
 <span class="sd">    - Train, validation, test sets (dates, sizes, validation approach).</span>
 <span class="sd">    - Application selection — either the standard closed-world setting (only *known* classes) or the open-world setting (*known* and *unknown* classes).</span>
-<span class="sd">    - Feature scaling. See the [data features][features] page for more information.</span>
+<span class="sd">    - Feature scaling. See the [data features][features] page for more information. DOCS_TODO</span>
 <span class="sd">    - Dataloader options like batch sizes, order of loading, or number of workers.</span>
 
 <span class="sd">    When initializing this class, pass a [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance to be configured and the desired configuration. Available options are [here][config.DatasetConfig--configuration-options].</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        dataset: The dataset instance to be configured</span>
-<span class="sd">        data_root: Taken from the dataset instance</span>
-<span class="sd">        database_filename: Taken from the dataset instance</span>
-<span class="sd">        database_path: Taken from the dataset instance</span>
-<span class="sd">        servicemap_path: Taken from the dataset instance</span>
-<span class="sd">        flowstats_features: Taken from `dataset.metadata.flowstats_features`</span>
-<span class="sd">        other_fields: Taken from `dataset.metadata.other_fields` if `return_other_fields` is true, otherwise an empty list</span>
+<span class="sd">        dataset: The dataset instance to be configured.</span>
+<span class="sd">        data_root: Taken from the dataset instance.</span>
+<span class="sd">        database_filename: Taken from the dataset instance.</span>
+<span class="sd">        database_path: Taken from the dataset instance.</span>
+<span class="sd">        servicemap_path: Taken from the dataset instance.</span>
+<span class="sd">        flowstats_features: Taken from `dataset.metadata.flowstats_features`.</span>
+<span class="sd">        flowstats_features_boolean: Taken from `dataset.metadata.flowstats_features_boolean`.</span>
+<span class="sd">        flowstats_features_phist: Taken from `dataset.metadata.packet_histograms` if `use_packet_histograms` is true, otherwise an empty list.</span>
+<span class="sd">        other_fields: Taken from `dataset.metadata.other_fields` if `return_other_fields` is true, otherwise an empty list.</span>
 
 <span class="sd">    # Configuration options</span>
 
 <span class="sd">    Attributes:</span>
+<span class="sd">        need_train_set: Use to disable the train set. `Default: True`</span>
+<span class="sd">        need_val_set: Use to disable the validation set. When `need_train_set` is false, the validation set will also be disabled. `Default: True`</span>
+<span class="sd">        need_test_set: Use to disable the test set. `Default: True`</span>
 <span class="sd">        train_period_name: Name of the train period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
 <span class="sd">        train_dates: Dates used for creating a train set.</span>
 <span class="sd">        train_dates_weigths: To use a non-uniform distribution of samples across train dates.</span>
-<span class="sd">        val_approach: How a validation set should be created. Either split train data into train and validation, have a separate validation period, or no validation at all. `Default: SPLIT_FROM_TRAIN`</span>
+<span class="sd">        val_approach: How a validation set should be created. Either split train data into train and validation or have a separate validation period. `Default: SPLIT_FROM_TRAIN`</span>
 <span class="sd">        train_val_split_fraction: The fraction of validation samples when splitting from the train set. `Default: 0.2`</span>
 <span class="sd">        val_period_name: Name of the validation period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
 <span class="sd">        val_dates: Dates used for creating a validation set.</span>
-<span class="sd">        no_test_set: Disable the test set. `Default: False`</span>
 <span class="sd">        test_period_name: Name of the test period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
 <span class="sd">        test_dates: Dates used for creating a test set.</span>
 
 <span class="sd">        apps_selection: How to select application classes. `Default: ALL_KNOWN`</span>
 <span class="sd">        apps_selection_topx: Take top X as known.</span>
-<span class="sd">        apps_selection_explicit_unknown: Provide a list of unknown applications.</span>
-<span class="sd">        apps_selection_fixed_longterm: Provide enums of known and unknown applications. This is suitable for long-term measurements.</span>
+<span class="sd">        apps_selection_background_unknown: Provide a list of background traffic classes to be used as unknown.</span>
+<span class="sd">        apps_selection_fixed_known: Provide a list of manually selected known applications.</span>
+<span class="sd">        apps_selection_fixed_unknown: Provide a list of manually selected unknown applications.</span>
 <span class="sd">        disabled_apps: List of applications to be disabled and not used at all.</span>
 <span class="sd">        min_train_samples_check: How to handle applications with *not enough* training samples. `Default: DISABLE_APPS`</span>
 <span class="sd">        min_train_samples_per_app: Defines the threshold for *not enough*. `Default: 100`</span>
@@ -2042,22 +2020,14 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        train_dataloader_seed: Seed for loading train data in random order. `Default: None`</span>
 
 <span class="sd">        return_other_fields: Whether to return [auxiliary fields][other-fields], such as communicating hosts, flow times, and more fields extracted from the ClientHello message. `Default: False`</span>
-<span class="sd">        return_torch: Use for returning `torch.Tensor` from dataloaders. Dataframes are not available when this option is used. `Default: False`</span>
-<span class="sd">        raw_output: Return raw output without data scaling, clipping, and normalization. `Default: False`</span>
+<span class="sd">        return_tensors: Use for returning `torch.Tensor` from dataloaders. Dataframes are not available when this option is used. `Default: False`</span>
 <span class="sd">        use_packet_histograms: Whether to use packet histogram features, if available in the dataset. `Default: True`</span>
-<span class="sd">        normalize_packet_histograms: Whether to normalize packet histograms. If true, bins contain fractions instead of absolute numbers. `Default: True`</span>
 <span class="sd">        use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`</span>
 <span class="sd">        use_push_flags: Whether to use push flags in packet sequences, if available in the dataset. `Default: False`</span>
-<span class="sd">        zero_ppi_start: Zeroing out the first N packets of each packet sequence. `Default: 0`</span>
-<span class="sd">        fit_scalers_samples: Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. `Default: 0.25`</span>
-<span class="sd">        flowstats_scaler: Which scaler to use for flow statistics. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: ROBUST`</span>
-<span class="sd">        psizes_scaler: Which scaler to use for packet sizes. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`</span>
-<span class="sd">        ipt_scaler: Which scaler to use for inter-packet times. Options are [`ROBUST`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html) | [`STANDARD`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) | [`MINMAX`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html) | `NO_SCALER`. `Default: STANDARD`</span>
-<span class="sd">        scalers_attrs: Load data scalers from numeric values in this dict rather than from pickled files. `Default: None`</span>
-<span class="sd">        flowstats_clip: Quantile clip before the scaling of flow statistics. Should limit the influence of outliers. Set to `1` to disable. `Default: 0.99`</span>
-<span class="sd">        psizes_max: Max clip packet sizes before scaling. `Default: 1500`</span>
-<span class="sd">        ipt_min: Min clip inter-packet times before scaling. `Default: 0`</span>
-<span class="sd">        ipt_max: Max clip inter-packet times before scaling. `Default: 65000`</span>
+<span class="sd">        fit_scalers_samples: Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. `Default: 0.25` DOCS_TODO</span>
+<span class="sd">        ppi_transform: Transform function for PPI sequences. `Default: None` DOCS_TODO</span>
+<span class="sd">        flowstats_transform: Transform function for flow statistics. `Default: None`</span>
+<span class="sd">        flowstats_phist_transform: Transform function for packet histograms. `Default: None`</span>
 
 <span class="sd">    # How to configure train, validation, and test sets</span>
 <span class="sd">    There are three options for how to define train/validation/test dates.</span>
@@ -2083,8 +2053,13 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">database_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span>  <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">servicemap_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">flowstats_features</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">flowstats_features_boolean</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">flowstats_features_phist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">other_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
+    <span class="n">need_train_set</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">need_val_set</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">need_test_set</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">train_period_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">train_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="n">train_dates_weigths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2092,14 +2067,14 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">train_val_split_fraction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span>
     <span class="n">val_period_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">val_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-    <span class="n">no_test_set</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">test_period_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">test_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
 
     <span class="n">apps_selection</span><span class="p">:</span> <span class="n">AppSelection</span> <span class="o">=</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span>
     <span class="n">apps_selection_topx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">apps_selection_explicit_unknown</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-    <span class="n">apps_selection_fixed_longterm</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">apps_selection_background_unknown</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">apps_selection_fixed_known</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">apps_selection_fixed_unknown</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="n">disabled_apps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
     <span class="n">min_train_samples_check</span><span class="p">:</span> <span class="n">MinTrainSamplesCheck</span> <span class="o">=</span> <span class="n">MinTrainSamplesCheck</span><span class="o">.</span><span class="n">DISABLE_APPS</span>
     <span class="n">min_train_samples_per_app</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
@@ -2122,22 +2097,14 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">train_dataloader_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">return_other_fields</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">return_torch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">raw_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">use_packet_histograms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">normalize_packet_histograms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">use_tcp_features</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">return_tensors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">use_packet_histograms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">use_tcp_features</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">use_push_flags</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">zero_ppi_start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">fit_scalers_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span>
-    <span class="n">flowstats_scaler</span><span class="p">:</span> <span class="n">ScalerEnum</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">ROBUST</span>
-    <span class="n">psizes_scaler</span><span class="p">:</span> <span class="n">ScalerEnum</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">STANDARD</span>
-    <span class="n">ipt_scaler</span><span class="p">:</span> <span class="n">ScalerEnum</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">STANDARD</span>
-    <span class="n">scalers_attrs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">flowstats_clip</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.99</span>
-    <span class="n">psizes_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1500</span>
-    <span class="n">ipt_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">ipt_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">65000</span>
+    <span class="n">ppi_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">flowstats_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">flowstats_phist_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">CesnetDataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2147,23 +2114,28 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="bp">self</span><span class="o">.</span><span class="n">servicemap_path</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">servicemap_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">database_filename</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">database_filename</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">database_path</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">database_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">flowstats_features</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">other_fields</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">other_fields</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_other_fields</span> <span class="k">else</span> <span class="p">[]</span>
 
-        <span class="c1"># Configure train dates</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_period_name has to be specified when train_dates are set&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown train_period_name </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period_name</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">need_val_set</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">!=</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">FIXED</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Application selection has to be fixed when need_train_set is false&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_dates and train_period_name cannot be specified when need_train_set is false&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Configure train dates</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_period_name has to be specified when train_dates are set&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown train_period_name </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period_name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period_name</span><span class="p">]</span>
         <span class="c1"># Configure test dates</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_test_set</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_test_set</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;test_dates and test_period_name cannot be specified when no_test_set is true&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;test_dates and test_period_name cannot be specified when need_test_set is false&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;test_period_name has to be specified when test_dates are set&quot;</span><span class="p">)</span>
@@ -2175,8 +2147,8 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">default_test_period_name</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_test_period_name</span><span class="p">]</span>
         <span class="c1"># Configure val dates</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">NO_VALIDATION</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_dates and val_period_name cannot be specified when val_approach is no-validation or split-from-train&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_val_set</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_dates and val_period_name cannot be specified when need_val_set is false or the validation approach is split-from-train&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">VALIDATION_DATES</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_period_name has to be specified when val_dates are set&quot;</span><span class="p">)</span>
@@ -2185,57 +2157,58 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown val_period_name </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_period_name and val_dates (or val_period_name from dataset.time_periods) have to be specified when val_approach is validation-dates&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_period_name and val_dates (or val_period_name from dataset.time_periods) have to be specified when the validation approach is validation-dates&quot;</span><span class="p">)</span>
         <span class="c1"># Check if train, val, and test dates are available in the dataset</span>
-        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">:</span>
-            <span class="n">unknown_train_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">]</span>
-            <span class="n">unknown_val_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">]</span>
-            <span class="n">unknown_test_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown train dates </span><span class="si">{</span><span class="n">unknown_train_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates (collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collection_period</span><span class="si">}</span><span class="s2">)&quot;</span> \
-                                <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown validation dates </span><span class="si">{</span><span class="n">unknown_val_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates (collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collection_period</span><span class="si">}</span><span class="s2">)&quot;</span> \
-                                <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown test dates </span><span class="si">{</span><span class="n">unknown_test_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates (collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collection_period</span><span class="si">}</span><span class="s2">)&quot;</span> \
-                                <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="n">bad_train_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">]</span>
+        <span class="n">bad_val_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">]</span>
+        <span class="n">bad_test_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_dates</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bad train dates </span><span class="si">{</span><span class="n">bad_train_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates (collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collection_period</span><span class="si">}</span><span class="s2">)&quot;</span> \
+                            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_val_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bad validation dates </span><span class="si">{</span><span class="n">bad_val_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates (collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collection_period</span><span class="si">}</span><span class="s2">)&quot;</span> \
+                            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bad test dates </span><span class="si">{</span><span class="n">bad_test_dates</span><span class="si">}</span><span class="s2">. Use dates available in dataset.available_dates (collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">collection_period</span><span class="si">}</span><span class="s2">)&quot;</span> \
+                            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. These dates are missing from the dataset collection period </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">missing_dates_in_collection_period</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
         <span class="c1"># Check time order of train, val, and test periods</span>
         <span class="n">train_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">date_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">]</span>
         <span class="n">test_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">date_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dates</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_test_set</span> <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">train_dates</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">train_dates</span><span class="p">):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Some test dates (</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">) are before or equal to the last train date (</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">train_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">). This might lead to improper evaluation and should be avoided.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">VALIDATION_DATES</span><span class="p">:</span>
+            <span class="c1"># Train dates are guaranteed to be set</span>
             <span class="n">val_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">date_str</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dates</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">val_dates</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">train_dates</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Some validation dates (</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">val_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">) are before or equal to the last train date (</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">train_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">). This might lead to improper evaluation and should be avoided.&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_test_set</span> <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">val_dates</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">val_dates</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Some test dates (</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">test_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">) are before or equal to the last validation date (</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">val_dates</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">). This might lead to improper evaluation and should be avoided.&quot;</span><span class="p">)</span>
         <span class="c1"># Configure features</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_output</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">normalize_packet_histograms</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_scaler</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">NO_SCALER</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_clip</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">psizes_scaler</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">NO_SCALER</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">psizes_max</span> <span class="o">=</span> <span class="mi">1500</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ipt_scaler</span> <span class="o">=</span> <span class="n">ScalerEnum</span><span class="o">.</span><span class="n">NO_SCALER</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ipt_min</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ipt_max</span> <span class="o">=</span> <span class="mi">65000</span>
-        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">protocol</span> <span class="o">==</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">TLS</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_tcp_features</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">+</span> <span class="n">SELECTED_TCP_FLAGS</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span> <span class="ow">and</span> <span class="s2">&quot;PUSH_FLAG&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">features_in_packet_sequences</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This TLS dataset does not support use_push_flags&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">flowstats_features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_boolean</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">flowstats_features_boolean</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">other_fields</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">other_fields</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_other_fields</span> <span class="k">else</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_packet_histograms</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">packet_histogram_features</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">+</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">packet_histogram_features</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">use_packet_histograms</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">packet_histograms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This dataset does not support use_packet_histograms&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_phist</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">packet_histograms</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_phist</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_phist_transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;flowstats_phist_transform cannot be specified when use_packet_histograms is false&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">protocol</span> <span class="o">==</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">TLS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_tcp_features</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_boolean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_boolean</span> <span class="o">+</span> <span class="n">SELECTED_TCP_FLAGS</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span> <span class="ow">and</span> <span class="s2">&quot;PUSH_FLAG&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">ppi_features</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This TLS dataset does not support use_push_flags&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">protocol</span> <span class="o">==</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">QUIC</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">use_tcp_features</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_tcp_features</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;QUIC datasets do not support use_tcp_features&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;QUIC datasets do not support use_push_flags&quot;</span><span class="p">)</span>
         <span class="c1"># When train_dates_weigths are used, train_size and val_known_size have to be specified</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dates_weigths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_dates_weigths cannot be specified when need_train_set is false&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates_weigths</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_dates_weigths has to have the same length as train_dates&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_size</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
@@ -2246,59 +2219,75 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">val_unknown_size</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_unknown_size</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_explicit_unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_longterm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_topx, apps_selection_explicit_unknown, and apps_selection_fixed_longterm cannot be specified when apps_selection is all-known&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">TOPX_KNOWN</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_topx has to be greater than 0 when apps_selection is top-x-known&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">EXPLICIT_UNKNOWN</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_explicit_unknown</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_explicit_unknown has to be specified when apps_selection is explicit-unknown&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">LONGTERM_FIXED</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_longterm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_fixed_longterm, a tuple of (known_apps_database_enum, unknown_apps_database_enum), has to be specified when apps_selection is longterm-fixed&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_background_unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_known</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_topx, apps_selection_background_unknown, apps_selection_fixed_known, and apps_selection_fixed_unknown cannot be specified when application selection is all-known&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">TOPX_KNOWN</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_topx has to be greater than 0 when application selection is top-x-known&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_background_unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_known</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_background_unknown, apps_selection_fixed_known, and apps_selection_fixed_unknown cannot be specified when application selection is top-x-known&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">BACKGROUND_UNKNOWN</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_background_unknown</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_background_unknown has to be specified when application selection is background-unknown&quot;</span><span class="p">)</span>
+            <span class="n">bad_apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_background_unknown</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_classes</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_apps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bad applications in apps_selection_background_unknown </span><span class="si">{</span><span class="n">bad_apps</span><span class="si">}</span><span class="s2">. Use applications available in dataset.available_classes&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_known</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_topx, apps_selection_fixed_known, and apps_selection_fixed_unknown cannot be specified when application selection is background-unknown&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">FIXED</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_known</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_fixed_known has to be specified when application selection is fixed&quot;</span><span class="p">)</span>
+            <span class="n">bad_apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_known</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_unknown</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_classes</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_apps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bad applications in apps_selection_fixed_known or apps_selection_fixed_unknown </span><span class="si">{</span><span class="n">bad_apps</span><span class="si">}</span><span class="s2">. Use applications available in dataset.available_classes&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disabled_apps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;disabled_apps cannot be specified when apps_selection is longterm-fixed&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_train_samples_per_app</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;min_train_samples_per_app has to be 0 when apps_selection is longterm-fixed&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">sum</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_explicit_unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_longterm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_topx, apps_selection_explicit_unknown, and apps_selection_fixed_longterm should not be specified at the same time&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;disabled_apps cannot be specified when application selection is fixed&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_train_samples_per_app</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_train_samples_per_app</span> <span class="o">!=</span> <span class="mi">100</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;min_train_samples_per_app is not used when application selection is fixed&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_background_unknown</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;apps_selection_topx and apps_selection_background_unknown cannot be specified when application selection is fixed&quot;</span><span class="p">)</span>
         <span class="c1"># More asserts</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_ppi_start</span> <span class="o">&gt;</span> <span class="n">PPI_MAX_LEN</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zero_ppi_start has to be &lt;= </span><span class="si">{</span><span class="n">PPI_MAX_LEN</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">bad_disabled_apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">disabled_apps</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">available_classes</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_disabled_apps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bad applications in disabled_apps </span><span class="si">{</span><span class="n">bad_disabled_apps</span><span class="si">}</span><span class="s2">. Use applications available in dataset.available_classes&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_scalers_samples</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_scalers_samples</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_scalers_samples</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fit_scalers_samples has to be either float between 0 and 1 (giving the fraction of training samples used for fitting scalers) or an integer&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_flowstats_features_len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the number of flow statistics features.&quot;&quot;&quot;</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PHIST_&quot;</span><span class="p">):</span>
-                <span class="n">n</span> <span class="o">+=</span> <span class="n">PHIST_BIN_COUNT</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">n</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">)</span> <span class="o">+</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets names of flow statistics features. Packet histograms are expanded into bin features.&quot;&quot;&quot;</span>
-        <span class="n">name_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">phist_mapping</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;PHIST_SRC_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
             <span class="s2">&quot;PHIST_DST_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_REV&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
             <span class="s2">&quot;PHIST_SRC_IPT&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
             <span class="s2">&quot;PHIST_DST_IPT&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_REV&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
-            <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_IDLE&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_ACTIVE&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_END&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_OTHER&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name_mapping</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">shorter_names</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">):</span>
-                    <span class="n">f</span> <span class="o">=</span> <span class="s2">&quot;F&quot;</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">)</span>
-                <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="n">feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
+        <span class="n">short_names_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_IDLE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_ACTIVE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_END&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_OTHER&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLAG_CWR&quot;</span><span class="p">:</span> <span class="s2">&quot;F_CWR&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLAG_CWR_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_CWR_REV&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLAG_ECE&quot;</span><span class="p">:</span> <span class="s2">&quot;F_ECE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLAG_ECE_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_ECE_REV&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLAG_PSH_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_PSH_REV&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLAG_RST&quot;</span><span class="p">:</span> <span class="s2">&quot;F_RST&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLAG_RST_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_RST_REV&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLAG_FIN&quot;</span><span class="p">:</span> <span class="s2">&quot;F_FIN&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;FLAG_FIN_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_FIN_REV&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">[:]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">shorter_names</span> <span class="ow">and</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">short_names_mapping</span><span class="p">:</span>
+                <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">short_names_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
+                <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">:</span>
+            <span class="n">feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">phist_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_flowstats_features_len</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">feature_names</span>
 
@@ -2311,8 +2300,8 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
             <span class="n">ppi_feature_names</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PUSH_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">ppi_feature_names</span>
 
-    <span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the number of features (channels) in PPI.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the available features (channels) in PPI sequences.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">TCP_PPI_CHANNELS</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2347,8 +2336,11 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
         <span class="k">return</span> <span class="n">params_hash</span>
 
     <span class="k">def</span> <span class="nf">_get_train_data_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">params_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_train_data_hash</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="s2">&quot;train-data&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">params_hash</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;fold_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fold_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
+            <span class="n">params_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_train_data_hash</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="s2">&quot;train-data&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">params_hash</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;fold_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fold_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="s2">&quot;train-data&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_train_data_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrainDataParams</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TrainDataParams</span><span class="p">(</span>
@@ -2357,32 +2349,33 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
             <span class="n">train_tables_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_train_tables_paths</span><span class="p">(),</span>
             <span class="n">apps_selection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span><span class="p">,</span>
             <span class="n">apps_selection_topx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_topx</span><span class="p">,</span>
-            <span class="n">apps_selection_explicit_unknown</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_explicit_unknown</span><span class="p">,</span>
-            <span class="n">apps_selection_fixed_longterm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_longterm</span><span class="p">,</span>
+            <span class="n">apps_selection_background_unknown</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_background_unknown</span><span class="p">,</span>
+            <span class="n">apps_selection_fixed_known</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_known</span><span class="p">,</span>
+            <span class="n">apps_selection_fixed_unknown</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">apps_selection_fixed_unknown</span><span class="p">,</span>
             <span class="n">disabled_apps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disabled_apps</span><span class="p">,</span>
             <span class="n">min_train_samples_per_app</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_train_samples_per_app</span><span class="p">,</span>
             <span class="n">min_train_samples_check</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_train_samples_check</span><span class="p">,)</span>
 
-    <span class="k">def</span> <span class="nf">_get_val_data_params_and_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">known_apps_database_enum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">unknown_apps_database_enum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">TestDataParams</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">_get_val_data_params_and_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">known_apps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">unknown_apps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">TestDataParams</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">VALIDATION_DATES</span>
         <span class="n">val_data_params</span> <span class="o">=</span> <span class="n">TestDataParams</span><span class="p">(</span>
             <span class="n">database_filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">database_filename</span><span class="p">,</span>
             <span class="n">test_period_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_period_name</span><span class="p">,</span>
             <span class="n">test_tables_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_val_tables_paths</span><span class="p">(),</span>
-            <span class="n">known_apps_database_enum</span><span class="o">=</span><span class="n">known_apps_database_enum</span><span class="p">,</span>
-            <span class="n">unknown_apps_database_enum</span><span class="o">=</span><span class="n">unknown_apps_database_enum</span><span class="p">,)</span>
+            <span class="n">known_apps</span><span class="o">=</span><span class="n">known_apps</span><span class="p">,</span>
+            <span class="n">unknown_apps</span><span class="o">=</span><span class="n">unknown_apps</span><span class="p">,)</span>
         <span class="n">params_hash</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="n">val_data_params</span><span class="p">),</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
         <span class="n">params_hash</span> <span class="o">=</span> <span class="n">params_hash</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
         <span class="n">val_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="s2">&quot;val-data&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">params_hash</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">val_data_params</span><span class="p">,</span> <span class="n">val_data_path</span>
 
-    <span class="k">def</span> <span class="nf">_get_test_data_params_and_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">known_apps_database_enum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">unknown_apps_database_enum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">TestDataParams</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">_get_test_data_params_and_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">known_apps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">unknown_apps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">TestDataParams</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
         <span class="n">test_data_params</span> <span class="o">=</span> <span class="n">TestDataParams</span><span class="p">(</span>
             <span class="n">database_filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">database_filename</span><span class="p">,</span>
             <span class="n">test_period_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span><span class="p">,</span>
             <span class="n">test_tables_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_test_tables_paths</span><span class="p">(),</span>
-            <span class="n">known_apps_database_enum</span><span class="o">=</span><span class="n">known_apps_database_enum</span><span class="p">,</span>
-            <span class="n">unknown_apps_database_enum</span><span class="o">=</span><span class="n">unknown_apps_database_enum</span><span class="p">,)</span>
+            <span class="n">known_apps</span><span class="o">=</span><span class="n">known_apps</span><span class="p">,</span>
+            <span class="n">unknown_apps</span><span class="o">=</span><span class="n">unknown_apps</span><span class="p">,)</span>
         <span class="n">params_hash</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="n">test_data_params</span><span class="p">),</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
         <span class="n">params_hash</span> <span class="o">=</span> <span class="n">params_hash</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
         <span class="n">test_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">,</span> <span class="s2">&quot;test-data&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">params_hash</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -2447,23 +2440,11 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_features_len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_features_len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the number of flow statistics features.&quot;&quot;&quot;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PHIST_&quot;</span><span class="p">):</span>
-            <span class="n">n</span> <span class="o">+=</span> <span class="n">PHIST_BIN_COUNT</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">)</span> <span class="o">+</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2492,7 +2473,15 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">420</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
 <span class="normal">421</span>
 <span class="normal">422</span>
 <span class="normal">423</span>
@@ -2515,28 +2504,38 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="normal">440</span>
 <span class="normal">441</span>
 <span class="normal">442</span>
-<span class="normal">443</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">443</span>
+<span class="normal">444</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_flowstats_feature_names_expanded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets names of flow statistics features. Packet histograms are expanded into bin features.&quot;&quot;&quot;</span>
-    <span class="n">name_mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">phist_mapping</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;PHIST_SRC_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
         <span class="s2">&quot;PHIST_DST_SIZES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PSIZE_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_REV&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
         <span class="s2">&quot;PHIST_SRC_IPT&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
         <span class="s2">&quot;PHIST_DST_IPT&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_BIN</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_REV&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PHIST_BIN_COUNT</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
-        <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_IDLE&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_ACTIVE&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_END&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_OTHER&quot;</span> <span class="k">if</span> <span class="n">shorter_names</span> <span class="k">else</span> <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name_mapping</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">shorter_names</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">):</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="s2">&quot;F&quot;</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;FLAG&quot;</span><span class="p">)</span>
-            <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
+    <span class="n">short_names_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;FLOW_ENDREASON_IDLE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_IDLE&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLOW_ENDREASON_ACTIVE&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_ACTIVE&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLOW_ENDREASON_END&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_END&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLOW_ENDREASON_OTHER&quot;</span><span class="p">:</span> <span class="s2">&quot;FEND_OTHER&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLAG_CWR&quot;</span><span class="p">:</span> <span class="s2">&quot;F_CWR&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLAG_CWR_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_CWR_REV&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLAG_ECE&quot;</span><span class="p">:</span> <span class="s2">&quot;F_ECE&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLAG_ECE_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_ECE_REV&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLAG_PSH_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_PSH_REV&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLAG_RST&quot;</span><span class="p">:</span> <span class="s2">&quot;F_RST&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLAG_RST_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_RST_REV&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLAG_FIN&quot;</span><span class="p">:</span> <span class="s2">&quot;F_FIN&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FLAG_FIN_REV&quot;</span><span class="p">:</span> <span class="s2">&quot;F_FIN_REV&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">[:]</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">shorter_names</span> <span class="ow">and</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">short_names_mapping</span><span class="p">:</span>
+            <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">short_names_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
+            <span class="n">feature_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">:</span>
+        <span class="n">feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">phist_mapping</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_flowstats_features_len</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">feature_names</span>
 </code></pre></div></td></tr></table></div>
@@ -2565,14 +2564,14 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">445</span>
-<span class="normal">446</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">446</span>
 <span class="normal">447</span>
 <span class="normal">448</span>
 <span class="normal">449</span>
 <span class="normal">450</span>
 <span class="normal">451</span>
-<span class="normal">452</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">452</span>
+<span class="normal">453</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the names of flattened PPI features.&quot;&quot;&quot;</span>
     <span class="n">ppi_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;IPT_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
                            <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;DIR_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">PPI_MAX_LEN</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> \
@@ -2597,22 +2596,22 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">get_ppi_channels</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">get_ppi_channels</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
 </code></pre></div>
 
   <div class="doc doc-contents ">
   
-      <p>Gets the number of features (channels) in PPI.</p>
+      <p>Gets the available features (channels) in PPI sequences.</p>
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">454</span>
-<span class="normal">455</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">455</span>
 <span class="normal">456</span>
 <span class="normal">457</span>
 <span class="normal">458</span>
-<span class="normal">459</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the number of features (channels) in PPI.&quot;&quot;&quot;</span>
+<span class="normal">459</span>
+<span class="normal">460</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ppi_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the available features (channels) in PPI sequences.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">TCP_PPI_CHANNELS</span>
     <span class="k">else</span><span class="p">:</span>
@@ -2675,8 +2674,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\config.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">461</span>
-<span class="normal">462</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">462</span>
 <span class="normal">463</span>
 <span class="normal">464</span>
 <span class="normal">465</span>
@@ -2684,7 +2682,8 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="normal">467</span>
 <span class="normal">468</span>
 <span class="normal">469</span>
-<span class="normal">470</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">470</span>
+<span class="normal">471</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">shorter_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Gets feature names.</span>
 
@@ -2790,31 +2789,6 @@ is used to create a random stratified validation set. The fraction of validation
 
 </div>
 
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h7 id="config.ValidationApproach.NO_VALIDATION" class="doc doc-heading">
-          <span class="doc doc-object-name doc-attribute-name">NO_VALIDATION</span>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h7>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">NO_VALIDATION</span> <span class="o">=</span> <span class="s1">&#39;no-validation&#39;</span>
-</code></pre></div>
-
-  <div class="doc doc-contents ">
-  
-      <p>Do not use validation. The validation dataloader and dataframe will not be available.</p>
-  </div>
-
-</div>
-
 
 
 
@@ -2841,8 +2815,8 @@ is used to create a random stratified validation set. The fraction of validation
 
   
       <p>Applications can be divided into <em>known</em> and <em>unknown</em> classes. To use a dataset in the standard closed-world setting, use <code>ALL_KNOWN</code> to select all the applications as <em>known</em>.
-Use <code>TOPX_KNOWN</code> or <code>EXPLICIT_UNKNOWN</code> for the open-world setting and evaluation of out-of-distribution or open-set recognition methods.
-The <code>LONGTERM_FIXED</code> is for long-term measurements when it is desired to use the same applications for multiple subsequent train and test periods.</p>
+Use <code>TOPX_KNOWN</code> or <code>BACKGROUND_UNKNOWN</code> for the open-world setting and evaluation of out-of-distribution or open-set recognition methods.
+The <code>FIXED</code> is for manual selection of <em>known</em> and <em>unknown</em> applications.</p>
 
 
   
@@ -2911,8 +2885,8 @@ Applications with the same provider are never separated, i.e., all applications 
 
 
 
-<h7 id="config.AppSelection.EXPLICIT_UNKNOWN" class="doc doc-heading">
-          <span class="doc doc-object-name doc-attribute-name">EXPLICIT_UNKNOWN</span>
+<h7 id="config.AppSelection.BACKGROUND_UNKNOWN" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">BACKGROUND_UNKNOWN</span>
 
   
   <span class="doc doc-labels">
@@ -2921,12 +2895,12 @@ Applications with the same provider are never separated, i.e., all applications 
   </span>
 
 </h7>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">EXPLICIT_UNKNOWN</span> <span class="o">=</span> <span class="s1">&#39;explicit-unknown&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">BACKGROUND_UNKNOWN</span> <span class="o">=</span> <span class="s1">&#39;background-unknown&#39;</span>
 </code></pre></div>
 
   <div class="doc doc-contents ">
   
-      <p>Use the provided list of applications (<code>apps_selection_explicit_unknown</code>) as <em>unknown</em>, and the rest as <em>known</em>.</p>
+      <p>Use the list of background traffic classes (<code>apps_selection_background_unknown</code>) as <em>unknown</em>, and the rest as <em>known</em>.</p>
   </div>
 
 </div>
@@ -2936,8 +2910,8 @@ Applications with the same provider are never separated, i.e., all applications 
 
 
 
-<h7 id="config.AppSelection.LONGTERM_FIXED" class="doc doc-heading">
-          <span class="doc doc-object-name doc-attribute-name">LONGTERM_FIXED</span>
+<h7 id="config.AppSelection.FIXED" class="doc doc-heading">
+          <span class="doc doc-object-name doc-attribute-name">FIXED</span>
 
   
   <span class="doc doc-labels">
@@ -2946,12 +2920,12 @@ Applications with the same provider are never separated, i.e., all applications 
   </span>
 
 </h7>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">LONGTERM_FIXED</span> <span class="o">=</span> <span class="s1">&#39;longterm-fixed&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">FIXED</span> <span class="o">=</span> <span class="s1">&#39;fixed&#39;</span>
 </code></pre></div>
 
   <div class="doc doc-contents ">
   
-      <p>Use fixed application selection. Provide a tuple of <code>(known_apps_database_enum, unknown_apps_database_enum)</code> in <code>apps_selection_fixed_longterm</code>.</p>
+      <p>Manual application selection. Provide lists of <em>known</em> applications (<code>apps_selection_fixed_known</code>) and <em>unknown</em> applications (<code>apps_selection_fixed_unknown</code>).</p>
   </div>
 
 </div>
@@ -3135,144 +3109,6 @@ This setting affects only <a class="autorefs autorefs-internal" href="../referen
   <div class="doc doc-contents ">
   
       <p>Iterate train data in sequential (datetime) order.</p>
-  </div>
-
-</div>
-
-
-
-
-
-  </div>
-
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-
-<h6 id="config.ScalerEnum" class="doc doc-heading">
-          <span class="doc doc-object-name doc-class-name">config.ScalerEnum</span>
-
-
-</h6>
-
-
-  <div class="doc doc-contents first">
-
-  
-      <p>Available scalers for flow statistics, packet sizes, and inter-packet times.</p>
-
-
-  
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h7 id="config.ScalerEnum.STANDARD" class="doc doc-heading">
-          <span class="doc doc-object-name doc-attribute-name">STANDARD</span>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h7>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">STANDARD</span> <span class="o">=</span> <span class="s1">&#39;standard&#39;</span>
-</code></pre></div>
-
-  <div class="doc doc-contents ">
-  
-      <p>Standardize features by removing the mean and scaling to unit variance - <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html"><code>sklearn.preprocessing.StandardScaler</code></a>.</p>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h7 id="config.ScalerEnum.ROBUST" class="doc doc-heading">
-          <span class="doc doc-object-name doc-attribute-name">ROBUST</span>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h7>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">ROBUST</span> <span class="o">=</span> <span class="s1">&#39;robust&#39;</span>
-</code></pre></div>
-
-  <div class="doc doc-contents ">
-  
-      <p>Robust scaling with the median and the interquartile range - <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.RobustScaler.html"><code>sklearn.preprocessing.RobustScaler</code></a>.</p>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h7 id="config.ScalerEnum.MINMAX" class="doc doc-heading">
-          <span class="doc doc-object-name doc-attribute-name">MINMAX</span>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h7>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">MINMAX</span> <span class="o">=</span> <span class="s1">&#39;minmax&#39;</span>
-</code></pre></div>
-
-  <div class="doc doc-contents ">
-  
-      <p>Scaling to a (0, 1) range - <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html"><code>sklearn.preprocessing.MinMaxScaler</code></a>.</p>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-
-<h7 id="config.ScalerEnum.NO_SCALER" class="doc doc-heading">
-          <span class="doc doc-object-name doc-attribute-name">NO_SCALER</span>
-
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h7>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">NO_SCALER</span> <span class="o">=</span> <span class="s1">&#39;no-scaler&#39;</span>
-</code></pre></div>
-
-  <div class="doc doc-contents ">
-  
-      <p>No scaling.</p>
   </div>
 
 </div>

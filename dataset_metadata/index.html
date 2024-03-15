@@ -680,28 +680,34 @@
 <td>180</td>
 </tr>
 <tr>
-<td><em>Background traffic</em></td>
+<td><em>Background traffic classes</em></td>
 <td></td>
 <td>default-background, google-background, facebook-background</td>
 <td></td>
 </tr>
 <tr>
-<td><em>Features in packet sequences</em></td>
+<td><em>PPI features</em></td>
 <td>IPT, DIR, SIZE</td>
 <td>IPT, DIR, SIZE</td>
 <td>IPT, DIR, SIZE, PUSH_FLAG</td>
 </tr>
 <tr>
-<td><em>Packet histogram features</em></td>
+<td><em>Flowstats features</em></td>
+<td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, DURATION, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION</td>
+<td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, DURATION, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION</td>
+<td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, DURATION, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION</td>
+</tr>
+<tr>
+<td><em>Flowstats features boolean</em></td>
+<td></td>
+<td>FLOW_ENDREASON_IDLE, FLOW_ENDREASON_ACTIVE, FLOW_ENDREASON_OTHER</td>
+<td>FLOW_ENDREASON_IDLE, FLOW_ENDREASON_ACTIVE, FLOW_ENDREASON_END, FLOW_ENDREASON_OTHER</td>
+</tr>
+<tr>
+<td><em>Packet histograms</em></td>
 <td></td>
 <td>PHIST_SRC_SIZES, PHIST_DST_SIZES, PHIST_SRC_IPT, PHIST_DST_IPT</td>
 <td>PHIST_SRC_SIZES, PHIST_DST_SIZES, PHIST_SRC_IPT, PHIST_DST_IPT</td>
-</tr>
-<tr>
-<td><em>Flowstats features</em></td>
-<td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION, DURATION</td>
-<td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION, DURATION, FLOW_ENDREASON_IDLE, FLOW_ENDREASON_ACTIVE, FLOW_ENDREASON_OTHER</td>
-<td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION, DURATION, FLOW_ENDREASON_IDLE, FLOW_ENDREASON_ACTIVE, FLOW_ENDREASON_END, FLOW_ENDREASON_OTHER</td>
 </tr>
 <tr>
 <td><em>TCP features</em></td>

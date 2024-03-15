@@ -812,8 +812,7 @@
   <div class="doc doc-contents first">
 
   
-      <p>The main class for accessing CESNET datasets. It handles downloading, data preprocessing,
-train/validation/test splitting, and class selection. Access to data is provided through:</p>
+      <p>The main class for accessing CESNET datasets. It handles downloading, train/validation/test splitting, and class selection. Access to data is provided through:</p>
 <ul>
 <li>Iterable PyTorch DataLoader for batch processing. See <a class="autorefs autorefs-internal" href="../dataloaders/#using-dataloaders">using dataloaders</a> for more details.</li>
 <li>Pandas DataFrame for loading the entire train, validation, or test set at once.</li>
@@ -826,7 +825,7 @@ which provides efficient parallel loading of the data. The dataset configuration
 <ol>
 <li>Create an instance of the <a class="autorefs autorefs-internal" href="../reference_datasets/#dataset-classes">dataset class</a> with the desired size and data root. This will download the dataset if it has not already been downloaded.</li>
 <li>Create an instance of <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> and set it with <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize"><code>set_dataset_config_and_initialize</code></a>.
-This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers. All is done according to the provided configuration and is cached for later use.</li>
+This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers if needed. All is done according to the provided configuration and is cached for later use.</li>
 <li>Use <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_train_dataloader"><code>get_train_dataloader</code></a> or <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_train_df"><code>get_train_df</code></a> to get training data for a classification model.</li>
 <li>Validate the model and perform the hyperparameter optimalization on <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_val_dataloader"><code>get_val_dataloader</code></a> or <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_val_df"><code>get_val_df</code></a>.</li>
 <li>Evaluate the model on <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_test_dataloader"><code>get_test_dataloader</code></a> or <a class="autorefs autorefs-internal" href="#datasets.cesnet_dataset.CesnetDataset.get_test_df"><code>get_test_df</code></a>.</li>
@@ -953,7 +952,7 @@ This will initialize the dataset — select classes, split data into train/valid
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Path to the dataset statistics.</p>
+              <p>Path to the dataset statistics folder.</p>
             </div>
           </td>
         </tr>
@@ -976,6 +975,17 @@ This will initialize the dataset — select classes, split data into train/valid
           <td>
             <div class="doc-md-description">
               <p>Additional <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a>.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>available_classes</code></td>
+          <td>
+                <code>list[str]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of all available classes in the dataset.</p>
             </div>
           </td>
         </tr>
@@ -1106,28 +1116,6 @@ This will initialize the dataset — select classes, split data into train/valid
           </td>
         </tr>
         <tr>
-          <td><code>known_apps_database_enum</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[dict[int, str]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Dictionary that maps the database integer labels (different to those from <code>encoder</code>) of known applications to their names.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>unknown_apps_database_enum</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[dict[int, str]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Dictionary that maps the database integer labels (different to those from <code>encoder</code>) of unknown applications to their names.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
           <td><code>known_app_counts</code></td>
           <td>
                 <code><span title="typing.Optional">Optional</span>[<span title="pandas.DataFrame">DataFrame</span>]</code>
@@ -1150,72 +1138,6 @@ This will initialize the dataset — select classes, split data into train/valid
           </td>
         </tr>
         <tr>
-          <td><code>collate_fn</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="typing.Callable">Callable</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Collate function used for creating batches in dataloaders.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>encoder</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="sklearn.preprocessing.LabelEncoder">LabelEncoder</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Scikit-learn <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html"><code>LabelEncoder</code></a> used to encode class names into integers. It is fitted during the initialization of the dataset.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>flowstats_scaler</code></td>
-          <td>
-                <code><span title="cesnet_datazoo.config.Scaler">Scaler</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Scaler for flow statistics. It is fitted during the initialization of the dataset.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>psizes_scaler</code></td>
-          <td>
-                <code><span title="cesnet_datazoo.config.Scaler">Scaler</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Scaler for packet sizes.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>ipt_scaler</code></td>
-          <td>
-                <code><span title="cesnet_datazoo.config.Scaler">Scaler</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Scaler for inter-packet times.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td><code>flowstats_quantiles</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.ndarray">ndarray</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Quantiles of flow statistics used for clipping.</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
           <td><code>train_dataloader</code></td>
           <td>
                 <code><span title="typing.Optional">Optional</span>[<span title="torch.utils.data.DataLoader">DataLoader</span>]</code>
@@ -1234,6 +1156,17 @@ This will initialize the dataset — select classes, split data into train/valid
           <td>
             <div class="doc-md-description">
               <p>Sampler used for iterating the training dataloader. Either <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.RandomSampler"><code>RandomSampler</code></a> or <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.SequentialSampler"><code>SequentialSampler</code></a>.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><code>train_dataloader_drop_last</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Whether to drop the last incomplete batch when iterating the training dataloader.</p>
             </div>
           </td>
         </tr>
@@ -1264,8 +1197,7 @@ This will initialize the dataset — select classes, split data into train/valid
 
             <details class="quote">
               <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 40</span>
-<span class="normal"> 41</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 41</span>
 <span class="normal"> 42</span>
 <span class="normal"> 43</span>
 <span class="normal"> 44</span>
@@ -1886,10 +1818,29 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="normal">659</span>
 <span class="normal">660</span>
 <span class="normal">661</span>
-<span class="normal">662</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CesnetDataset</span><span class="p">():</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CesnetDataset</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The main class for accessing CESNET datasets. It handles downloading, data preprocessing,</span>
-<span class="sd">    train/validation/test splitting, and class selection. Access to data is provided through:</span>
+<span class="sd">    The main class for accessing CESNET datasets. It handles downloading, train/validation/test splitting, and class selection. Access to data is provided through:</span>
 
 <span class="sd">    - Iterable PyTorch DataLoader for batch processing. See [using dataloaders][using-dataloaders] for more details.</span>
 <span class="sd">    - Pandas DataFrame for loading the entire train, validation, or test set at once.</span>
@@ -1903,7 +1854,7 @@ This will initialize the dataset — select classes, split data into train/valid
 
 <span class="sd">    1. Create an instance of the [dataset class][dataset-classes] with the desired size and data root. This will download the dataset if it has not already been downloaded.</span>
 <span class="sd">    2. Create an instance of [`DatasetConfig`][config.DatasetConfig] and set it with [`set_dataset_config_and_initialize`][datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize].</span>
-<span class="sd">    This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers. All is done according to the provided configuration and is cached for later use.</span>
+<span class="sd">    This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers if needed. All is done according to the provided configuration and is cached for later use.</span>
 <span class="sd">    3. Use [`get_train_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_train_dataloader] or [`get_train_df`][datasets.cesnet_dataset.CesnetDataset.get_train_df] to get training data for a classification model.</span>
 <span class="sd">    4. Validate the model and perform the hyperparameter optimalization on [`get_val_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_val_dataloader] or [`get_val_df`][datasets.cesnet_dataset.CesnetDataset.get_val_df].</span>
 <span class="sd">    5. Evaluate the model on [`get_test_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_test_dataloader] or [`get_test_df`][datasets.cesnet_dataset.CesnetDataset.get_test_df].</span>
@@ -1918,9 +1869,10 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        database_filename: Name of the database file.</span>
 <span class="sd">        database_path: Path to the database file.</span>
 <span class="sd">        servicemap_path: Path to the servicemap file.</span>
-<span class="sd">        statistics_path: Path to the dataset statistics.</span>
+<span class="sd">        statistics_path: Path to the dataset statistics folder.</span>
 <span class="sd">        bucket_url: URL of the bucket where the database is stored.</span>
 <span class="sd">        metadata: Additional [dataset metadata][metadata].</span>
+<span class="sd">        available_classes: List of all available classes in the dataset.</span>
 <span class="sd">        available_dates: List of all available dates in the dataset.</span>
 <span class="sd">        time_periods: Predefined time periods. Each time period is a list of dates.</span>
 <span class="sd">        default_train_period_name: Default time period for training.</span>
@@ -1935,36 +1887,30 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        train_dataset: Train set in the form of `PyTablesDataset` instance wrapping the PyTables database.</span>
 <span class="sd">        val_dataset: Validation set in the form of `PyTablesDataset` instance wrapping the PyTables database.</span>
 <span class="sd">        test_dataset: Test set in the form of `PyTablesDataset` instance wrapping the PyTables database.</span>
-<span class="sd">        known_apps_database_enum: Dictionary that maps the database integer labels (different to those from `encoder`) of known applications to their names.</span>
-<span class="sd">        unknown_apps_database_enum: Dictionary that maps the database integer labels (different to those from `encoder`) of unknown applications to their names.</span>
 <span class="sd">        known_app_counts: Known application counts in the train, validation, and test sets.</span>
 <span class="sd">        unknown_app_counts: Unknown application counts in the validation and test sets.</span>
-<span class="sd">        collate_fn: Collate function used for creating batches in dataloaders.</span>
-<span class="sd">        encoder: Scikit-learn [`LabelEncoder`](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html) used to encode class names into integers. It is fitted during the initialization of the dataset.</span>
-<span class="sd">        flowstats_scaler: Scaler for flow statistics. It is fitted during the initialization of the dataset.</span>
-<span class="sd">        psizes_scaler: Scaler for packet sizes.</span>
-<span class="sd">        ipt_scaler: Scaler for inter-packet times.</span>
-<span class="sd">        flowstats_quantiles: Quantiles of flow statistics used for clipping.</span>
 <span class="sd">        train_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for training.</span>
 <span class="sd">        train_dataloader_sampler: Sampler used for iterating the training dataloader. Either [`RandomSampler`](https://pytorch.org/docs/stable/data.html#torch.utils.data.RandomSampler) or [`SequentialSampler`](https://pytorch.org/docs/stable/data.html#torch.utils.data.SequentialSampler).</span>
+<span class="sd">        train_dataloader_drop_last: Whether to drop the last incomplete batch when iterating the training dataloader.</span>
 <span class="sd">        val_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for validation.</span>
 <span class="sd">        test_dataloader: Iterable PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for testing.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">size</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">data_root</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">database_filename</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">database_path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">servicemap_path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">statistics_path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">bucket_url</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">metadata</span><span class="p">:</span> <span class="n">DatasetMetadata</span>
+    <span class="n">available_classes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">available_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">time_periods</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="n">default_train_period_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">default_test_period_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">time_periods_gen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">dataset_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DatasetConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">class_info</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClassInfo</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1972,25 +1918,19 @@ This will initialize the dataset — select classes, split data into train/valid
     <span class="n">train_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PyTablesDataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">val_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PyTablesDataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">test_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PyTablesDataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">known_apps_database_enum</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">unknown_apps_database_enum</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">known_app_counts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">unknown_app_counts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="n">collate_fn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LabelEncoder</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">flowstats_scaler</span><span class="p">:</span> <span class="n">Scaler</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">psizes_scaler</span><span class="p">:</span> <span class="n">Scaler</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">ipt_scaler</span><span class="p">:</span> <span class="n">Scaler</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">flowstats_quantiles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
     <span class="n">train_dataloader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">train_dataloader_sampler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sampler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">train_dataloader_drop_last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">val_dataloader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">test_dataloader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">skip_dataset_read_at_init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">_collate_fn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_tables_app_enum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="n">_tables_cat_enum</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">database_checks_at_init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">silent</span> <span class="o">=</span> <span class="n">silent</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">load_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
@@ -2008,24 +1948,31 @@ This will initialize the dataset — select classes, split data into train/valid
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_root</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_downloaded</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_download</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_dataset_read_at_init</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">database_checks_at_init</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">tb</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">database</span><span class="p">:</span>
                 <span class="n">tables_paths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">_v_pathname</span><span class="p">,</span> <span class="nb">iter</span><span class="p">(</span><span class="n">database</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/flows&quot;</span><span class="p">))))</span>
                 <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">tables_paths</span><span class="p">:</span>
-                    <span class="n">num_samples</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">database</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+                    <span class="n">table</span> <span class="o">=</span> <span class="n">database</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">tb</span><span class="o">.</span><span class="n">Table</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span> <span class="o">!=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">get_enum</span><span class="p">(</span><span class="n">APP_COLUMN</span><span class="p">))</span><span class="o">.</span><span class="n">items</span><span class="p">()}:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found mismatch between _tables_app_enum and the PyTables database enum in table </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">. Please report this issue.&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables_cat_enum</span> <span class="o">!=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">get_enum</span><span class="p">(</span><span class="n">CATEGORY_COLUMN</span><span class="p">))</span><span class="o">.</span><span class="n">items</span><span class="p">()}:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found mismatch between _tables_cat_enum and the PyTables database enum in table </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">. Please report this issue.&quot;</span><span class="p">)</span>
+                    <span class="n">num_samples</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="s2">&quot;ORIG&quot;</span> <span class="ow">and</span> <span class="n">num_samples</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">available_samples</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">available_samples</span><span class="si">}</span><span class="s2"> samples, but got </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2"> in the database. Please delete the data root folder, update cesnet-datazoo, and redownload the dataset.&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="s2">&quot;ORIG&quot;</span> <span class="ow">and</span> <span class="n">num_samples</span> <span class="o">!=</span> <span class="n">DATASET_SIZES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">DATASET_SIZES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">]</span><span class="si">}</span><span class="s2"> samples, but got </span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2"> in the database. Please delete the data root folder, update cesnet-datazoo, and redownload the dataset.&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">available_dates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;/flows/D&quot;</span><span class="p">),</span> <span class="n">tables_paths</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">available_dates</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_periods_gen</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_generate_time_periods</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_dates</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;/flows/D&quot;</span><span class="p">),</span> <span class="n">tables_paths</span><span class="p">)):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found mismatch between available_dates and the dates available in the PyTables database. Please report this issue.&quot;</span><span class="p">)</span>
         <span class="c1"># Add all available dates as single date time periods</span>
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_dates</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">]</span>
+        <span class="n">available_applications</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">app</span> <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">servicemap_path</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;Tag&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_background_app</span><span class="p">(</span><span class="n">app</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_applications</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">application_count</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">available_applications</span><span class="p">)</span><span class="si">}</span><span class="s2"> applications in the servicemap (omitting background traffic classes), but expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">application_count</span><span class="si">}</span><span class="s2">. Please report this issue.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">available_classes</span> <span class="o">=</span> <span class="n">available_applications</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">background_traffic_classes</span>
 
     <span class="k">def</span> <span class="nf">set_dataset_config_and_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_config</span><span class="p">:</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">disable_indices_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2057,6 +2004,8 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting train dataloader&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Train dataloader is not available when need_train_set is false&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dataloader</span>
@@ -2079,7 +2028,7 @@ This will initialize the dataset — select classes, split data into train/valid
             <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span>
             <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_workers</span><span class="p">,</span>
             <span class="n">worker_init_fn</span><span class="o">=</span><span class="n">worker_init_fn</span><span class="p">,</span>
-            <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collate_fn</span><span class="p">,</span>
+            <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_collate_fn</span><span class="p">,</span>
             <span class="n">persistent_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">sampler</span><span class="o">=</span><span class="n">batch_sampler</span><span class="p">,)</span>
@@ -2104,8 +2053,8 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting validaion dataloader&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">NO_VALIDATION</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation dataloader is not available when using no-validation&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">need_val_set</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation dataloader is not available when need_val_set is false&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dataloader</span>
@@ -2114,7 +2063,7 @@ This will initialize the dataset — select classes, split data into train/valid
             <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span><span class="p">,</span>
             <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_workers</span><span class="p">,</span>
             <span class="n">worker_init_fn</span><span class="o">=</span><span class="n">worker_init_fn</span><span class="p">,</span>
-            <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collate_fn</span><span class="p">,</span>
+            <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_collate_fn</span><span class="p">,</span>
             <span class="n">persistent_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">sampler</span><span class="o">=</span><span class="n">batch_sampler</span><span class="p">,)</span>
@@ -2143,8 +2092,8 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting test dataloader&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">no_test_set</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Test dataloader is not available when no_test_set is true&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">need_test_set</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Test dataloader is not available when need_test_set is false&quot;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dataloader</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dataloader</span>
@@ -2153,7 +2102,7 @@ This will initialize the dataset — select classes, split data into train/valid
             <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">,</span>
             <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">test_workers</span><span class="p">,</span>
             <span class="n">worker_init_fn</span><span class="o">=</span><span class="n">worker_init_fn</span><span class="p">,</span>
-            <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collate_fn</span><span class="p">,</span>
+            <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_collate_fn</span><span class="p">,</span>
             <span class="n">persistent_workers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">sampler</span><span class="o">=</span><span class="n">batch_sampler</span><span class="p">,)</span>
@@ -2185,7 +2134,7 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        Returns:</span>
 <span class="sd">            Train data as a dataframe.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_train</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">DATAFRAME_SAMPLES_WARNING_THRESHOLD</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train set has (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples), consider using get_train_dataloader() instead&quot;</span><span class="p">)</span>
@@ -2218,7 +2167,7 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        Returns:</span>
 <span class="sd">            Validation data as a dataframe.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_no_val</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_val</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">DATAFRAME_SAMPLES_WARNING_THRESHOLD</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation set has (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples), consider using get_val_dataloader() instead&quot;</span><span class="p">)</span>
@@ -2247,7 +2196,7 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">        Returns:</span>
 <span class="sd">            Test data as a dataframe.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_no_test</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_test</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">DATAFRAME_SAMPLES_WARNING_THRESHOLD</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test set has (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples), consider using get_test_dataloader() instead&quot;</span><span class="p">)</span>
@@ -2285,12 +2234,18 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="sd">            batch_size: Number of samples per batch for loading data.</span>
 <span class="sd">            disabled_apps: List of applications to exclude from the statistics.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">flowstats_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">packet_histogram_features</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">tcp_features</span>
+        <span class="k">if</span> <span class="n">disabled_apps</span><span class="p">:</span>
+            <span class="n">bad_disabled_apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">disabled_apps</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_classes</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_disabled_apps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bad applications in disabled_apps </span><span class="si">{</span><span class="n">bad_disabled_apps</span><span class="si">}</span><span class="s2">. Use applications available in dataset.available_classes&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_path</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_path</span><span class="p">)</span>
         <span class="n">compute_dataset_statistics</span><span class="p">(</span><span class="n">database_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span>
+                                   <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
+                                   <span class="n">tables_cat_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_cat_enum</span><span class="p">,</span>
                                    <span class="n">output_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_path</span><span class="p">,</span>
-                                   <span class="n">flowstats_features</span><span class="o">=</span><span class="n">flowstats_features</span><span class="p">,</span>
+                                   <span class="n">packet_histograms</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">packet_histograms</span><span class="p">,</span>
+                                   <span class="n">flowstats_features_boolean</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">,</span>
                                    <span class="n">protocol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span>
                                    <span class="n">extra_fields</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;CESNET-TLS22&quot;</span><span class="p">),</span>
                                    <span class="n">disabled_apps</span><span class="o">=</span><span class="n">disabled_apps</span> <span class="k">if</span> <span class="n">disabled_apps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[],</span>
@@ -2338,177 +2293,193 @@ This will initialize the dataset — select classes, split data into train/valid
         <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">known_apps_database_enum</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">unknown_apps_database_enum</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">known_app_counts</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unknown_app_counts</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_scaler</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">psizes_scaler</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ipt_scaler</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_quantiles</span> <span class="o">=</span> <span class="kc">None</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">train_dataloader</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_dataloader_sampler</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_dataloader_drop_last</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_dataloader</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_dataloader</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_collate_fn</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_check_before_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_no_val</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">check_no_test</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_check_before_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_train</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">check_val</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">check_test</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting a dataframe&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_torch</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataframes are not available when return_torch is set. Use a dataloader instead.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">check_no_val</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">NO_VALIDATION</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation dataframe is not available when using no-validation&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">check_no_test</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">no_test_set</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Test dataframe is not available when no_test_set is true&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataframes are not available when return_tensors is set. Use a dataloader instead.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check_train</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Train dataframe is not available when need_train_set is false&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check_val</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">need_val_set</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation dataframe is not available when need_val_set is false&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">check_test</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">need_test_set</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Test dataframe is not available when need_test_set is false&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_initialize_train_val_test</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disable_indices_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">dataset_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span>
         <span class="n">servicemap</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">servicemap_path</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;Tag&quot;</span><span class="p">)</span>
-        <span class="c1"># Initialize train and test indices</span>
-        <span class="n">train_indices</span><span class="p">,</span> <span class="n">train_unknown_indices</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">known_apps_database_enum</span><span class="p">,</span> <span class="n">unknown_apps_database_enum</span> <span class="o">=</span> <span class="n">init_or_load_train_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span>
-                                                                                                                                         <span class="n">servicemap</span><span class="o">=</span><span class="n">servicemap</span><span class="p">,</span>
-                                                                                                                                         <span class="n">disable_indices_cache</span><span class="o">=</span><span class="n">disable_indices_cache</span><span class="p">,)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">no_test_set</span><span class="p">:</span>
-            <span class="n">test_known_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-            <span class="n">test_unknown_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-            <span class="n">test_data_path</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">test_known_indices</span><span class="p">,</span> <span class="n">test_unknown_indices</span><span class="p">,</span> <span class="n">test_data_path</span> <span class="o">=</span> <span class="n">init_or_load_test_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span>
-                                                                                                 <span class="n">known_apps_database_enum</span><span class="o">=</span><span class="n">known_apps_database_enum</span><span class="p">,</span>
-                                                                                                 <span class="n">unknown_apps_database_enum</span><span class="o">=</span><span class="n">unknown_apps_database_enum</span><span class="p">,</span>
-                                                                                                 <span class="n">disable_indices_cache</span><span class="o">=</span><span class="n">disable_indices_cache</span><span class="p">,)</span>
-        <span class="c1"># Date weight sampling of train indices</span>
-        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_dates_weigths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span>
-            <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span><span class="p">:</span>
-                <span class="c1"># requested number of samples is train_size + val_known_size when using the split-from-train validation approach</span>
-                <span class="k">assert</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span>
-                <span class="n">num_samples</span> <span class="o">=</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">num_samples</span> <span class="o">=</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span>
-            <span class="k">if</span> <span class="n">num_samples</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested number of samples for weight sampling (</span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-            <span class="n">train_indices</span> <span class="o">=</span> <span class="n">date_weight_sample_train_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">train_indices</span><span class="o">=</span><span class="n">train_indices</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">)</span>
-        <span class="c1"># Obtain validation indices based on the selected approach</span>
-        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">VALIDATION_DATES</span><span class="p">:</span>
-            <span class="n">val_known_indices</span><span class="p">,</span> <span class="n">val_unknown_indices</span><span class="p">,</span> <span class="n">val_data_path</span> <span class="o">=</span> <span class="n">init_or_load_val_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span>
-                                                                                             <span class="n">known_apps_database_enum</span><span class="o">=</span><span class="n">known_apps_database_enum</span><span class="p">,</span>
-                                                                                             <span class="n">unknown_apps_database_enum</span><span class="o">=</span><span class="n">unknown_apps_database_enum</span><span class="p">,</span>
-                                                                                             <span class="n">disable_indices_cache</span><span class="o">=</span><span class="n">disable_indices_cache</span><span class="p">,)</span>
-        <span class="k">elif</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span><span class="p">:</span>
-            <span class="n">train_val_rng</span> <span class="o">=</span> <span class="n">get_fresh_random_generator</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="n">RandomizedSection</span><span class="o">.</span><span class="n">TRAIN_VAL_SPLIT</span><span class="p">)</span>
-            <span class="n">val_data_path</span> <span class="o">=</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_train_data_path</span><span class="p">()</span>
-            <span class="n">val_unknown_indices</span> <span class="o">=</span> <span class="n">train_unknown_indices</span>
-            <span class="n">train_labels</span> <span class="o">=</span> <span class="n">train_indices</span><span class="p">[:,</span> <span class="n">INDICES_LABEL_POS</span><span class="p">]</span>
+        <span class="c1"># Initialize train set</span>
+        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
+            <span class="n">train_indices</span><span class="p">,</span> <span class="n">train_unknown_indices</span><span class="p">,</span> <span class="n">known_apps</span><span class="p">,</span> <span class="n">unknown_apps</span> <span class="o">=</span> <span class="n">init_or_load_train_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span>
+                                                                                                        <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
+                                                                                                        <span class="n">servicemap</span><span class="o">=</span><span class="n">servicemap</span><span class="p">,</span>
+                                                                                                        <span class="n">disable_indices_cache</span><span class="o">=</span><span class="n">disable_indices_cache</span><span class="p">,)</span>
+            <span class="c1"># Date weight sampling of train indices</span>
             <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_dates_weigths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span>
-                <span class="c1"># When weight sampling is used, val_known_size is kept but the resulting train size can be smaller due to no enough samples in some train dates</span>
-                <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested validation size (</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples after weight sampling (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-                <span class="n">train_indices</span><span class="p">,</span> <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">train_labels</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">train_val_rng</span><span class="p">)</span>
-                <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
-                <span class="n">train_indices</span><span class="p">,</span> <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_val_split_fraction</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">train_labels</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">train_val_rng</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span>  <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested train size + validation size (</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested train size (</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested validation size (</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-                <span class="n">train_indices</span><span class="p">,</span> <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">train_indices</span><span class="p">,</span>
-                                                                          <span class="n">train_size</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                                                                          <span class="n">test_size</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                                                                          <span class="n">stratify</span><span class="o">=</span><span class="n">train_labels</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">train_val_rng</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">NO_VALIDATION</span><span class="p">:</span>
-            <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-            <span class="n">val_unknown_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span>
+                <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span><span class="p">:</span>
+                    <span class="c1"># requested number of samples is train_size + val_known_size when using the split-from-train validation approach</span>
+                    <span class="k">assert</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span>
+                    <span class="n">num_samples</span> <span class="o">=</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">num_samples</span> <span class="o">=</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span>
+                <span class="k">if</span> <span class="n">num_samples</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested number of samples for weight sampling (</span><span class="si">{</span><span class="n">num_samples</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                <span class="n">train_indices</span> <span class="o">=</span> <span class="n">date_weight_sample_train_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">train_indices</span><span class="o">=</span><span class="n">train_indices</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">FIXED</span><span class="p">:</span>
+            <span class="n">known_apps</span> <span class="o">=</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">apps_selection_fixed_known</span>
+            <span class="n">unknown_apps</span> <span class="o">=</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">apps_selection_fixed_unknown</span>
+            <span class="n">train_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">train_unknown_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either need train set or the fixed application selection&quot;</span><span class="p">)</span>
+        <span class="c1"># Initialize validation set</span>
+        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">need_val_set</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">VALIDATION_DATES</span><span class="p">:</span>
+                <span class="n">val_known_indices</span><span class="p">,</span> <span class="n">val_unknown_indices</span><span class="p">,</span> <span class="n">val_data_path</span> <span class="o">=</span> <span class="n">init_or_load_val_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span>
+                                                                                                 <span class="n">known_apps</span><span class="o">=</span><span class="n">known_apps</span><span class="p">,</span>
+                                                                                                 <span class="n">unknown_apps</span><span class="o">=</span><span class="n">unknown_apps</span><span class="p">,</span>
+                                                                                                 <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
+                                                                                                 <span class="n">disable_indices_cache</span><span class="o">=</span><span class="n">disable_indices_cache</span><span class="p">,)</span>
+            <span class="k">elif</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span><span class="p">:</span>
+                <span class="n">train_val_rng</span> <span class="o">=</span> <span class="n">get_fresh_random_generator</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="n">RandomizedSection</span><span class="o">.</span><span class="n">TRAIN_VAL_SPLIT</span><span class="p">)</span>
+                <span class="n">val_data_path</span> <span class="o">=</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_train_data_path</span><span class="p">()</span>
+                <span class="n">val_unknown_indices</span> <span class="o">=</span> <span class="n">train_unknown_indices</span>
+                <span class="n">train_labels</span> <span class="o">=</span> <span class="n">train_indices</span><span class="p">[:,</span> <span class="n">INDICES_LABEL_POS</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_dates_weigths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span>
+                    <span class="c1"># When weight sampling is used, val_known_size is kept but the resulting train size can be smaller due to no enough samples in some train dates</span>
+                    <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested validation size (</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples after weight sampling (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                    <span class="n">train_indices</span><span class="p">,</span> <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">train_labels</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">train_val_rng</span><span class="p">)</span>
+                    <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+                    <span class="n">train_indices</span><span class="p">,</span> <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">train_indices</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_val_split_fraction</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">train_labels</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">train_val_rng</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span>  <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">+</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested train size + validation size (</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested train size (</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested validation size (</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="si">}</span><span class="s2">) is larger than the number of available train samples (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                    <span class="n">train_indices</span><span class="p">,</span> <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">train_indices</span><span class="p">,</span>
+                                                                        <span class="n">train_size</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                                                                        <span class="n">test_size</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                                                                        <span class="n">stratify</span><span class="o">=</span><span class="n">train_labels</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">train_val_rng</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val_known_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">val_unknown_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
             <span class="n">val_data_path</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span> <span class="n">assert_never</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span><span class="p">)</span>
-
-        <span class="c1"># Create class info</span>
-        <span class="n">class_info</span> <span class="o">=</span> <span class="n">create_class_info</span><span class="p">(</span><span class="n">servicemap</span><span class="o">=</span><span class="n">servicemap</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span> <span class="n">known_apps_database_enum</span><span class="o">=</span><span class="n">known_apps_database_enum</span><span class="p">,</span> <span class="n">unknown_apps_database_enum</span><span class="o">=</span><span class="n">unknown_apps_database_enum</span><span class="p">)</span>
-        <span class="c1"># Load or fit data scalers</span>
-        <span class="n">flowstats_scaler</span><span class="p">,</span> <span class="n">psizes_scaler</span><span class="p">,</span> <span class="n">ipt_scaler</span><span class="p">,</span> <span class="n">flowstats_quantiles</span> <span class="o">=</span> <span class="n">fit_or_load_scalers</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">train_indices</span><span class="o">=</span><span class="n">train_indices</span><span class="p">)</span>
+        <span class="c1"># Initialize test set</span>
+        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">need_test_set</span><span class="p">:</span>
+            <span class="n">test_known_indices</span><span class="p">,</span> <span class="n">test_unknown_indices</span><span class="p">,</span> <span class="n">test_data_path</span> <span class="o">=</span> <span class="n">init_or_load_test_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span>
+                                                                                                 <span class="n">known_apps</span><span class="o">=</span><span class="n">known_apps</span><span class="p">,</span>
+                                                                                                 <span class="n">unknown_apps</span><span class="o">=</span><span class="n">unknown_apps</span><span class="p">,</span>
+                                                                                                 <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
+                                                                                                 <span class="n">disable_indices_cache</span><span class="o">=</span><span class="n">disable_indices_cache</span><span class="p">,)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">test_known_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">test_unknown_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">test_data_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Fit scalers if needed</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="o">.</span><span class="n">needs_fitting</span> <span class="ow">or</span>
+            <span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="o">.</span><span class="n">needs_fitting</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Train set is needed to fit the scalers. Provide pre-fitted scalers.&quot;</span><span class="p">)</span>
+            <span class="n">fit_scalers</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">train_indices</span><span class="o">=</span><span class="n">train_indices</span><span class="p">)</span>
         <span class="c1"># Subset dataset indices based on the selected sizes and compute application counts</span>
         <span class="n">dataset_indices</span> <span class="o">=</span> <span class="n">IndicesTuple</span><span class="p">(</span><span class="n">train_indices</span><span class="o">=</span><span class="n">train_indices</span><span class="p">,</span> <span class="n">val_known_indices</span><span class="o">=</span><span class="n">val_known_indices</span><span class="p">,</span> <span class="n">val_unknown_indices</span><span class="o">=</span><span class="n">val_unknown_indices</span><span class="p">,</span> <span class="n">test_known_indices</span><span class="o">=</span><span class="n">test_known_indices</span><span class="p">,</span> <span class="n">test_unknown_indices</span><span class="o">=</span><span class="n">test_unknown_indices</span><span class="p">)</span>
         <span class="n">dataset_indices</span> <span class="o">=</span> <span class="n">subset_and_sort_indices</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">dataset_indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="p">)</span>
-        <span class="n">known_app_counts</span> <span class="o">=</span> <span class="n">compute_known_app_counts</span><span class="p">(</span><span class="n">dataset_indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="p">,</span> <span class="n">database_enum</span><span class="o">=</span><span class="n">known_apps_database_enum</span><span class="p">)</span>
-        <span class="n">unknown_app_counts</span> <span class="o">=</span> <span class="n">compute_unknown_app_counts</span><span class="p">(</span><span class="n">dataset_indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="p">,</span> <span class="n">database_enum</span><span class="o">=</span><span class="n">unknown_apps_database_enum</span><span class="p">)</span>
+        <span class="n">known_app_counts</span> <span class="o">=</span> <span class="n">compute_known_app_counts</span><span class="p">(</span><span class="n">dataset_indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="p">,</span> <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">)</span>
+        <span class="n">unknown_app_counts</span> <span class="o">=</span> <span class="n">compute_unknown_app_counts</span><span class="p">(</span><span class="n">dataset_indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="p">,</span> <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">)</span>
         <span class="c1"># Combine known and unknown test indicies to create a single dataloader</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">test_unknown_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">test_unknown_size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_apps_database_enum</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">test_unknown_size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">unknown_apps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">test_combined_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">dataset_indices</span><span class="o">.</span><span class="n">test_known_indices</span><span class="p">,</span> <span class="n">dataset_indices</span><span class="o">.</span><span class="n">test_unknown_indices</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">test_combined_indices</span> <span class="o">=</span> <span class="n">dataset_indices</span><span class="o">.</span><span class="n">test_known_indices</span>
-
+        <span class="c1"># Create encoder the class info structure</span>
+        <span class="n">encoder</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">known_apps</span><span class="p">)</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">classes_</span><span class="p">,</span> <span class="n">UNKNOWN_STR_LABEL</span><span class="p">)</span>
+        <span class="n">class_info</span> <span class="o">=</span> <span class="n">create_class_info</span><span class="p">(</span><span class="n">servicemap</span><span class="o">=</span><span class="n">servicemap</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span> <span class="n">known_apps</span><span class="o">=</span><span class="n">known_apps</span><span class="p">,</span> <span class="n">unknown_apps</span><span class="o">=</span><span class="n">unknown_apps</span><span class="p">)</span>
+        <span class="n">encode_labels_with_unknown_fn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_encode_labels_with_unknown</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span> <span class="n">class_info</span><span class="o">=</span><span class="n">class_info</span><span class="p">)</span>
         <span class="c1"># Create train, validation, and test datasets</span>
-        <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">PyTablesDataset</span><span class="p">(</span>
-            <span class="n">database_path</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span>
-            <span class="n">tables_paths</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_train_tables_paths</span><span class="p">(),</span>
-            <span class="n">indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="o">.</span><span class="n">train_indices</span><span class="p">,</span>
-            <span class="n">flowstats_features</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">,</span>
-            <span class="n">other_fields</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">other_fields</span><span class="p">,)</span>
-        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">no_test_set</span><span class="p">:</span>
-            <span class="n">test_dataset</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">test_data_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">PyTablesDataset</span><span class="p">(</span>
+        <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">val_dataset</span> <span class="o">=</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
+            <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">PyTablesDataset</span><span class="p">(</span>
                 <span class="n">database_path</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span>
-                <span class="n">tables_paths</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_test_tables_paths</span><span class="p">(),</span>
-                <span class="n">indices</span><span class="o">=</span><span class="n">test_combined_indices</span><span class="p">,</span>
+                <span class="n">tables_paths</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_train_tables_paths</span><span class="p">(),</span>
+                <span class="n">indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="o">.</span><span class="n">train_indices</span><span class="p">,</span>
+                <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
+                <span class="n">tables_cat_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_cat_enum</span><span class="p">,</span>
                 <span class="n">flowstats_features</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">,</span>
+                <span class="n">flowstats_features_boolean</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">,</span>
+                <span class="n">flowstats_features_phist</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">,</span>
                 <span class="n">other_fields</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">other_fields</span><span class="p">,</span>
-                <span class="n">preload</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">preload_test</span><span class="p">,</span>
-                <span class="n">preload_blob</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">test_data_path</span><span class="p">,</span> <span class="s2">&quot;preload&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;test_dataset-</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">test_known_size</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">test_unknown_size</span><span class="si">}</span><span class="s2">.npz&quot;</span><span class="p">),)</span>
-        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">NO_VALIDATION</span><span class="p">:</span>
-            <span class="n">val_dataset</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
+                <span class="n">ppi_channels</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">get_ppi_channels</span><span class="p">(),</span>
+                <span class="n">ppi_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="p">,</span>
+                <span class="n">flowstats_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="p">,</span>
+                <span class="n">flowstats_phist_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_phist_transform</span><span class="p">,</span>
+                <span class="n">target_transform</span><span class="o">=</span><span class="n">encode_labels_with_unknown_fn</span><span class="p">,</span>
+                <span class="n">return_tensors</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">need_val_set</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">val_data_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="n">val_dataset</span> <span class="o">=</span> <span class="n">PyTablesDataset</span><span class="p">(</span>
                 <span class="n">database_path</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span>
                 <span class="n">tables_paths</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_train_tables_paths</span><span class="p">(),</span>
                 <span class="n">indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="o">.</span><span class="n">val_known_indices</span><span class="p">,</span>
+                <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
+                <span class="n">tables_cat_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_cat_enum</span><span class="p">,</span>
                 <span class="n">flowstats_features</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">,</span>
+                <span class="n">flowstats_features_boolean</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">,</span>
+                <span class="n">flowstats_features_phist</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">,</span>
                 <span class="n">other_fields</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">other_fields</span><span class="p">,</span>
+                <span class="n">ppi_channels</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">get_ppi_channels</span><span class="p">(),</span>
+                <span class="n">ppi_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="p">,</span>
+                <span class="n">flowstats_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="p">,</span>
+                <span class="n">flowstats_phist_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_phist_transform</span><span class="p">,</span>
+                <span class="n">target_transform</span><span class="o">=</span><span class="n">encode_labels_with_unknown_fn</span><span class="p">,</span>
+                <span class="n">return_tensors</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">,</span>
                 <span class="n">preload</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">preload_val</span><span class="p">,</span>
                 <span class="n">preload_blob</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">val_data_path</span><span class="p">,</span> <span class="s2">&quot;preload&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;val_dataset-</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="si">}</span><span class="s2">.npz&quot;</span><span class="p">),)</span>
-        <span class="n">collate_fn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">pytables_collate_fn</span><span class="p">,</span>
-            <span class="n">flowstats_scaler</span><span class="o">=</span><span class="n">flowstats_scaler</span><span class="p">,</span>
-            <span class="n">flowstats_quantiles</span><span class="o">=</span><span class="n">flowstats_quantiles</span><span class="p">,</span>
-            <span class="n">psizes_scaler</span><span class="o">=</span><span class="n">psizes_scaler</span><span class="p">,</span>
-            <span class="n">psizes_max</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">psizes_max</span><span class="p">,</span>
-            <span class="n">ipt_scaler</span><span class="o">=</span><span class="n">ipt_scaler</span><span class="p">,</span>
-            <span class="n">ipt_min</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ipt_min</span><span class="p">,</span>
-            <span class="n">ipt_max</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ipt_max</span><span class="p">,</span>
-            <span class="n">use_push_flags</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">,</span>
-            <span class="n">use_packet_histograms</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">use_packet_histograms</span><span class="p">,</span>
-            <span class="n">normalize_packet_histograms</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">normalize_packet_histograms</span><span class="p">,</span>
-            <span class="n">zero_ppi_start</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">zero_ppi_start</span><span class="p">,</span>
-            <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
-            <span class="n">known_apps</span><span class="o">=</span><span class="n">class_info</span><span class="o">.</span><span class="n">known_apps</span><span class="p">,</span>
-            <span class="n">return_torch</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_torch</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">need_test_set</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">test_data_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">PyTablesDataset</span><span class="p">(</span>
+                <span class="n">database_path</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span>
+                <span class="n">tables_paths</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_test_tables_paths</span><span class="p">(),</span>
+                <span class="n">indices</span><span class="o">=</span><span class="n">test_combined_indices</span><span class="p">,</span>
+                <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
+                <span class="n">tables_cat_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_cat_enum</span><span class="p">,</span>
+                <span class="n">flowstats_features</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">,</span>
+                <span class="n">flowstats_features_boolean</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">,</span>
+                <span class="n">flowstats_features_phist</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">,</span>
+                <span class="n">other_fields</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">other_fields</span><span class="p">,</span>
+                <span class="n">ppi_channels</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">get_ppi_channels</span><span class="p">(),</span>
+                <span class="n">ppi_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="p">,</span>
+                <span class="n">flowstats_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="p">,</span>
+                <span class="n">flowstats_phist_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_phist_transform</span><span class="p">,</span>
+                <span class="n">target_transform</span><span class="o">=</span><span class="n">encode_labels_with_unknown_fn</span><span class="p">,</span>
+                <span class="n">return_tensors</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">,</span>
+                <span class="n">preload</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">preload_test</span><span class="p">,</span>
+                <span class="n">preload_blob</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">test_data_path</span><span class="p">,</span> <span class="s2">&quot;preload&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;test_dataset-</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">test_known_size</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">test_unknown_size</span><span class="si">}</span><span class="s2">.npz&quot;</span><span class="p">),)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">class_info</span> <span class="o">=</span> <span class="n">class_info</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset_indices</span> <span class="o">=</span> <span class="n">dataset_indices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="o">=</span> <span class="n">val_dataset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="n">test_dataset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">known_apps_database_enum</span> <span class="o">=</span> <span class="n">known_apps_database_enum</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">unknown_apps_database_enum</span> <span class="o">=</span> <span class="n">unknown_apps_database_enum</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">known_app_counts</span> <span class="o">=</span> <span class="n">known_app_counts</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unknown_app_counts</span> <span class="o">=</span> <span class="n">unknown_app_counts</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">=</span> <span class="n">collate_fn</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_scaler</span> <span class="o">=</span> <span class="n">flowstats_scaler</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">psizes_scaler</span> <span class="o">=</span> <span class="n">psizes_scaler</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ipt_scaler</span> <span class="o">=</span> <span class="n">ipt_scaler</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">flowstats_quantiles</span> <span class="o">=</span> <span class="n">flowstats_quantiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_collate_fn</span> <span class="o">=</span> <span class="n">collate_fn_simple</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -2591,17 +2562,17 @@ This will initialize the dataset — select classes, split data into train/valid
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">181</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
 <span class="normal">182</span>
 <span class="normal">183</span>
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_dataset_config_and_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_config</span><span class="p">:</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">disable_indices_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_dataset_config_and_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_config</span><span class="p">:</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">disable_indices_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize train, validation, and test sets. Data cannot be accessed before calling this method.</span>
 
@@ -2690,7 +2661,11 @@ The dataloader is configured with the following config attributes:</p>
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">193</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
@@ -2735,9 +2710,7 @@ The dataloader is configured with the following config attributes:</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Provides a PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for training. The dataloader is created on the first call and then cached.</span>
 <span class="sd">    When the dataloader is iterated in random order, the last incomplete batch is dropped.</span>
@@ -2755,6 +2728,8 @@ The dataloader is configured with the following config attributes:</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting train dataloader&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Train dataloader is not available when need_train_set is false&quot;</span><span class="p">)</span>
     <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dataloader</span>
@@ -2777,7 +2752,7 @@ The dataloader is configured with the following config attributes:</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_workers</span><span class="p">,</span>
         <span class="n">worker_init_fn</span><span class="o">=</span><span class="n">worker_init_fn</span><span class="p">,</span>
-        <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collate_fn</span><span class="p">,</span>
+        <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_collate_fn</span><span class="p">,</span>
         <span class="n">persistent_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sampler</span><span class="o">=</span><span class="n">batch_sampler</span><span class="p">,)</span>
@@ -2855,7 +2830,9 @@ The dataloader is configured with the following config attributes:</p>
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">242</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
 <span class="normal">243</span>
 <span class="normal">244</span>
 <span class="normal">245</span>
@@ -2886,9 +2863,7 @@ The dataloader is configured with the following config attributes:</p>
 <span class="normal">270</span>
 <span class="normal">271</span>
 <span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">273</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Provides a PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for validation.</span>
 <span class="sd">    The dataloader is created on the first call and then cached.</span>
@@ -2904,8 +2879,8 @@ The dataloader is configured with the following config attributes:</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting validaion dataloader&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">NO_VALIDATION</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation dataloader is not available when using no-validation&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">need_val_set</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation dataloader is not available when need_val_set is false&quot;</span><span class="p">)</span>
     <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dataloader</span>
@@ -2914,7 +2889,7 @@ The dataloader is configured with the following config attributes:</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_workers</span><span class="p">,</span>
         <span class="n">worker_init_fn</span><span class="o">=</span><span class="n">worker_init_fn</span><span class="p">,</span>
-        <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collate_fn</span><span class="p">,</span>
+        <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_collate_fn</span><span class="p">,</span>
         <span class="n">persistent_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_workers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sampler</span><span class="o">=</span><span class="n">batch_sampler</span><span class="p">,)</span>
@@ -2994,7 +2969,9 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">277</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
 <span class="normal">278</span>
 <span class="normal">279</span>
 <span class="normal">280</span>
@@ -3029,9 +3006,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="normal">309</span>
 <span class="normal">310</span>
 <span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">312</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Provides a PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for testing.</span>
 <span class="sd">    The dataloader is created on the first call and then cached.</span>
@@ -3051,8 +3026,8 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting test dataloader&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">no_test_set</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Test dataloader is not available when no_test_set is true&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">need_test_set</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Test dataloader is not available when need_test_set is false&quot;</span><span class="p">)</span>
     <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dataloader</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dataloader</span>
@@ -3061,7 +3036,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
         <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">test_workers</span><span class="p">,</span>
         <span class="n">worker_init_fn</span><span class="o">=</span><span class="n">worker_init_fn</span><span class="p">,</span>
-        <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collate_fn</span><span class="p">,</span>
+        <span class="n">collate_fn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_collate_fn</span><span class="p">,</span>
         <span class="n">persistent_workers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">sampler</span><span class="o">=</span><span class="n">batch_sampler</span><span class="p">,)</span>
@@ -3097,14 +3072,14 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">316</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
 <span class="normal">317</span>
 <span class="normal">318</span>
 <span class="normal">319</span>
 <span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_dataloaders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">]:</span>
+<span class="normal">321</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_dataloaders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets train, validation, and test dataloaders in one call.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting dataloaders&quot;</span><span class="p">)</span>
@@ -3196,7 +3171,9 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">325</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
 <span class="normal">326</span>
 <span class="normal">327</span>
 <span class="normal">328</span>
@@ -3225,9 +3202,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="normal">351</span>
 <span class="normal">352</span>
 <span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_train_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">354</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_train_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a train Pandas [`DataFrame`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html). The dataframe is in sequential (datetime) order. Consider shuffling the dataframe if needed.</span>
 
@@ -3241,7 +3216,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="sd">    Returns:</span>
 <span class="sd">        Train data as a dataframe.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_train</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">DATAFRAME_SAMPLES_WARNING_THRESHOLD</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train set has (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples), consider using get_train_dataloader() instead&quot;</span><span class="p">)</span>
@@ -3343,7 +3318,9 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">358</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
 <span class="normal">359</span>
 <span class="normal">360</span>
 <span class="normal">361</span>
@@ -3363,9 +3340,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="normal">375</span>
 <span class="normal">376</span>
 <span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_val_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">378</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_val_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates validation Pandas [`DataFrame`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html). The dataframe is in sequential (datetime) order.</span>
 
@@ -3379,7 +3354,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="sd">    Returns:</span>
 <span class="sd">        Validation data as a dataframe.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_no_val</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_val</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">DATAFRAME_SAMPLES_WARNING_THRESHOLD</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation set has (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples), consider using get_val_dataloader() instead&quot;</span><span class="p">)</span>
@@ -3474,7 +3449,9 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">382</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
 <span class="normal">383</span>
 <span class="normal">384</span>
 <span class="normal">385</span>
@@ -3499,9 +3476,7 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 <span class="normal">404</span>
 <span class="normal">405</span>
 <span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">407</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates test Pandas [`DataFrame`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html). The dataframe is in sequential (datetime) order.</span>
 
@@ -3520,7 +3495,7 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 <span class="sd">    Returns:</span>
 <span class="sd">        Test data as a dataframe.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_no_test</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_check_before_dataframe</span><span class="p">(</span><span class="n">check_test</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">DATAFRAME_SAMPLES_WARNING_THRESHOLD</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test set has (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples), consider using get_test_dataloader() instead&quot;</span><span class="p">)</span>
@@ -3555,11 +3530,11 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">411</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
 <span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_num_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="normal">413</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_num_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the number of classes in the current configuration of the dataset.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting the number of classes&quot;</span><span class="p">)</span>
@@ -3590,11 +3565,11 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">417</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
 <span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_known_apps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">419</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_known_apps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the list of known applications in the current configuration of the dataset.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting known apps&quot;</span><span class="p">)</span>
@@ -3625,11 +3600,11 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">423</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
 <span class="normal">424</span>
-<span class="normal">425</span>
-<span class="normal">426</span>
-<span class="normal">427</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_unknown_apps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">425</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_unknown_apps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the list of unknown applications in the current configuration of the dataset.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting unknown apps&quot;</span><span class="p">)</span>
@@ -3737,7 +3712,9 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">429</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
 <span class="normal">430</span>
 <span class="normal">431</span>
 <span class="normal">432</span>
@@ -3759,7 +3736,11 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 <span class="normal">448</span>
 <span class="normal">449</span>
 <span class="normal">450</span>
-<span class="normal">451</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">compute_dataset_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10_000_000</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16384</span><span class="p">,</span> <span class="n">disabled_apps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">compute_dataset_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10_000_000</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16384</span><span class="p">,</span> <span class="n">disabled_apps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes dataset statistics and saves them to the `statistics_path` folder.</span>
 
@@ -3769,12 +3750,18 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 <span class="sd">        batch_size: Number of samples per batch for loading data.</span>
 <span class="sd">        disabled_apps: List of applications to exclude from the statistics.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">flowstats_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">flowstats_features</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">packet_histogram_features</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">tcp_features</span>
+    <span class="k">if</span> <span class="n">disabled_apps</span><span class="p">:</span>
+        <span class="n">bad_disabled_apps</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">disabled_apps</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_classes</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_disabled_apps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bad applications in disabled_apps </span><span class="si">{</span><span class="n">bad_disabled_apps</span><span class="si">}</span><span class="s2">. Use applications available in dataset.available_classes&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_path</span><span class="p">):</span>
         <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_path</span><span class="p">)</span>
     <span class="n">compute_dataset_statistics</span><span class="p">(</span><span class="n">database_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span>
+                               <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
+                               <span class="n">tables_cat_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_cat_enum</span><span class="p">,</span>
                                <span class="n">output_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">statistics_path</span><span class="p">,</span>
-                               <span class="n">flowstats_features</span><span class="o">=</span><span class="n">flowstats_features</span><span class="p">,</span>
+                               <span class="n">packet_histograms</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">packet_histograms</span><span class="p">,</span>
+                               <span class="n">flowstats_features_boolean</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">,</span>
                                <span class="n">protocol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span>
                                <span class="n">extra_fields</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;CESNET-TLS22&quot;</span><span class="p">),</span>
                                <span class="n">disabled_apps</span><span class="o">=</span><span class="n">disabled_apps</span> <span class="k">if</span> <span class="n">disabled_apps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[],</span>

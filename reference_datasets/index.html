@@ -667,27 +667,33 @@
 
             <details class="quote">
               <summary>Source code in <code>cesnet_datazoo\datasets\datasets.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CESNET_TLS22</span><span class="p">(</span><span class="n">CesnetDataset</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CESNET_TLS22</span><span class="p">(</span><span class="n">CesnetDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset class for [CESNET-TLS22][cesnet-tls22].&quot;&quot;&quot;</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;CESNET-TLS22&quot;</span>
     <span class="n">database_filename</span> <span class="o">=</span> <span class="s2">&quot;CESNET-TLS22.h5&quot;</span>
     <span class="n">bucket_url</span> <span class="o">=</span> <span class="s2">&quot;https://liberouter.org/datazoo/download?bucket=cesnet-tls22&quot;</span>
+    <span class="n">available_dates</span> <span class="o">=</span> <span class="n">_CESNET_TLS22_AVAILABLE_DATES</span>
     <span class="n">time_periods</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;W-2021-40&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;20211004&quot;</span><span class="p">,</span> <span class="s2">&quot;20211005&quot;</span><span class="p">,</span> <span class="s2">&quot;20211006&quot;</span><span class="p">,</span> <span class="s2">&quot;20211007&quot;</span><span class="p">,</span> <span class="s2">&quot;20211008&quot;</span><span class="p">,</span> <span class="s2">&quot;20211009&quot;</span><span class="p">,</span> <span class="s2">&quot;20211010&quot;</span><span class="p">],</span>
         <span class="s2">&quot;W-2021-41&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;20211011&quot;</span><span class="p">,</span> <span class="s2">&quot;20211012&quot;</span><span class="p">,</span> <span class="s2">&quot;20211013&quot;</span><span class="p">,</span> <span class="s2">&quot;20211014&quot;</span><span class="p">,</span> <span class="s2">&quot;20211015&quot;</span><span class="p">,</span> <span class="s2">&quot;20211016&quot;</span><span class="p">,</span> <span class="s2">&quot;20211017&quot;</span><span class="p">],</span>
     <span class="p">}</span>
     <span class="n">default_train_period_name</span> <span class="o">=</span> <span class="s2">&quot;W-2021-40&quot;</span>
     <span class="n">default_test_period_name</span> <span class="o">=</span> <span class="s2">&quot;W-2021-41&quot;</span>
+    <span class="n">_tables_app_enum</span> <span class="o">=</span> <span class="n">_CESNET_TLS22_TABLES_APP_ENUM</span>
+    <span class="n">_tables_cat_enum</span> <span class="o">=</span> <span class="n">_CESNET_TLS22_TABLES_CATEGORY_ENUM</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -732,26 +738,30 @@
 
             <details class="quote">
               <summary>Source code in <code>cesnet_datazoo\datasets\datasets.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
 <span class="normal">30</span>
-<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CESNET_QUIC22</span><span class="p">(</span><span class="n">CesnetDataset</span><span class="p">):</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CESNET_QUIC22</span><span class="p">(</span><span class="n">CesnetDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset class for [CESNET-QUIC22][cesnet-quic22].&quot;&quot;&quot;</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;CESNET-QUIC22&quot;</span>
     <span class="n">database_filename</span> <span class="o">=</span> <span class="s2">&quot;CESNET-QUIC22.h5&quot;</span>
     <span class="n">bucket_url</span> <span class="o">=</span> <span class="s2">&quot;https://liberouter.org/datazoo/download?bucket=cesnet-quic22&quot;</span>
+    <span class="n">available_dates</span> <span class="o">=</span> <span class="n">_CESNET_QUIC22_AVAILABLE_DATES</span>
     <span class="n">time_periods</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;W-2022-44&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;20221031&quot;</span><span class="p">,</span> <span class="s2">&quot;20221101&quot;</span><span class="p">,</span> <span class="s2">&quot;20221102&quot;</span><span class="p">,</span> <span class="s2">&quot;20221103&quot;</span><span class="p">,</span> <span class="s2">&quot;20221104&quot;</span><span class="p">,</span> <span class="s2">&quot;20221105&quot;</span><span class="p">,</span> <span class="s2">&quot;20221106&quot;</span><span class="p">],</span>
         <span class="s2">&quot;W-2022-45&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;20221107&quot;</span><span class="p">,</span> <span class="s2">&quot;20221108&quot;</span><span class="p">,</span> <span class="s2">&quot;20221109&quot;</span><span class="p">,</span> <span class="s2">&quot;20221110&quot;</span><span class="p">,</span> <span class="s2">&quot;20221111&quot;</span><span class="p">,</span> <span class="s2">&quot;20221112&quot;</span><span class="p">,</span> <span class="s2">&quot;20221113&quot;</span><span class="p">],</span>
@@ -763,6 +773,8 @@
     <span class="p">}</span>
     <span class="n">default_train_period_name</span> <span class="o">=</span> <span class="s2">&quot;W-2022-44&quot;</span>
     <span class="n">default_test_period_name</span> <span class="o">=</span> <span class="s2">&quot;W-2022-45&quot;</span>
+    <span class="n">_tables_app_enum</span> <span class="o">=</span> <span class="n">_CESNET_QUIC22_TABLES_APP_ENUM</span>
+    <span class="n">_tables_cat_enum</span> <span class="o">=</span> <span class="n">_CESNET_QUIC22_TABLES_CATEGORY_ENUM</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -807,23 +819,27 @@
 
             <details class="quote">
               <summary>Source code in <code>cesnet_datazoo\datasets\datasets.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CESNET_TLS_Year22</span><span class="p">(</span><span class="n">CesnetDataset</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CESNET_TLS_Year22</span><span class="p">(</span><span class="n">CesnetDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dataset class for [CESNET-TLS-Year22][cesnet-tls-year22].&quot;&quot;&quot;</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;CESNET-TLS-Year22&quot;</span>
     <span class="n">database_filename</span> <span class="o">=</span> <span class="s2">&quot;CESNET-TLS-Year22.h5&quot;</span>
     <span class="n">bucket_url</span> <span class="o">=</span> <span class="s2">&quot;https://liberouter.org/datazoo/download?bucket=cesnet-tls-year22&quot;</span>
-    <span class="n">time_periods</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;W-2022-</span><span class="si">{</span><span class="n">week</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">week</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">53</span><span class="p">)}</span> <span class="o">|</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;M-2022-</span><span class="si">{</span><span class="n">month</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">month</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">)}</span>
-    <span class="n">time_periods_gen</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">available_dates</span> <span class="o">=</span> <span class="n">_CESNET_TLS_YEAR22_AVAILABLE_DATES</span>
+    <span class="n">time_periods</span> <span class="o">=</span> <span class="n">_CESNET_TLS_YEAR22_TIME_PERIODS</span>
     <span class="n">default_train_period_name</span> <span class="o">=</span> <span class="s2">&quot;M-2022-9&quot;</span>
     <span class="n">default_test_period_name</span> <span class="o">=</span> <span class="s2">&quot;M-2022-10&quot;</span>
+    <span class="n">_tables_app_enum</span> <span class="o">=</span> <span class="n">_CESNET_TLS_YEAR22_TABLES_APP_ENUM</span>
+    <span class="n">_tables_cat_enum</span> <span class="o">=</span> <span class="n">_CESNET_TLS_YEAR22_TABLES_CATEGORY_ENUM</span>
 </code></pre></div></td></tr></table></div>
             </details>
 

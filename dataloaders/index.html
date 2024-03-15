@@ -584,12 +584,12 @@
 <p>When a dataloader is iterated, the returned data are in the format <code>tuple(batch_other_fields,  batch_ppi, batch_flowstats, batch_labels)</code>. Batch size <em>B</em> is configured with <code>batch_size</code> and <code>test_batch_size</code> config options.
 The shapes are:</p>
 <ul>
-<li>batch_other_fields <code>pd.DataFrame (B, C)</code> - a Pandas DataFrame with <a class="autorefs autorefs-internal" href="../features/#other-fields">auxiliary fields</a>, such as communicating hosts, flow times, and more fields extracted from the ClientHello message. If the <code>return_other_fields</code> config option is false, this will be an empty DataFrame. DataFrame columns C depend on the used dataset and are available at <code>dataset_config.other_fields</code>.</li>
+<li>batch_other_fields <code>pd.DataFrame (B, C)</code> - a Pandas DataFrame with <a class="autorefs autorefs-internal" href="../features/#other-fields">auxiliary fields</a>, such as communicating hosts, flow times, and more fields extracted from the ClientHello message. If the <code>return_other_fields</code> config option is false, this will be an empty DataFrame. Columns C depend on the used dataset and are available at <code>dataset_config.other_fields</code>.</li>
 <li>batch_ppi - <code>np.ndarray (B, [3, 4], 30)</code> - the middle dimension is either 4 when TCP push flags are used (<code>use_push_flags</code>) or 3 otherwise.</li>
 <li>batch_flowstats <code>np.ndarray (B, F)</code> - where F is the number of flowstats features computed with <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig.get_flowstats_features_len">DatasetConfig.get_flowstats_features_len</a>. To get the order and names of flowstats features, call <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig.get_flowstats_feature_names_expanded">DatasetConfig.get_flowstats_feature_names_expanded</a>. The batch_flowstats array includes flow statistics, TCP features (if available and configured), and bins of packet histograms (if available and configured). See the <a class="autorefs autorefs-internal" href="../features/#features">data features</a> page for more information about features.</li>
-<li>batch_labels <code>np.ndarray (B)</code> - integer labels encoded with a <code>LabelEncoder</code> instance available at <code>dataset.encoder</code>.</li>
+<li>batch_labels <code>np.ndarray (B)</code> - integer labels encoded with a <code>LabelEncoder</code> instance available at <code>dataset.class_info.encoder</code>.</li>
 </ul>
-<p>PPI and flow statistics features returned from dataloaders are scaled depending on the selected configuration; see <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> for options.</p>
+<p>PPI and flow statistics features returned from dataloaders are scaled depending on the selected configuration; see <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> for options. DOCS_TODO</p>
 
 
   
