@@ -40,8 +40,7 @@ DATAFRAME_SAMPLES_WARNING_THRESHOLD = 20_000_000
 
 class CesnetDataset():
     """
-    The main class for accessing CESNET datasets. It handles downloading, data preprocessing,
-    train/validation/test splitting, and class selection. Access to data is provided through:
+    The main class for accessing CESNET datasets. It handles downloading, train/validation/test splitting, and class selection. Access to data is provided through:
 
     - Iterable PyTorch DataLoader for batch processing. See [using dataloaders][using-dataloaders] for more details.
     - Pandas DataFrame for loading the entire train, validation, or test set at once.
@@ -55,7 +54,7 @@ class CesnetDataset():
 
     1. Create an instance of the [dataset class][dataset-classes] with the desired size and data root. This will download the dataset if it has not already been downloaded.
     2. Create an instance of [`DatasetConfig`][config.DatasetConfig] and set it with [`set_dataset_config_and_initialize`][datasets.cesnet_dataset.CesnetDataset.set_dataset_config_and_initialize].
-    This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers. All is done according to the provided configuration and is cached for later use.
+    This will initialize the dataset — select classes, split data into train/validation/test sets, and fit data scalers if needed. All is done according to the provided configuration and is cached for later use.
     3. Use [`get_train_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_train_dataloader] or [`get_train_df`][datasets.cesnet_dataset.CesnetDataset.get_train_df] to get training data for a classification model.
     4. Validate the model and perform the hyperparameter optimalization on [`get_val_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_val_dataloader] or [`get_val_df`][datasets.cesnet_dataset.CesnetDataset.get_val_df].
     5. Evaluate the model on [`get_test_dataloader`][datasets.cesnet_dataset.CesnetDataset.get_test_dataloader] or [`get_test_df`][datasets.cesnet_dataset.CesnetDataset.get_test_df].
@@ -70,7 +69,7 @@ class CesnetDataset():
         database_filename: Name of the database file.
         database_path: Path to the database file.
         servicemap_path: Path to the servicemap file.
-        statistics_path: Path to the dataset statistics.
+        statistics_path: Path to the dataset statistics folder.
         bucket_url: URL of the bucket where the database is stored.
         metadata: Additional [dataset metadata][metadata].
         available_classes: List of all available classes in the dataset.

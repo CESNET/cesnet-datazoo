@@ -52,13 +52,3 @@ The following enums are used for dataset configuration.
         show_bases: false
         show_source: false
         members_order: source
-
-::: config.ScalerEnum
-    options:
-        heading_level: 6
-        show_root_heading: true
-        separate_signature: true
-        show_signature: true
-        show_bases: false
-        show_source: false
-        members_order: source

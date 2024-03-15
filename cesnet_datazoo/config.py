@@ -48,7 +48,7 @@ class AppSelection(Enum):
     """Use the first X (`apps_selection_topx`) most frequent (with the most samples) applications as *known*, and the rest as *unknown*.
     Applications with the same provider are never separated, i.e., all applications of a given provider are either *known* or *unknown*."""
     BACKGROUND_UNKNOWN = "background-unknown"
-    """Use the list of background applications (`apps_selection_background_unknown`) as *unknown*, and the rest as *known*."""
+    """Use the list of background traffic classes (`apps_selection_background_unknown`) as *unknown*, and the rest as *known*."""
     FIXED = "fixed"
     """Manual application selection. Provide lists of *known* applications (`apps_selection_fixed_known`) and *unknown* applications (`apps_selection_fixed_unknown`)."""
     def __str__(self): return self.value
@@ -119,26 +119,26 @@ class DatasetConfig():
     When initializing this class, pass a [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance to be configured and the desired configuration. Available options are [here][config.DatasetConfig--configuration-options].
 
     Attributes:
-        dataset: The dataset instance to be configured
-        data_root: Taken from the dataset instance
-        database_filename: Taken from the dataset instance
-        database_path: Taken from the dataset instance
-        servicemap_path: Taken from the dataset instance
-        flowstats_features: Taken from `dataset.metadata.flowstats_features`
-        flowstats_features_boolean: Taken from `dataset.metadata.flowstats_features_boolean`
-        flowstats_features_phist: Taken from `dataset.metadata.packet_histograms` if `use_packet_histograms` is true, otherwise an empty list
-        other_fields: Taken from `dataset.metadata.other_fields` if `return_other_fields` is true, otherwise an empty list
+        dataset: The dataset instance to be configured.
+        data_root: Taken from the dataset instance.
+        database_filename: Taken from the dataset instance.
+        database_path: Taken from the dataset instance.
+        servicemap_path: Taken from the dataset instance.
+        flowstats_features: Taken from `dataset.metadata.flowstats_features`.
+        flowstats_features_boolean: Taken from `dataset.metadata.flowstats_features_boolean`.
+        flowstats_features_phist: Taken from `dataset.metadata.packet_histograms` if `use_packet_histograms` is true, otherwise an empty list.
+        other_fields: Taken from `dataset.metadata.other_fields` if `return_other_fields` is true, otherwise an empty list.
 
     # Configuration options
 
     Attributes:
         need_train_set: Use to disable the train set. `Default: True`
-        need_val_set: Use to disable the validation set. When need_train_set is false, the validation set will also be disabled. `Default: True`
+        need_val_set: Use to disable the validation set. When `need_train_set` is false, the validation set will also be disabled. `Default: True`
         need_test_set: Use to disable the test set. `Default: True`
         train_period_name: Name of the train period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
         train_dates: Dates used for creating a train set.
         train_dates_weigths: To use a non-uniform distribution of samples across train dates.
-        val_approach: How a validation set should be created. Either split train data into train and validation, have a separate validation period, or no validation at all. `Default: SPLIT_FROM_TRAIN`
+        val_approach: How a validation set should be created. Either split train data into train and validation or have a separate validation period. `Default: SPLIT_FROM_TRAIN`
         train_val_split_fraction: The fraction of validation samples when splitting from the train set. `Default: 0.2`
         val_period_name: Name of the validation period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
         val_dates: Dates used for creating a validation set.
@@ -147,9 +147,9 @@ class DatasetConfig():
 
         apps_selection: How to select application classes. `Default: ALL_KNOWN`
         apps_selection_topx: Take top X as known.
-        apps_selection_background_unknown: Provide a list of background applications to be used as unknown.
-        apps_selection_fixed_known: Provide a list of known applications for the fixed application selection.
-        apps_selection_fixed_unknown: Provide a list of unknown applications for the fixed application selection.
+        apps_selection_background_unknown: Provide a list of background traffic classes to be used as unknown.
+        apps_selection_fixed_known: Provide a list of manually selected known applications.
+        apps_selection_fixed_unknown: Provide a list of manually selected unknown applications.
         disabled_apps: List of applications to be disabled and not used at all.
         min_train_samples_check: How to handle applications with *not enough* training samples. `Default: DISABLE_APPS`
         min_train_samples_per_app: Defines the threshold for *not enough*. `Default: 100`
