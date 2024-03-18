@@ -307,6 +307,25 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../transforms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transforms
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
     
     
     
@@ -320,10 +339,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -334,8 +353,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Tutorials
           </label>
@@ -408,10 +427,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -422,8 +441,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             Reference
           </label>
@@ -854,7 +873,7 @@
 <ul>
 <li>Train, validation, test sets (dates, sizes, validation approach).</li>
 <li>Application selection — either the standard closed-world setting (only <em>known</em> classes) or the open-world setting (<em>known</em> and <em>unknown</em> classes).</li>
-<li>Feature scaling. See the <a class="autorefs autorefs-internal" href="../features/#features">data features</a> page for more information. DOCS_TODO</li>
+<li>Data transformations. See the <a class="autorefs autorefs-internal" href="../transforms/#transforms">transforms</a> page for more information.</li>
 <li>Dataloader options like batch sizes, order of loading, or number of workers.</li>
 </ul>
 <p>When initializing this class, pass a <a class="autorefs autorefs-internal" href="../reference_cesnet_dataset/#datasets.cesnet_dataset.CesnetDataset"><code>CesnetDataset</code></a> instance to be configured and the desired configuration. Available options are <a class="autorefs autorefs-internal" href="#config.DatasetConfig--configuration-options">here</a>.</p>
@@ -1444,7 +1463,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. <code>Default: 0.25</code> DOCS_TODO</p>
+              <p>Used when scaling transformation is configured and requires fitting. Fraction of train samples used for fitting, if float. The absolute number of samples otherwise. <code>Default: 0.25</code></p>
             </div>
           </td>
         </tr>
@@ -1455,7 +1474,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Transform function for PPI sequences. <code>Default: None</code> DOCS_TODO</p>
+              <p>Transform function for PPI sequences. See the <a class="autorefs autorefs-internal" href="../transforms/#transforms">transforms</a> page for more information. <code>Default: None</code></p>
             </div>
           </td>
         </tr>
@@ -1466,7 +1485,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Transform function for flow statistics. <code>Default: None</code></p>
+              <p>Transform function for flow statistics. See the <a class="autorefs autorefs-internal" href="../transforms/#transforms">transforms</a> page for more information. <code>Default: None</code></p>
             </div>
           </td>
         </tr>
@@ -1477,7 +1496,7 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Transform function for packet histograms. <code>Default: None</code></p>
+              <p>Transform function for packet histograms. See the <a class="autorefs autorefs-internal" href="../transforms/#transforms">transforms</a> page for more information. <code>Default: None</code></p>
             </div>
           </td>
         </tr>
@@ -1961,7 +1980,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 
 <span class="sd">    - Train, validation, test sets (dates, sizes, validation approach).</span>
 <span class="sd">    - Application selection — either the standard closed-world setting (only *known* classes) or the open-world setting (*known* and *unknown* classes).</span>
-<span class="sd">    - Feature scaling. See the [data features][features] page for more information. DOCS_TODO</span>
+<span class="sd">    - Data transformations. See the [transforms][transforms] page for more information.</span>
 <span class="sd">    - Dataloader options like batch sizes, order of loading, or number of workers.</span>
 
 <span class="sd">    When initializing this class, pass a [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance to be configured and the desired configuration. Available options are [here][config.DatasetConfig--configuration-options].</span>
@@ -2024,10 +2043,10 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        use_packet_histograms: Whether to use packet histogram features, if available in the dataset. `Default: True`</span>
 <span class="sd">        use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`</span>
 <span class="sd">        use_push_flags: Whether to use push flags in packet sequences, if available in the dataset. `Default: False`</span>
-<span class="sd">        fit_scalers_samples: Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. `Default: 0.25` DOCS_TODO</span>
-<span class="sd">        ppi_transform: Transform function for PPI sequences. `Default: None` DOCS_TODO</span>
-<span class="sd">        flowstats_transform: Transform function for flow statistics. `Default: None`</span>
-<span class="sd">        flowstats_phist_transform: Transform function for packet histograms. `Default: None`</span>
+<span class="sd">        fit_scalers_samples: Used when scaling transformation is configured and requires fitting. Fraction of train samples used for fitting, if float. The absolute number of samples otherwise. `Default: 0.25`</span>
+<span class="sd">        ppi_transform: Transform function for PPI sequences. See the [transforms][transforms] page for more information. `Default: None`</span>
+<span class="sd">        flowstats_transform: Transform function for flow statistics. See the [transforms][transforms] page for more information. `Default: None`</span>
+<span class="sd">        flowstats_phist_transform: Transform function for packet histograms. See the [transforms][transforms] page for more information. `Default: None`</span>
 
 <span class="sd">    # How to configure train, validation, and test sets</span>
 <span class="sd">    There are three options for how to define train/validation/test dates.</span>
@@ -2129,7 +2148,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown train_period_name </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span><span class="si">}</span><span class="s2">. Use time period available in dataset.time_periods&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">train_period_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period_name</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">time_periods</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">default_train_period_name</span><span class="p">]</span>
         <span class="c1"># Configure test dates</span>

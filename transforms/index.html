@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../installation/">
+        <link rel="prev" href="../features/">
       
       
-        <link rel="next" href="../features/">
+        <link rel="next" href="../getting_started/">
       
       
       <link rel="icon" href="../images/datazoo_logo.svg">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Oveview of datasets - CESNET DataZoo</title>
+        <title>Transforms - CESNET DataZoo</title>
       
     
     
@@ -83,7 +83,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#overview-of-datasets" class="md-skip">
+        <a href="#transforms" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Oveview of datasets
+              Transforms
             
           </span>
         </div>
@@ -268,29 +268,9 @@
       
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Oveview of datasets
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../datasets_overview/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -299,47 +279,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-tls22" class="md-nav__link">
-    CESNET-TLS22
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-quic22" class="md-nav__link">
-    CESNET-QUIC22
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-tls-year22" class="md-nav__link">
-    CESNET-TLS-Year22
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -367,9 +306,29 @@
       
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../transforms/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Transforms
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -378,6 +337,46 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#available-transformations" class="md-nav__link">
+    Available transformations
+  </a>
+  
+    <nav class="md-nav" aria-label="Available transformations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-scaling" class="md-nav__link">
+    Data scaling
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -621,23 +620,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cesnet-tls22" class="md-nav__link">
-    CESNET-TLS22
+  <a href="#available-transformations" class="md-nav__link">
+    Available transformations
+  </a>
+  
+    <nav class="md-nav" aria-label="Available transformations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-scaling" class="md-nav__link">
+    Data scaling
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-quic22" class="md-nav__link">
-    CESNET-QUIC22
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cesnet-tls-year22" class="md-nav__link">
-    CESNET-TLS-Year22
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -659,47 +657,34 @@
   
 
 
-<h1 id="overview-of-datasets">Overview of datasets</h1>
-<h2 id="cesnet-tls22">CESNET-TLS22</h2>
-<div class="admonition info inline end">
-<p class="admonition-title">CESNET-TLS22</p>
+<h1 id="transforms">Transforms</h1>
+<p>The <code>cesnet_datazoo</code> package supports configurable transforms of input data in a similar fashion to what torchvision is doing for the computer vision field. Input features are split into three groups, each having its own transformation. Those groups are PPI sequences, flow statistics, and packet histograms.</p>
 <ul>
-<li>TLS protocol</li>
-<li>Collected in 2021</li>
-<li>Spans two weeks</li>
-<li>Contains 141 million samples</li>
-<li>Has 191 application classes</li>
+<li>Transformation configured in <code>ppi_transform</code> of <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> is applied to PPI sequences.</li>
+<li><code>flowstats_transform</code> is applied to flow statistics (excluding boolean features, such as flow end reasons or TCP flags).</li>
+<li><code>flowstats_phist_transform</code> is applied to packet histograms.</li>
 </ul>
+<p>Transforms are implemented in a separate package <a href="https://github.com/CESNET/cesnet-models">CESNET Models</a>. See <code>cesnet_models.transforms</code> <a href="https://cesnet.github.io/cesnet-models/reference_transforms/">documentation</a> for details.</p>
+<div class="admonition info">
+<p class="admonition-title">Limitations</p>
+<p>The current implementation does not support the composing of transformations.</p>
 </div>
-<p>This dataset was published in <em>"Fine-grained TLS services classification with reject option"</em> (<a href="https://doi.org/10.1016/j.comnet.2022.109467">DOI</a>, <a href="https://arxiv.org/abs/2202.11984">arXiv</a>). It was built from live traffic collected using high-speed monitoring probes at the perimeter of the CESNET2 network.</p>
-<p>For detailed information about the dataset, see the linked paper and the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page.</p>
-<h2 id="cesnet-quic22">CESNET-QUIC22</h2>
-<div class="admonition info inline end">
-<p class="admonition-title">CESNET-QUIC22</p>
+<h2 id="available-transformations">Available transformations</h2>
+<p><strong>PPI sequences</strong></p>
 <ul>
-<li>QUIC protocol</li>
-<li>Collected in 2022</li>
-<li>Spans four weeks</li>
-<li>Contains 153 million samples</li>
-<li>Has 102 application classes and three background traffic classes</li>
+<li><a href="https://cesnet.github.io/cesnet-models/reference_transforms/#transforms.ClipAndScalePPI">ClipAndScalePPI</a></li>
 </ul>
-</div>
-<p>This dataset was published in <em>"CESNET-QUIC22: A large one-month QUIC network traffic dataset from backbone lines"</em> (<a href="https://doi.org/10.1016/j.dib.2023.108888">DOI</a>).
-The QUIC protocol has the potential to replace TLS over TLS as the standard protocol for reliable and secure Internet communication.
-Due to its design that makes the inspection of connection handshakes challenging and its usage in HTTP/3, there is an increasing demand for QUIC traffic classification methods.</p>
-<p>For detailed information about the dataset, see the linked paper and the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page. Experiments based on this dataset were published in <em>"Encrypted traffic classification: the QUIC case"</em> (<a href="https://ieeexplore.ieee.org/abstractdocument/10199052/">DOI</a>).</p>
-<h2 id="cesnet-tls-year22">CESNET-TLS-Year22</h2>
-<div class="admonition info inline end">
-<p class="admonition-title">CESNET-TLS-Year22</p>
+<p><strong>Flow statistics</strong></p>
 <ul>
-<li>TLS protocol</li>
-<li>Collected in 2022</li>
-<li>Spans one year</li>
-<li>Contains 507 million samples</li>
-<li>Has 180 application classes</li>
+<li><a href="https://cesnet.github.io/cesnet-models/reference_transforms/#transforms.ClipAndScaleFlowstats">ClipAndScaleFlowstats</a></li>
 </ul>
-</div>
-<p>This dataset is similar to CESNET-TLS22; however, it spans the <em>entire year 2022</em>. It will be published in the near future.</p>
+<p><strong>Packet histograms</strong></p>
+<ul>
+<li><a href="https://cesnet.github.io/cesnet-models/reference_transforms/#transforms.NormalizeHistograms">NormalizeHistograms</a></li>
+</ul>
+<p>More transformations will be implemented in future versions.</p>
+<h3 id="data-scaling">Data scaling</h3>
+<p>Transformations implementing data scaling will be fitted, if needed, on a subset of training data during dataset initialization.</p>
 
 
   

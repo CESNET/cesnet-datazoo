@@ -306,6 +306,25 @@
       
   
   
+  
+    <li class="md-nav__item">
+      <a href="../transforms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transforms
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -322,10 +341,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -336,8 +355,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Tutorials
           </label>
@@ -418,10 +437,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -432,8 +451,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             Reference
           </label>
@@ -589,7 +608,7 @@ The shapes are:</p>
 <li>batch_flowstats <code>np.ndarray (B, F)</code> - where F is the number of flowstats features computed with <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig.get_flowstats_features_len">DatasetConfig.get_flowstats_features_len</a>. To get the order and names of flowstats features, call <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig.get_flowstats_feature_names_expanded">DatasetConfig.get_flowstats_feature_names_expanded</a>. The batch_flowstats array includes flow statistics, TCP features (if available and configured), and bins of packet histograms (if available and configured). See the <a class="autorefs autorefs-internal" href="../features/#features">data features</a> page for more information about features.</li>
 <li>batch_labels <code>np.ndarray (B)</code> - integer labels encoded with a <code>LabelEncoder</code> instance available at <code>dataset.class_info.encoder</code>.</li>
 </ul>
-<p>PPI and flow statistics features returned from dataloaders are scaled depending on the selected configuration; see <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> for options. DOCS_TODO</p>
+<p>PPI and flow statistics features returned from dataloaders are transformed depending on the selected configuration. See the <a class="autorefs autorefs-internal" href="../transforms/#transforms">transforms</a> page for more information.</p>
 
 
   

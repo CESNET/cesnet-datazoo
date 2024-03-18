@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../features/">
+        <link rel="prev" href="../transforms/">
       
       
         <link rel="next" href="../dataloaders/">
@@ -306,6 +306,25 @@
       
   
   
+  
+    <li class="md-nav__item">
+      <a href="../transforms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transforms
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -322,10 +341,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -336,8 +355,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Tutorials
           </label>
@@ -489,10 +508,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -503,8 +522,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             Reference
           </label>
@@ -684,11 +703,11 @@
 
 <h1 id="getting-started">Getting started</h1>
 <h2 id="jupyter-notebooks">Jupyter notebooks</h2>
+<p>Example Jupyter notebooks are provided at <a href="https://github.com/CESNET/cesnet-tcexamples">https://github.com/CESNET/cesnet-tcexamples</a>. Start with:</p>
 <ul>
-<li>Explore the CESNET-QUIC22 dataset - <a href="https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/explore_data.ipynb">https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/explore_data.ipynb</a></li>
-<li>Train a LightGBM model and evaluate it on each week of CESNET-QUIC22 - <a href="https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/example_evaluation.ipynb">https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/example_evaluation.ipynb</a></li>
+<li>Initialize the CESNET-QUIC22 dataset and explore its data features - <a href="https://nbviewer.org/github/CESNET/cesnet-tcexamples/blob/main/notebooks/explore_data.ipynb">explore_data.ipynb</a></li>
+<li>Training of a LightGBM classifier and its evaluation on a per-week and per-day basis - <a href="https://nbviewer.org/github/CESNET/cesnet-tcexamples/blob/main/notebooks/example_evaluation.ipynb">example_evaluation.ipynb</a></li>
 </ul>
-<p>More example notebooks will be published in the future.</p>
 <h2 id="code-snippets">Code snippets</h2>
 <h3 id="download-a-dataset-and-compute-statistics">Download a dataset and compute statistics</h3>
 <p><div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">cesnet_datazoo.datasets</span> <span class="kn">import</span> <span class="n">CESNET_QUIC22</span>

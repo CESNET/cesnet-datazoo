@@ -352,6 +352,25 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="transforms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transforms
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
     
     
     
@@ -365,10 +384,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -379,8 +398,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Tutorials
           </label>
@@ -451,10 +470,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   <span class="md-ellipsis">
@@ -465,8 +484,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             Reference
           </label>
@@ -619,7 +638,7 @@
 <li>Extensive configuration options for:<ul>
 <li>Selection of train, validation, and test periods. The datasets span from two weeks to one year; therefore, it is possible to evaluate classification methods in a time-based fashion that is closer to practical deployment.</li>
 <li>Selection of application classes and splitting classes between <em>known</em> and <em>unknown</em>. This enables research in the open-world setting, in which classification models need to handle new classes that were not seen during the training process.</li>
-<li>Feature scaling. DOCS_TODO</li>
+<li>Data transformations, such as feature scaling. Transforms are implemented in a separate package <a href="https://github.com/CESNET/cesnet-models">CESNET Models</a>. See <code>cesnet_models.transforms</code> <a href="https://cesnet.github.io/cesnet-models/reference_transforms/">documentation</a> for details.</li>
 </ul>
 </li>
 <li>Built on suitable data structures for experiments with large datasets. There are several caching mechanisms to make repeated runs faster, for example, when searching for the best model configuration.</li>
