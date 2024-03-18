@@ -113,7 +113,7 @@ class DatasetConfig():
 
     - Train, validation, test sets (dates, sizes, validation approach).
     - Application selection — either the standard closed-world setting (only *known* classes) or the open-world setting (*known* and *unknown* classes).
-    - Feature scaling. See the [data features][features] page for more information.
+    - Data transformations. See the [transforms][transforms] page for more information.
     - Dataloader options like batch sizes, order of loading, or number of workers.
 
     When initializing this class, pass a [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset] instance to be configured and the desired configuration. Available options are [here][config.DatasetConfig--configuration-options].
@@ -176,10 +176,10 @@ class DatasetConfig():
         use_packet_histograms: Whether to use packet histogram features, if available in the dataset. `Default: True`
         use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`
         use_push_flags: Whether to use push flags in packet sequences, if available in the dataset. `Default: False`
-        fit_scalers_samples: Fraction of train samples used for fitting feature scalers, if float. The absolute number of samples otherwise. `Default: 0.25`
-        ppi_transform: Transform function for PPI sequences. `Default: None`
-        flowstats_transform: Transform function for flow statistics. `Default: None`
-        flowstats_phist_transform: Transform function for packet histograms. `Default: None`
+        fit_scalers_samples: Used when scaling transformation is configured and requires fitting. Fraction of train samples used for fitting, if float. The absolute number of samples otherwise. `Default: 0.25`
+        ppi_transform: Transform function for PPI sequences. See the [transforms][transforms] page for more information. `Default: None`
+        flowstats_transform: Transform function for flow statistics. See the [transforms][transforms] page for more information. `Default: None`
+        flowstats_phist_transform: Transform function for packet histograms. See the [transforms][transforms] page for more information. `Default: None`
 
     # How to configure train, validation, and test sets
     There are three options for how to define train/validation/test dates.
@@ -453,7 +453,7 @@ class DatasetConfig():
         return ppi_feature_names
 
     def get_ppi_channels(self) -> list[int]:
-        """Gets the number of features (channels) in PPI."""
+        """Gets the available features (channels) in PPI sequences."""
         if self.use_push_flags:
             return TCP_PPI_CHANNELS
         else:

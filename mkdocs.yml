@@ -34,6 +34,7 @@ nav:
   - Installation: installation.md
   - Oveview of datasets: datasets_overview.md
   - Data features: features.md
+  - Transforms: transforms.md
   - Tutorials:
     - Getting started: getting_started.md
     - Using dataloaders: dataloaders.md

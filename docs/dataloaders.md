@@ -29,4 +29,4 @@ The shapes are:
 * batch_flowstats `np.ndarray (B, F)` - where F is the number of flowstats features computed with [DatasetConfig.get_flowstats_features_len][config.DatasetConfig.get_flowstats_features_len]. To get the order and names of flowstats features, call [DatasetConfig.get_flowstats_feature_names_expanded][config.DatasetConfig.get_flowstats_feature_names_expanded]. The batch_flowstats array includes flow statistics, TCP features (if available and configured), and bins of packet histograms (if available and configured). See the [data features][features] page for more information about features.
 * batch_labels `np.ndarray (B)` - integer labels encoded with a `LabelEncoder` instance available at `dataset.class_info.encoder`.
 
-PPI and flow statistics features returned from dataloaders are scaled depending on the selected configuration; see [`DatasetConfig`][config.DatasetConfig] for options.
+PPI and flow statistics features returned from dataloaders are transformed depending on the selected configuration. See the [transforms][transforms] page for more information.

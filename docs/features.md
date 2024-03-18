@@ -3,76 +3,78 @@ This page provides a description of individual data features in the datasets. Fe
 
 ## PPI sequence
 A per-packet information (PPI) sequence is a 2D matrix describing the first 30 packets of a flow. For flows shorter than 30 packets, the PPI sequence is padded with zeros.
-When data scalers (`psizes_scaler` and `ipt_scaler` config options) are enabled, this padding is ignored during the scaling transformation, and padding zeroes are kept in the final scaled data.
-The `zero_ppi_start` config option can be used to zero out the first *N* packets of PPI sequences, which is useful when evaluating the importance of handshake packets that are transmitted at the start of each connection.
+Set `use_push_flags` for using PUSH flags in PPI sequences, if available in the used dataset.
 
-| **Name**                | **Description**                                                                     | **Config options**                 |
-|-------------------------|-------------------------------------------------------------------------------------|------------------------------------|
-| SIZE                    | Size of the transport payload                                                       | `psizes_scaler`, `psizes_max`      |
-| IPT                     | Inter-packet time in milliseconds. The IPT of the first packet is set to zero       | `ipt_scaler`, `ipt_min`, `ipt_max` |
-| DIR                     | Direction of the packet encoded as ±1                                               |                                    |
-| PUSH_FLAG               | Whether the push flag was set in the TCP packet                                     | `use_push_flags`                   |
+| **Name**                | **Description**                                                                     |
+|-------------------------|-------------------------------------------------------------------------------------|
+| SIZE                    | Size of the transport payload                                                       |
+| IPT                     | Inter-packet time in milliseconds. The IPT of the first packet is set to zero       |
+| DIR                     | Direction of the packet encoded as ±1                                               |
+| PUSH_FLAG               | Whether the push flag was set in the TCP packet                                     |
 
 ## Flow statistics
 Flow statistics are standard features describing the entire flow (with exceptions of *PPI_* features that relate to the PPI sequence of the given flow). *_REV* features correspond to the reverse (server to client) direction.
 
-| **Name**                | **Description**                                                                     | **Config options**                   |
-|-------------------------|-------------------------------------------------------------------------------------|--------------------------------------|
-| DURATION                | Duration of the flow in seconds                                                     | `flowstats_scaler`                   |
-| BYTES                   | Number of transmitted bytes from client to server                                   | `flowstats_scaler`, `flowstats_clip` |
-| BYTES_REV               | Number of transmitted bytes from server to client                                   | `flowstats_scaler`, `flowstats_clip` |
-| PACKETS                 | Number of packets transmitted from client to server                                 | `flowstats_scaler`, `flowstats_clip` |
-| PACKETS_REV             | Number of packets transmitted from server to client                                 | `flowstats_scaler`, `flowstats_clip` |
-| PPI_LEN                 | Number of packets in the PPI sequence                                               | `flowstats_scaler`                   |
-| PPI_DURATION            | Duration of the PPI sequence in seconds                                             | `flowstats_scaler`                   |
-| PPI_ROUNDTRIPS          | Number of roundtrips in the PPI sequence                                            | `flowstats_scaler`                   |
-| FLOW_ENDREASON_IDLE     | Flow was terminated because it was idle                                             |                                      |
-| FLOW_ENDREASON_ACTIVE   | Flow was terminated because it reached the active timeout                           |                                      |
-| FLOW_ENDREASON_OTHER    | Flow was terminated for other reasons                                               |                                      |
+| **Name**                | **Description**                                                                     |
+|-------------------------|-------------------------------------------------------------------------------------|
+| DURATION                | Duration of the flow in seconds                                                     |
+| BYTES                   | Number of transmitted bytes from client to server                                   |
+| BYTES_REV               | Number of transmitted bytes from server to client                                   |
+| PACKETS                 | Number of packets transmitted from client to server                                 |
+| PACKETS_REV             | Number of packets transmitted from server to client                                 |
+| PPI_LEN                 | Number of packets in the PPI sequence                                               |
+| PPI_DURATION            | Duration of the PPI sequence in seconds                                             |
+| PPI_ROUNDTRIPS          | Number of roundtrips in the PPI sequence                                            |
+| FLOW_ENDREASON_IDLE     | Flow was terminated because it was idle                                             |
+| FLOW_ENDREASON_ACTIVE   | Flow was terminated because it reached the active timeout                           |
+| FLOW_ENDREASON_OTHER    | Flow was terminated for other reasons                                               |
 
 ## Packet histograms
 Packet histograms include binned counts of packet sizes and inter-packet times of the entire flow.
 There are 8 bins with a logarithmic scale; the intervals are 0–15, 16–31, 32–63, 64–127, 128–255, 256–511, 512–1024, >1024 [ms or B]. The units are milliseconds for inter-packet times and bytes for packet sizes.
 The histograms are built from all packets of the entire flow, unlike PPI sequences that describe the first 30 packets.
+Set `use_packet_histograms` for using packet histograms features, if available in the dataset.
 
-| **Name**                | **Description**                                                                     |  **Config options**                                    |
-|-------------------------|-------------------------------------------------------------------------------------|--------------------------------------------------------|
-| PSIZE_BIN{*x*}          | Packet sizes histogram *x*-th bin for the forward direction                         | `use_packet_histograms`, `normalize_packet_histograms` |
-| PSIZE_BIN{*x*}_REV      | Packet sizes histogram *x*-th bin for the reverse direction                         | `use_packet_histograms`, `normalize_packet_histograms` |
-| IPT_BIN{*x*}            | Inter-packet times histogram *x*-th bin for the forward direction                   | `use_packet_histograms`, `normalize_packet_histograms` |
-| IPT_BIN{*x*}_REV        | Inter-packet times histogram *x*-th bin for the reverse direction                   | `use_packet_histograms`, `normalize_packet_histograms` |
+| **Name**                | **Description**                                                                     |
+|-------------------------|-------------------------------------------------------------------------------------|
+| PSIZE_BIN{*x*}          | Packet sizes histogram *x*-th bin for the forward direction                         |
+| PSIZE_BIN{*x*}_REV      | Packet sizes histogram *x*-th bin for the reverse direction                         |
+| IPT_BIN{*x*}            | Inter-packet times histogram *x*-th bin for the forward direction                   |
+| IPT_BIN{*x*}_REV        | Inter-packet times histogram *x*-th bin for the reverse direction                   |
 
 On the [dataset metadata][metadata] page, packet histogram features are called `PHIST_SRC_SIZES`, `PHIST_DST_SIZES`, `PHIST_SRC_IPT`, `PHIST_DST_IPT`. Those are the names of database columns that are flattened to the _BIN{*x*} features.
 
 ## TCP features
-Datasets with TLS over TCP traffic contain features indicating the presence of individual TCP flags in the flow. A subset of flags defined in `cesnet_datazoo.constants.SELECTED_TCP_FLAGS` is used.
+Datasets with TLS over TCP traffic contain features indicating the presence of individual TCP flags in the flow.
+Set `use_tcp_features` for using a subset of flags defined in `cesnet_datazoo.constants.SELECTED_TCP_FLAGS`.
 
-| **Name**         | **Description**                                                                            |  **Config options**             |
-|------------------|--------------------------------------------------------------------------------------------|                                 |
-| FLAG_{*F*}       | Whether *F* flag was present in the forward (client to server) direction                   | `use_tcp_features`              |
-| FLAG_{*F*}_REV   | Whether *F* flag was present in the reverse (server to client) direction                   | `use_tcp_features`              |
+| **Name**         | **Description**                                                                            |
+|------------------|--------------------------------------------------------------------------------------------|
+| FLAG_{*F*}       | Whether *F* flag was present in the forward (client to server) direction                   |
+| FLAG_{*F*}_REV   | Whether *F* flag was present in the reverse (server to client) direction                   |
 
 ## Other fields
 Datasets contain auxiliary information about samples, such as communicating hosts, flow times, and more fields extracted from the ClientHello message. The [dataset metadata][metadata] page lists available fields in individual datasets. 
+Set `return_other_fields` to include those fields in returned dataframes. See [using dataloaders][using-dataloaders] for how other fields are handled in dataloaders.
 
-| **Name**                | **Description**                                                                     | **Config options**              |
-|-------------------------|-------------------------------------------------------------------------------------|                                 |
-| ID                      | Per-dataset unique flow identifier                                                  | `return_other_fields`           |
-| TIME_FIRST              | Timestamp of the first packet                                                       | `return_other_fields`           |
-| TIME_LAST               | Timestamp of the last packet                                                        | `return_other_fields`           |
-| SRC_IP                  | Source IP address                                                                   | `return_other_fields`           |
-| DST_IP                  | Destination IP address                                                              | `return_other_fields`           |
-| DST_ASN                 | Destination Autonomous System number                                                | `return_other_fields`           |
-| SRC_PORT                | Source port                                                                         | `return_other_fields`           |
-| DST_PORT                | Destination port                                                                    | `return_other_fields`           |
-| PROTOCOL                | Transport protocol                                                                  | `return_other_fields`           |
-| TLS_SNI / QUIC_SNI      | Server Name Indication domain                                                       | `return_other_fields`           |
-| TLS_JA3                 | JA3 fingerprint                                                                     | `return_other_fields`           |
-| QUIC_VERSION            | QUIC protocol version                                                               | `return_other_fields`           |
-| QUIC_USER_AGENT         | User agent string if available in the QUIC Initial Packet                           | `return_other_fields`           |
+| **Name**                | **Description**                                                                     |
+|-------------------------|-------------------------------------------------------------------------------------|
+| ID                      | Per-dataset unique flow identifier                                                  |
+| TIME_FIRST              | Timestamp of the first packet                                                       |
+| TIME_LAST               | Timestamp of the last packet                                                        |
+| SRC_IP                  | Source IP address                                                                   |
+| DST_IP                  | Destination IP address                                                              |
+| DST_ASN                 | Destination Autonomous System number                                                |
+| SRC_PORT                | Source port                                                                         |
+| DST_PORT                | Destination port                                                                    |
+| PROTOCOL                | Transport protocol                                                                  |
+| TLS_SNI / QUIC_SNI      | Server Name Indication domain                                                       |
+| TLS_JA3                 | JA3 fingerprint                                                                     |
+| QUIC_VERSION            | QUIC protocol version                                                               |
+| QUIC_USER_AGENT         | User agent string if available in the QUIC Initial Packet                           |
 <!-- 
-| APP                     | Web service label                                                                   |                                 |
-| CATEGORY                | Service category label                                                              |                                 | 
+| APP                     | Web service label                                                                   |
+| CATEGORY                | Service category label                                                              | 
 -->
 
 ## Details about packet histograms and PPI
