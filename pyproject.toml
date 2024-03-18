@@ -45,10 +45,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "black",
   "build",
-  "jupyterlab",
-  "lightgbm",
   "mkdocs-autorefs",
   "mkdocs-material-extensions",
   "mkdocs-material",

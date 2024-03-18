@@ -1,11 +1,11 @@
 # Getting started
 
 ## Jupyter notebooks
+Example Jupyter notebooks are provided at [https://github.com/CESNET/cesnet-tcexamples](https://github.com/CESNET/cesnet-tcexamples). Start with:
 
-* Explore the CESNET-QUIC22 dataset - [https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/explore_data.ipynb](https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/explore_data.ipynb)
-* Train a LightGBM model and evaluate it on each week of CESNET-QUIC22 - [https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/example_evaluation.ipynb](https://nbviewer.org/github/CESNET/cesnet-datazoo/blob/main/notebooks/example_evaluation.ipynb)
+* Initialize the CESNET-QUIC22 dataset and explore its data features - [explore_data.ipynb](https://nbviewer.org/github/CESNET/cesnet-tcexamples/blob/main/notebooks/explore_data.ipynb)
+* Training of a LightGBM classifier and its evaluation on a per-week and per-day basis - [example_evaluation.ipynb](https://nbviewer.org/github/CESNET/cesnet-tcexamples/blob/main/notebooks/example_evaluation.ipynb)
 
-More example notebooks will be published in the future.
 
 ## Code snippets
 
