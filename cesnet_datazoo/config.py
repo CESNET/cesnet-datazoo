@@ -281,7 +281,7 @@ class DatasetConfig():
                 if self.train_period_name not in dataset.time_periods:
                     raise ValueError(f"Unknown train_period_name {self.train_period_name}. Use time period available in dataset.time_periods")
                 self.train_dates = dataset.time_periods[self.train_period_name]
-            if len(self.train_dates) == 0 and self.test_period_name == "":
+            if len(self.train_dates) == 0 and self.train_period_name == "":
                 self.train_period_name = dataset.default_train_period_name
                 self.train_dates = dataset.time_periods[dataset.default_train_period_name]
         # Configure test dates
