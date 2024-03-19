@@ -17,18 +17,6 @@ from cesnet_datazoo.utils.random import RandomizedSection, get_fresh_random_gene
 log = logging.getLogger(__name__)
 
 
-def get_scaler_attrs(scaler: StandardScaler | RobustScaler | MinMaxScaler) -> dict[str, list[float]]:
-    if isinstance(scaler, StandardScaler):
-        assert hasattr(scaler, "mean_") and scaler.mean_ is not None and hasattr(scaler, "scale_") and scaler.scale_ is not None
-        scaler_attrs = {"mean_": scaler.mean_.tolist(), "scale_": scaler.scale_.tolist()}
-    elif isinstance(scaler, RobustScaler):
-        assert hasattr(scaler, "center_") and hasattr(scaler, "scale_")
-        scaler_attrs = {"center_": scaler.center_.tolist(), "scale_": scaler.scale_.tolist()}
-    elif isinstance(scaler, MinMaxScaler):
-        assert hasattr(scaler, "min_") and hasattr(scaler, "scale_")
-        scaler_attrs = {"min_": scaler.min_.tolist(), "scale_": scaler.scale_.tolist()}
-    return scaler_attrs
-
 def fit_scalers(dataset_config: DatasetConfig, train_indices: np.ndarray) -> None:
     # Define indices for fitting scalers
     if isinstance(dataset_config.fit_scalers_samples, int) and dataset_config.fit_scalers_samples > len(train_indices):
@@ -48,6 +36,7 @@ def fit_scalers(dataset_config: DatasetConfig, train_indices: np.ndarray) -> Non
 
     clip_and_scale_ppi_transform = dataset_config.ppi_transform # TODO Fix after transforms composing is implemented
     clip_and_scale_flowstats_transform = dataset_config.flowstats_transform
+    train_data_path = dataset_config._get_train_data_path()
 
     # Fit the ClipAndScalePPI transform
     if clip_and_scale_ppi_transform is not None and clip_and_scale_ppi_transform.needs_fitting:
@@ -70,6 +59,7 @@ def fit_scalers(dataset_config: DatasetConfig, train_indices: np.ndarray) -> Non
             train_psizes = np.concatenate((train_psizes, [0]))
         clip_and_scale_ppi_transform.psizes_scaler.fit(train_psizes.reshape(-1, 1))
         clip_and_scale_ppi_transform.needs_fitting = False
+        json.dump(clip_and_scale_ppi_transform.to_dict(), open(os.path.join(train_data_path, "transforms", "ppi-transform.json"), "w"), indent=4)
 
     # Fit the ClipAndScaleFlowstats transform
     if clip_and_scale_flowstats_transform is not None and clip_and_scale_flowstats_transform.needs_fitting:
@@ -82,29 +72,5 @@ def fit_scalers(dataset_config: DatasetConfig, train_indices: np.ndarray) -> Non
         clip_and_scale_flowstats_transform.flowstats_scaler.fit(train_flowstats)
         clip_and_scale_flowstats_transform.flowstats_quantiles = flowstats_quantiles.tolist()
         clip_and_scale_flowstats_transform.needs_fitting = False
-
+        json.dump(clip_and_scale_flowstats_transform.to_dict(), open(os.path.join(train_data_path, "transforms", "flowstats-transform.json"), "w"), indent=4)
     log.info(f"Reading data and fitting scalers took {time.time() - start_time:.2f} seconds")
-    train_data_path = dataset_config._get_train_data_path()
-    if clip_and_scale_ppi_transform is not None:
-        ppi_transform_path = os.path.join(train_data_path, "transforms", "ppi-transform.json")
-        ppi_transform_dict = {
-            "psizes_scaler_enum": str(clip_and_scale_ppi_transform._psizes_scaler_enum),
-            "psizes_scaler_attrs": get_scaler_attrs(clip_and_scale_ppi_transform.psizes_scaler),
-            "pszies_min": clip_and_scale_ppi_transform.pszies_min,
-            "psizes_max": clip_and_scale_ppi_transform.psizes_max,
-            "ipt_scaler_enum": str(clip_and_scale_ppi_transform._ipt_scaler_enum),
-            "ipt_scaler_attrs": get_scaler_attrs(clip_and_scale_ppi_transform.ipt_scaler),
-            "ipt_min": clip_and_scale_ppi_transform.ipt_min,
-            "ipt_max": clip_and_scale_ppi_transform.ipt_max,
-        }
-        json.dump(ppi_transform_dict, open(ppi_transform_path, "w"), indent=4)
-    if clip_and_scale_flowstats_transform is not None:
-        assert clip_and_scale_flowstats_transform.flowstats_quantiles is not None
-        flowstats_transform_path = os.path.join(train_data_path, "transforms", "flowstats-transform.json")
-        flowstats_transform_dict = {
-            "flowstats_scaler_enum": str(clip_and_scale_flowstats_transform._flowstats_scaler_enum),
-            "flowstats_scaler_attrs": get_scaler_attrs(clip_and_scale_flowstats_transform.flowstats_scaler),
-            "flowstats_quantiles": clip_and_scale_flowstats_transform.flowstats_quantiles,
-            "quantile_clip": clip_and_scale_flowstats_transform.quantile_clip,
-        }
-        json.dump(flowstats_transform_dict, open(flowstats_transform_path, "w"), indent=4)
