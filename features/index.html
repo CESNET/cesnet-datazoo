@@ -705,7 +705,7 @@
 <p>This page provides a description of individual data features in the datasets. Features available in each dataset are listed on the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page.</p>
 <h2 id="ppi-sequence">PPI sequence</h2>
 <p>A per-packet information (PPI) sequence is a 2D matrix describing the first 30 packets of a flow. For flows shorter than 30 packets, the PPI sequence is padded with zeros.
-Set <code>use_push_flags</code> for using PUSH flags in PPI sequences, if available in the used dataset.</p>
+Set <code>use_push_flags</code> to include PUSH flags in PPI sequences, if available in the dataset.</p>
 <table>
 <thead>
 <tr>
@@ -822,7 +822,7 @@ Set <code>use_packet_histograms</code> for using packet histograms features, if 
 <p>On the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page, packet histogram features are called <code>PHIST_SRC_SIZES</code>, <code>PHIST_DST_SIZES</code>, <code>PHIST_SRC_IPT</code>, <code>PHIST_DST_IPT</code>. Those are the names of database columns that are flattened to the _BIN{<em>x</em>} features.</p>
 <h2 id="tcp-features">TCP features</h2>
 <p>Datasets with TLS over TCP traffic contain features indicating the presence of individual TCP flags in the flow.
-Set <code>use_tcp_features</code> for using a subset of flags defined in <code>cesnet_datazoo.constants.SELECTED_TCP_FLAGS</code>.</p>
+Set <code>use_tcp_features</code> to use a subset of flags defined in <code>cesnet_datazoo.constants.SELECTED_TCP_FLAGS</code>.</p>
 <table>
 <thead>
 <tr>
