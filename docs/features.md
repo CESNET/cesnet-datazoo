@@ -3,7 +3,7 @@ This page provides a description of individual data features in the datasets. Fe
 
 ## PPI sequence
 A per-packet information (PPI) sequence is a 2D matrix describing the first 30 packets of a flow. For flows shorter than 30 packets, the PPI sequence is padded with zeros.
-Set `use_push_flags` for using PUSH flags in PPI sequences, if available in the used dataset.
+Set `use_push_flags` to include PUSH flags in PPI sequences, if available in the dataset.
 
 | **Name**                | **Description**                                                                     |
 |-------------------------|-------------------------------------------------------------------------------------|
@@ -46,7 +46,7 @@ On the [dataset metadata][metadata] page, packet histogram features are called `
 
 ## TCP features
 Datasets with TLS over TCP traffic contain features indicating the presence of individual TCP flags in the flow.
-Set `use_tcp_features` for using a subset of flags defined in `cesnet_datazoo.constants.SELECTED_TCP_FLAGS`.
+Set `use_tcp_features` to use a subset of flags defined in `cesnet_datazoo.constants.SELECTED_TCP_FLAGS`.
 
 | **Name**         | **Description**                                                                            |
 |------------------|--------------------------------------------------------------------------------------------|
