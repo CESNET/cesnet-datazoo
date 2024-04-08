@@ -28,7 +28,7 @@ from cesnet_datazoo.pytables_data.indices_setup import (IndicesTuple, compute_kn
                                                         date_weight_sample_train_indices,
                                                         init_or_load_test_indices,
                                                         init_or_load_train_indices,
-                                                        init_or_load_val_indices,
+                                                        init_or_load_val_indices, no_indices,
                                                         subset_and_sort_indices)
 from cesnet_datazoo.pytables_data.pytables_dataset import PyTablesDataset, worker_init_fn
 from cesnet_datazoo.utils.class_info import ClassInfo, create_class_info
@@ -537,10 +537,10 @@ class CesnetDataset():
                     raise ValueError(f"Requested number of samples for weight sampling ({num_samples}) is larger than the number of available train samples ({len(train_indices)})")
                 train_indices = date_weight_sample_train_indices(dataset_config=dataset_config, train_indices=train_indices, num_samples=num_samples)
         elif dataset_config.apps_selection == AppSelection.FIXED:
-            known_apps = dataset_config.apps_selection_fixed_known
-            unknown_apps = dataset_config.apps_selection_fixed_unknown
-            train_indices = np.zeros((0,3), dtype=np.int64)
-            train_unknown_indices = np.zeros((0,3), dtype=np.int64)
+            known_apps = sorted(dataset_config.apps_selection_fixed_known)
+            unknown_apps = sorted(dataset_config.apps_selection_fixed_unknown)
+            train_indices = no_indices()
+            train_unknown_indices = no_indices()
         else:
             raise ValueError("Either need train set or the fixed application selection")
         # Initialize validation set
@@ -577,8 +577,8 @@ class CesnetDataset():
                                                                         test_size=dataset_config.val_known_size if dataset_config.val_known_size != "all" else None,
                                                                         stratify=train_labels, shuffle=True, random_state=train_val_rng)
         else:
-            val_known_indices = np.zeros((0,3), dtype=np.int64)
-            val_unknown_indices = np.zeros((0,3), dtype=np.int64)
+            val_known_indices = no_indices()
+            val_unknown_indices = no_indices()
             val_data_path = None
         # Initialize test set
         if dataset_config.need_test_set:
@@ -588,8 +588,8 @@ class CesnetDataset():
                                                                                                  tables_app_enum=self._tables_app_enum,
                                                                                                  disable_indices_cache=disable_indices_cache,)
         else:
-            test_known_indices = np.zeros((0,3), dtype=np.int64)
-            test_unknown_indices = np.zeros((0,3), dtype=np.int64)
+            test_known_indices = no_indices()
+            test_unknown_indices = no_indices()
             test_data_path = None
         # Fit scalers if needed
         if (dataset_config.ppi_transform is not None and dataset_config.ppi_transform.needs_fitting or
@@ -636,7 +636,7 @@ class CesnetDataset():
             assert val_data_path is not None
             val_dataset = PyTablesDataset(
                 database_path=dataset_config.database_path,
-                tables_paths=dataset_config._get_train_tables_paths(),
+                tables_paths=dataset_config._get_val_tables_paths(),
                 indices=dataset_indices.val_known_indices,
                 tables_app_enum=self._tables_app_enum,
                 tables_cat_enum=self._tables_cat_enum,

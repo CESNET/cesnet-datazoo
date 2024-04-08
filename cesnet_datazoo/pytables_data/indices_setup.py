@@ -132,7 +132,7 @@ def init_or_load_val_indices(dataset_config: DatasetConfig, known_apps: list[str
             np.save(os.path.join(val_data_path, "val_known_indices.npy"), val_known_indices)
             np.save(os.path.join(val_data_path, "val_unknown_indices.npy"), val_unknown_indices)
     else:
-        val_known_indices = np.load(os.path.join(val_data_path, "val_known_indices.npu"))
+        val_known_indices = np.load(os.path.join(val_data_path, "val_known_indices.npy"))
         val_unknown_indices = np.load(os.path.join(val_data_path, "val_unknown_indices.npy"))
     return val_known_indices, val_unknown_indices, val_data_path
 
@@ -162,3 +162,6 @@ def init_train_data(train_data_path: str):
 def init_test_data(test_data_path: str):
     os.makedirs(test_data_path, exist_ok=True)
     os.makedirs(os.path.join(test_data_path, "preload"), exist_ok=True)
+
+def no_indices() -> np.ndarray:
+    return np.zeros((0,3), dtype=np.int64)

@@ -16,7 +16,8 @@ from typing_extensions import assert_never
 
 from cesnet_datazoo.config import (AppSelection, MinTrainSamplesCheck, TestDataParams,
                                    TrainDataParams)
-from cesnet_datazoo.constants import APP_COLUMN, INDICES_INDEX_POS, INDICES_TABLE_POS, PPI_COLUMN
+from cesnet_datazoo.constants import (APP_COLUMN, INDICES_INDEX_POS, INDICES_TABLE_POS, PPI_COLUMN,
+                                      QUIC_SNI_COLUMN, TLS_SNI_COLUMN)
 from cesnet_datazoo.pytables_data.apps_split import (is_background_app,
                                                      split_apps_topx_with_provider_groups)
 
@@ -66,6 +67,7 @@ class PyTablesDataset(Dataset):
         self.target_transform = target_transform
         self.return_tensors = return_tensors
         self.return_all_fields = return_all_fields
+        self.sni_column = TLS_SNI_COLUMN if TLS_SNI_COLUMN in self.other_fields else QUIC_SNI_COLUMN if QUIC_SNI_COLUMN in self.other_fields else None
 
         self.preload = preload
         self.preload_blob = preload_blob
@@ -179,7 +181,7 @@ def init_train_indices(train_data_params: TrainDataParams, database_path: str, t
     start_time = time.time()
     for i, table_path in enumerate(train_data_params.train_tables_paths):
         all_app_labels[i] = train_tables[i].read(field=APP_COLUMN)
-        log.info(f"Reading app column for train table {table_path} took {time.time() - start_time:.2f} seconds"); start_time = time.time()
+        log.info(f"Reading app column for table {table_path} took {time.time() - start_time:.2f} seconds"); start_time = time.time()
         app_counts = app_counts.add(pd.Series(all_app_labels[i]).value_counts(), fill_value=0)
     database.close()
     # Handle disabled apps and apps with less than min_samples_per_app samples
@@ -223,13 +225,15 @@ def init_train_indices(train_data_params: TrainDataParams, database_path: str, t
     else:
         known_apps = train_data_params.apps_selection_fixed_known
         unknown_apps = train_data_params.apps_selection_fixed_unknown
+    known_apps = sorted(known_apps)
+    unknown_apps = sorted(unknown_apps)
     known_apps_ids = [inverted_tables_app_enum[app] for app in known_apps]
     unknown_apps_ids = [inverted_tables_app_enum[app] for app in unknown_apps]
 
     train_known_indices, train_unknown_indices = convert_dict_indices(base_indices=base_indices, base_labels=base_labels, known_apps_ids=known_apps_ids, unknown_apps_ids=unknown_apps_ids)
     rng.shuffle(train_known_indices)
     rng.shuffle(train_unknown_indices)
-    log.info(f"Processing train indices took {time.time() - start_time:.2f} seconds"); start_time = time.time()
+    log.info(f"Processing indices took {time.time() - start_time:.2f} seconds"); start_time = time.time()
     return train_known_indices, train_unknown_indices, known_apps, unknown_apps
 
 def init_test_indices(test_data_params: TestDataParams, database_path: str, tables_app_enum: dict[int, str], rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray]:
@@ -240,7 +244,7 @@ def init_test_indices(test_data_params: TestDataParams, database_path: str, tabl
     start_time = time.time()
     for i, table_path in enumerate(test_data_params.test_tables_paths):
         base_labels[i] = test_tables[i].read(field=APP_COLUMN)
-        log.info(f"Reading app column for test table {table_path} took {time.time() - start_time:.2f} seconds"); start_time = time.time()
+        log.info(f"Reading app column for table {table_path} took {time.time() - start_time:.2f} seconds"); start_time = time.time()
         base_indices[i] = np.arange(len(test_tables[i]))
     database.close()
     known_apps_ids = [inverted_tables_app_enum[app] for app in test_data_params.known_apps]
@@ -248,7 +252,7 @@ def init_test_indices(test_data_params: TestDataParams, database_path: str, tabl
     test_known_indices, test_unknown_indices = convert_dict_indices(base_indices=base_indices, base_labels=base_labels, known_apps_ids=known_apps_ids, unknown_apps_ids=unknown_apps_ids)
     rng.shuffle(test_known_indices)
     rng.shuffle(test_unknown_indices)
-    log.info(f"Processing test indices took {time.time() - start_time:.2f} seconds"); start_time = time.time()
+    log.info(f"Processing indices took {time.time() - start_time:.2f} seconds"); start_time = time.time()
     return test_known_indices, test_unknown_indices
 
 def load_database(database_path: str, tables_paths: Optional[list[str]] = None, mode: str = "r") -> tuple[tb.File, dict[int, Any]]: # dict[int, tb.Table]

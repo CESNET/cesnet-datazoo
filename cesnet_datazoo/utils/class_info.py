@@ -23,8 +23,6 @@ class ClassInfo:
     categories_mapping: dict[str, Optional[str]]
 
 def create_class_info(servicemap: Any, encoder: LabelEncoder, known_apps: list[str], unknown_apps: list[str]) -> ClassInfo:
-    known_apps = sorted(known_apps)
-    unknown_apps = sorted(unknown_apps)
     target_names_arr = encoder.classes_
     assert known_apps == list(target_names_arr[:-1])
     group_matrix = np.array([[a == b or
