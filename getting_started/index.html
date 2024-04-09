@@ -715,7 +715,7 @@
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">CESNET_QUIC22</span><span class="p">(</span><span class="s2">&quot;/datasets/CESNET-QUIC22/&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;XS&quot;</span><span class="p">)</span>
 <span class="n">dataset</span><span class="o">.</span><span class="n">compute_dataset_statistics</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </code></pre></div>
-This will download the dataset, compute dataset statistics, and save them into <code>/datasets/CESNET-QUIC22/statistics</code>.</p>
+This code will download the dataset, compute dataset statistics, and save them into <code>/datasets/CESNET-QUIC22/statistics</code>.</p>
 <h3 id="enable-logging-and-set-the-spawn-method-on-windows">Enable logging and set the spawn method on Windows</h3>
 <p><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
