@@ -658,7 +658,7 @@
 
 
 <h1 id="transforms">Transforms</h1>
-<p>The <code>cesnet_datazoo</code> package supports configurable transforms of input data in a similar fashion to what torchvision is doing for the computer vision field. Input features are split into three groups, each having its own transformation. Those groups are PPI sequences, flow statistics, and packet histograms.</p>
+<p>The <code>cesnet-datazoo</code> package supports configurable transforms of input data in a similar fashion to what torchvision is doing for the computer vision field. Input features are split into three groups, each having its own transformation. Those groups are PPI sequences, flow statistics, and packet histograms.</p>
 <ul>
 <li>Transformation configured in <code>ppi_transform</code> of <a class="autorefs autorefs-internal" href="../reference_dataset_config/#config.DatasetConfig"><code>DatasetConfig</code></a> is applied to PPI sequences.</li>
 <li><code>flowstats_transform</code> is applied to flow statistics (excluding boolean features, such as flow end reasons or TCP flags).</li>
