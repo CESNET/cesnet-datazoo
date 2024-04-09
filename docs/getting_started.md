@@ -5,7 +5,7 @@ Example Jupyter notebooks are provided at [https://github.com/CESNET/cesnet-tcex
 
 * Initialize the CESNET-QUIC22 dataset and explore its data features - [explore_data.ipynb](https://nbviewer.org/github/CESNET/cesnet-tcexamples/blob/main/notebooks/explore_data.ipynb)
 * Training of a LightGBM classifier and its evaluation on a per-week and per-day basis - [example_evaluation.ipynb](https://nbviewer.org/github/CESNET/cesnet-tcexamples/blob/main/notebooks/example_evaluation.ipynb)
-
+* Training of a neural network from the `cesnet-models` package with data transformations - [example_train_nn.ipynb](https://nbviewer.org/github/CESNET/cesnet-tcexamples/blob/main/notebooks/example_train_nn.ipynb)
 
 ## Code snippets
 
@@ -15,7 +15,7 @@ from cesnet_datazoo.datasets import CESNET_QUIC22
 dataset = CESNET_QUIC22("/datasets/CESNET-QUIC22/", size="XS")
 dataset.compute_dataset_statistics(num_samples=100_000, num_workers=0)
 ```
-This will download the dataset, compute dataset statistics, and save them into `/datasets/CESNET-QUIC22/statistics`.
+This code will download the dataset, compute dataset statistics, and save them into `/datasets/CESNET-QUIC22/statistics`.
 
 ### Enable logging and set the spawn method on Windows
 ```python

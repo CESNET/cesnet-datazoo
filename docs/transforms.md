@@ -1,5 +1,5 @@
 # Transforms
-The `cesnet_datazoo` package supports configurable transforms of input data in a similar fashion to what torchvision is doing for the computer vision field. Input features are split into three groups, each having its own transformation. Those groups are PPI sequences, flow statistics, and packet histograms.
+The `cesnet-datazoo` package supports configurable transforms of input data in a similar fashion to what torchvision is doing for the computer vision field. Input features are split into three groups, each having its own transformation. Those groups are PPI sequences, flow statistics, and packet histograms.
 
 - Transformation configured in `ppi_transform` of [`DatasetConfig`][config.DatasetConfig] is applied to PPI sequences.
 - `flowstats_transform` is applied to flow statistics (excluding boolean features, such as flow end reasons or TCP flags).

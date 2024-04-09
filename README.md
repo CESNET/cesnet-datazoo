@@ -3,7 +3,7 @@
 </p>
 
 [![](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/CESNET/cesnet-datazoo/blob/main/LICENCE)
-[![](https://img.shields.io/badge/docs-mkdocs_material-blue.svg)](https://cesnet.github.io/cesnet-datazoo/)
+[![](https://img.shields.io/badge/docs-cesnet--datazoo-blue.svg)](https://cesnet.github.io/cesnet-datazoo/)
 [![](https://img.shields.io/badge/python->=3.10-blue.svg)](https://pypi.org/project/cesnet-datazoo/)
 [![](https://img.shields.io/pypi/v/cesnet-datazoo)](https://pypi.org/project/cesnet-datazoo/)
 
@@ -18,9 +18,12 @@ The goal of this project is to provide tools for working with large network traf
 - Built on suitable data structures for experiments with large datasets. There are several caching mechanisms to make repeated runs faster, for example, when searching for the best model configuration.
 - Datasets are offered in multiple sizes to give users an option to start the experiments at a smaller scale (also faster dataset download, disk space, etc.). The default is the `S` size containing 25 million samples. 
 
-## Datasets
+:brain: :brain: See a related project [CESNET Models](https://github.com/CESNET/cesnet-models) providing pre-trained neural networks for traffic classification. :brain: :brain:
 
-The package is able to handle the following datasets:
+:notebook: :notebook: Example Jupyter notebooks are included in a separate [CESNET Traffic Classification Examples](https://github.com/CESNET/cesnet-tcexamples) repo. :notebook: :notebook:
+
+## Datasets
+The following datasets are available in the `cesnet-datazoo` package:
 
 | Name                               | CESNET-TLS22                                                                                                                                                                                   | CESNET-QUIC22                                                                                                                                             | CESNET-TLS-Year22                                                                                                                                                                              |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -80,6 +83,6 @@ See more examples in the [documentation](https://cesnet.github.io/cesnet-datazoo
 Jan Luxemburk and Karel Hynek <br>
 CoNEXT Workshop on Explainable and Safety Bounded, Fidelitous, Machine Learning for Networking (SAFE), 2023
 
-### Acknowledgements
+## Acknowledgments
 
-    This project was supported by the Ministry of the Interior of the Czech Republic, grant No. VJ02010024: Flow-Based Encrypted Traffic Analysis.
+This project was supported by the Ministry of the Interior of the Czech Republic, grant No. VJ02010024: Flow-Based Encrypted Traffic Analysis.

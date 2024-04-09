@@ -8,8 +8,8 @@ from cesnet_datazoo.utils.class_info import ClassInfo
 
 def better_classification_report(y_true: np.ndarray, y_pred: np.ndarray, cm: np.ndarray, labels: list[int], class_info: ClassInfo, digits: int = 2, zero_division: int = 0) -> tuple[str, dict[str, float]]:
     p, r, f1, s  = precision_recall_fscore_support(y_true, y_pred,
-                                                    labels=labels,
-                                                    zero_division=zero_division)
+                                                   labels=labels,
+                                                   zero_division=zero_division)
     sc_p, sc_r, sc_f1 = per_app_provider_metrics(cm, class_info=class_info)
     predicted_unknown = cm[:, -1]
     with np.errstate(divide="ignore", invalid="ignore"):
