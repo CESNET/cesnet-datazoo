@@ -16,8 +16,8 @@ from typing_extensions import assert_never
 
 from cesnet_datazoo.config import (AppSelection, MinTrainSamplesCheck, TestDataParams,
                                    TrainDataParams)
-from cesnet_datazoo.constants import (APP_COLUMN, INDICES_INDEX_POS, INDICES_TABLE_POS, PPI_COLUMN,
-                                      QUIC_SNI_COLUMN, TLS_SNI_COLUMN)
+from cesnet_datazoo.constants import (APP_COLUMN, INDICES_DTYPE, INDICES_INDEX_FIELD,
+                                      INDICES_TABLE_FIELD, PPI_COLUMN)
 from cesnet_datazoo.pytables_data.apps_split import (is_background_app,
                                                      split_apps_topx_with_provider_groups)
 
@@ -36,12 +36,13 @@ class PyTablesDataset(Dataset):
                  flowstats_features_phist: list[str],
                  other_fields: list[str],
                  ppi_channels: list[int],
+                 sni_column: Optional[str] = None,
                  ppi_transform: Optional[Callable] = None,
                  flowstats_transform: Optional[Callable] = None,
                  flowstats_phist_transform: Optional[Callable] = None,
                  target_transform: Optional[Callable] = None,
                  return_tensors: bool = False,
-                 return_all_fields: bool = False,
+                 return_raw_fields: bool = False,
                  preload: bool = False,
                  preload_blob: Optional[str] = None,
                  disabled_apps: Optional[list[str]] = None,):
@@ -60,14 +61,14 @@ class PyTablesDataset(Dataset):
         self.flowstats_features_boolean = flowstats_features_boolean
         self.flowstats_features_phist = flowstats_features_phist
         self.other_fields = other_fields
+        self.sni_column = sni_column
         self.ppi_channels = ppi_channels
         self.ppi_transform = ppi_transform
         self.flowstats_transform = flowstats_transform
         self.flowstats_phist_transform = flowstats_phist_transform
         self.target_transform = target_transform
         self.return_tensors = return_tensors
-        self.return_all_fields = return_all_fields
-        self.sni_column = TLS_SNI_COLUMN if TLS_SNI_COLUMN in self.other_fields else QUIC_SNI_COLUMN if QUIC_SNI_COLUMN in self.other_fields else None
+        self.return_raw_fields = return_raw_fields
 
         self.preload = preload
         self.preload_blob = preload_blob
@@ -78,7 +79,7 @@ class PyTablesDataset(Dataset):
             batch_data = self.data[batch_idx]
         else:
             batch_data = load_data_from_tables(tables=self.tables, indices=self.indices[batch_idx], data_dtype=self.data_dtype)
-        if self.return_all_fields:
+        if self.return_raw_fields:
             return (batch_data, batch_idx)
 
         # Prepare data
@@ -173,16 +174,21 @@ def worker_init_fn(worker_id):
     dataset = worker_info.dataset
     dataset.pytables_worker_init(worker_id)
 
-def init_train_indices(train_data_params: TrainDataParams, database_path: str, tables_app_enum: dict[int, str], servicemap: pd.DataFrame, rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray, list[str], list[str]]:
+def init_train_indices(train_data_params: TrainDataParams, database_path: str, tables_app_enum: dict[int, str], sni_column: Optional[str], servicemap: pd.DataFrame, rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray, list[str], list[str]]:
     database, train_tables = load_database(database_path, tables_paths=train_data_params.train_tables_paths)
     inverted_tables_app_enum = {v: k for k, v in tables_app_enum.items()}
-    all_app_labels = {}
+    all_labels = {}
+    all_sni_domains = {}
     app_counts = pd.Series(dtype="int64")
     start_time = time.time()
     for i, table_path in enumerate(train_data_params.train_tables_paths):
-        all_app_labels[i] = train_tables[i].read(field=APP_COLUMN)
-        log.info(f"Reading app column for table {table_path} took {time.time() - start_time:.2f} seconds"); start_time = time.time()
-        app_counts = app_counts.add(pd.Series(all_app_labels[i]).value_counts(), fill_value=0)
+        all_labels[i] = train_tables[i].read(field=APP_COLUMN)
+        if sni_column is not None:
+            all_sni_domains[i] = train_tables[i].read(field=sni_column)
+        else:
+            all_sni_domains[i] = np.full_like(all_labels[i], "", dtype="U1")
+        log.info(f"Reading app and SNI columns for table {table_path} took {time.time() - start_time:.2f} seconds"); start_time = time.time()
+        app_counts = app_counts.add(pd.Series(all_labels[i]).value_counts(), fill_value=0)
     database.close()
     # Handle disabled apps and apps with less than min_samples_per_app samples
     if len(train_data_params.disabled_apps) > 0:
@@ -202,8 +208,9 @@ def init_train_indices(train_data_params: TrainDataParams, database_path: str, t
     # Base indices are indices of samples that are not disabled and have enough samples
     base_indices = {}
     for i, table_path in enumerate(train_data_params.train_tables_paths):
-        base_indices[i] = np.nonzero(np.isin(all_app_labels[i], disabled_apps_ids, invert=True))[0]
-    base_labels = {table_id: arr[base_indices[table_id]] for table_id, arr in all_app_labels.items()}
+        base_indices[i] = np.nonzero(np.isin(all_labels[i], disabled_apps_ids, invert=True))[0]
+    base_labels = {table_id: arr[base_indices[table_id]] for table_id, arr in all_labels.items()}
+    base_sni_domains = {table_id: arr[base_indices[table_id]] for table_id, arr in all_sni_domains.items()}
     # Apps selection
     if train_data_params.apps_selection != AppSelection.FIXED:
         app_counts = app_counts[[app for app in app_counts.index.tolist() if app not in disabled_apps_ids]]
@@ -230,26 +237,38 @@ def init_train_indices(train_data_params: TrainDataParams, database_path: str, t
     known_apps_ids = [inverted_tables_app_enum[app] for app in known_apps]
     unknown_apps_ids = [inverted_tables_app_enum[app] for app in unknown_apps]
 
-    train_known_indices, train_unknown_indices = convert_dict_indices(base_indices=base_indices, base_labels=base_labels, known_apps_ids=known_apps_ids, unknown_apps_ids=unknown_apps_ids)
+    train_known_indices, train_unknown_indices = convert_dict_indices(base_indices=base_indices,
+                                                                      base_labels=base_labels,
+                                                                      base_sni_domains=base_sni_domains,
+                                                                      known_apps_ids=known_apps_ids,
+                                                                      unknown_apps_ids=unknown_apps_ids)
     rng.shuffle(train_known_indices)
     rng.shuffle(train_unknown_indices)
-    log.info(f"Processing indices took {time.time() - start_time:.2f} seconds"); start_time = time.time()
     return train_known_indices, train_unknown_indices, known_apps, unknown_apps
 
-def init_test_indices(test_data_params: TestDataParams, database_path: str, tables_app_enum: dict[int, str], rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray]:
+def init_test_indices(test_data_params: TestDataParams, database_path: str, tables_app_enum: dict[int, str], sni_column: Optional[str], rng: np.random.RandomState) -> tuple[np.ndarray, np.ndarray]:
     database, test_tables = load_database(database_path, tables_paths=test_data_params.test_tables_paths)
     inverted_tables_app_enum = {v: k for k, v in tables_app_enum.items()}
     base_labels = {}
+    base_sni_domains = {}
     base_indices = {}
     start_time = time.time()
     for i, table_path in enumerate(test_data_params.test_tables_paths):
         base_labels[i] = test_tables[i].read(field=APP_COLUMN)
-        log.info(f"Reading app column for table {table_path} took {time.time() - start_time:.2f} seconds"); start_time = time.time()
+        if sni_column is not None:
+            base_sni_domains[i] = test_tables[i].read(field=sni_column)
+        else:
+            base_sni_domains[i] = np.full_like(base_labels[i], "", dtype="U1")
+        log.info(f"Reading app and SNI columns for table {table_path} took {time.time() - start_time:.2f} seconds"); start_time = time.time()
         base_indices[i] = np.arange(len(test_tables[i]))
     database.close()
     known_apps_ids = [inverted_tables_app_enum[app] for app in test_data_params.known_apps]
     unknown_apps_ids = [inverted_tables_app_enum[app] for app in test_data_params.unknown_apps]
-    test_known_indices, test_unknown_indices = convert_dict_indices(base_indices=base_indices, base_labels=base_labels, known_apps_ids=known_apps_ids, unknown_apps_ids=unknown_apps_ids)
+    test_known_indices, test_unknown_indices = convert_dict_indices(base_indices=base_indices,
+                                                                    base_labels=base_labels,
+                                                                    base_sni_domains=base_sni_domains,
+                                                                    known_apps_ids=known_apps_ids,
+                                                                    unknown_apps_ids=unknown_apps_ids)
     rng.shuffle(test_known_indices)
     rng.shuffle(test_unknown_indices)
     log.info(f"Processing indices took {time.time() - start_time:.2f} seconds"); start_time = time.time()
@@ -271,28 +290,32 @@ def list_all_tables(database_path: str) -> list[str]:
     with tb.open_file(database_path, mode="r") as database:
         return list(map(lambda x: x._v_pathname, iter(database.get_node(f"/flows"))))
 
-def convert_dict_indices(base_indices: dict[int, np.ndarray], base_labels: dict[int, np.ndarray], known_apps_ids: list[int], unknown_apps_ids: list[int]) -> tuple[np.ndarray, np.ndarray]:
+def convert_dict_indices(base_indices: dict[int, np.ndarray], base_labels: dict[int, np.ndarray], base_sni_domains: dict[int, np.ndarray], known_apps_ids: list[int], unknown_apps_ids: list[int]) -> tuple[np.ndarray, np.ndarray]:
     is_known = {table_id: np.isin(table_arr, known_apps_ids) for table_id, table_arr in base_labels.items()}
     is_unknown = {table_id: np.isin(table_arr, unknown_apps_ids) for table_id, table_arr in base_labels.items()}
     known_indices_dict = {table_id: table_arr[is_known[table_id]] for table_id, table_arr in base_indices.items()}
     unknown_indices_dict = {table_id: table_arr[is_unknown[table_id]] for table_id, table_arr in base_indices.items()}
     known_labels_dict = {table_id: table_arr[is_known[table_id]] for table_id, table_arr in base_labels.items()}
     unknown_labels_dict = {table_id: table_arr[is_unknown[table_id]] for table_id, table_arr in base_labels.items()}
-    known_indices = np.column_stack((
+    known_sni_domains_dict = {table_id: table_arr[is_known[table_id]] for table_id, table_arr in base_sni_domains.items()}
+    unknown_sni_domains_dict = {table_id: table_arr[is_unknown[table_id]] for table_id, table_arr in base_sni_domains.items()}
+    known_indices = np.array(list(zip(
         np.concatenate([[table_id] * table_arr.sum() for table_id, table_arr in is_known.items()]),
         np.concatenate(list(known_indices_dict.values())),
-        np.concatenate(list(known_labels_dict.values()))))
-    unknown_indices = np.column_stack((
+        np.concatenate(list(known_labels_dict.values())),
+        np.concatenate(list(known_sni_domains_dict.values())))), dtype=INDICES_DTYPE)
+    unknown_indices = np.array(list(zip(
         np.concatenate([[table_id] * table_arr.sum() for table_id, table_arr in is_unknown.items()]),
         np.concatenate(list(unknown_indices_dict.values())),
-        np.concatenate(list(unknown_labels_dict.values()))))
+        np.concatenate(list(unknown_labels_dict.values())),
+        np.concatenate(list(unknown_sni_domains_dict.values())))), dtype=INDICES_DTYPE)
     return known_indices, unknown_indices
 
 def load_data_from_tables(tables, indices: np.ndarray, data_dtype: np.dtype) -> np.ndarray:
-    sorted_indices = indices[indices[:, INDICES_TABLE_POS].argsort(kind="stable")]
-    unique_tables, split_bounderies = np.unique(sorted_indices[:, INDICES_TABLE_POS], return_index=True)
+    sorted_indices = indices[indices[INDICES_TABLE_FIELD].argsort(kind="stable")]
+    unique_tables, split_bounderies = np.unique(sorted_indices[INDICES_TABLE_FIELD], return_index=True)
     indices_per_table = np.split(sorted_indices, split_bounderies[1:])
     data = np.zeros(len(indices), dtype=data_dtype)
     for table_id, table_indices in zip(unique_tables, indices_per_table):
-        data[np.where(indices[:, INDICES_TABLE_POS] == table_id)[0]] = tables[table_id].read_coordinates(table_indices[:, INDICES_INDEX_POS])
+        data[np.where(indices[INDICES_TABLE_FIELD] == table_id)[0]] = tables[table_id].read_coordinates(table_indices[INDICES_INDEX_FIELD])
     return data

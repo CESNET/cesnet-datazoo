@@ -1,13 +1,12 @@
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
-from cesnet_datazoo.metrics.provider_metrics import (per_app_provider_metrics,
-                                                       provider_accuracies)
+from cesnet_datazoo.metrics.provider_metrics import per_app_provider_metrics, provider_accuracies
 from cesnet_datazoo.utils.class_info import ClassInfo
 
 
-def better_classification_report(y_true: np.ndarray, y_pred: np.ndarray, cm: np.ndarray, labels: list[int], class_info: ClassInfo, digits: int = 2, zero_division: int = 0) -> tuple[str, dict[str, float]]:
-    p, r, f1, s  = precision_recall_fscore_support(y_true, y_pred,
+def better_classification_report(test_labels: np.ndarray, preds: np.ndarray, cm: np.ndarray, labels: list[int], class_info: ClassInfo, digits: int = 2, zero_division: int = 0) -> tuple[str, dict[str, float]]:
+    p, r, f1, s  = precision_recall_fscore_support(test_labels, preds,
                                                    labels=labels,
                                                    zero_division=zero_division)
     sc_p, sc_r, sc_f1 = per_app_provider_metrics(cm, class_info=class_info)
@@ -46,20 +45,20 @@ def better_classification_report(y_true: np.ndarray, y_pred: np.ndarray, cm: np.
     report += headers_fmt.format("", *headers_avg, width=width)
     report += row_fmt_avg.format("macro avg", *row_avg, width=width, digits=digits)
 
-    acc = accuracy_score(y_true, y_pred)
-    provider_acc, failed_provider_acc = provider_accuracies(y_true, y_pred, class_info=class_info)
+    acc = accuracy_score(test_labels, preds)
+    provider_acc, failed_provider_acc = provider_accuracies(test_labels, preds, class_info=class_info)
 
     row_fmt_acc = "{:>{width}} {:>15} {:>15} {:>7.{digits}f}\n"
     report += row_fmt_acc.format("acc", "", "", acc, width=width, digits=digits)
     report += row_fmt_acc.format("provider acc", "", "", provider_acc, width=width, digits=digits)
     report += row_fmt_acc.format("failed provider acc", "", "", failed_provider_acc, width=width, digits=digits)
     metrics = {
-        "Test/Accuracy": acc,
-        "Test/Provider Accuracy": provider_acc,
-        "Test/Failed Provider Accuracy": failed_provider_acc,
-        "Test/Fscore": avg_f1,
-        "Test/Provider Fscore": avg_sc_f1,
-        "Test/Recall": avg_r,
-        "Test/Provider Recall": avg_sc_r,
+        "test/acc": acc,
+        "test/provider-acc": provider_acc,
+        "test/failed-provider-acc": failed_provider_acc,
+        "test/fscore": avg_f1,
+        "test/provider-fscore": avg_sc_f1,
+        "test/recall": avg_r,
+        "test/provider-recall": avg_sc_r,
     }
     return report, metrics

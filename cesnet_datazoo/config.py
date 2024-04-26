@@ -14,8 +14,9 @@ import yaml
 from pydantic import model_validator
 from pydantic.dataclasses import dataclass
 
-from cesnet_datazoo.constants import (PHIST_BIN_COUNT, PPI_MAX_LEN, SELECTED_TCP_FLAGS,
-                                      TCP_PPI_CHANNELS, UDP_PPI_CHANNELS)
+from cesnet_datazoo.constants import (PHIST_BIN_COUNT, PPI_MAX_LEN, QUIC_SNI_COLUMN,
+                                      SELECTED_TCP_FLAGS, TCP_PPI_CHANNELS, TLS_SNI_COLUMN,
+                                      UDP_PPI_CHANNELS)
 
 if TYPE_CHECKING:
     from cesnet_datazoo.datasets.cesnet_dataset import CesnetDataset
@@ -128,6 +129,7 @@ class DatasetConfig():
         flowstats_features_boolean: Taken from `dataset.metadata.flowstats_features_boolean`.
         flowstats_features_phist: Taken from `dataset.metadata.packet_histograms` if `use_packet_histograms` is true, otherwise an empty list.
         other_fields: Taken from `dataset.metadata.other_fields` if `return_other_fields` is true, otherwise an empty list.
+        sni_column: Database column with SNI domains, can be None for datasets without SNI domains.
 
     # Configuration options
 
@@ -343,6 +345,8 @@ class DatasetConfig():
         # Configure features
         self.flowstats_features = dataset.metadata.flowstats_features
         self.flowstats_features_boolean = dataset.metadata.flowstats_features_boolean
+        sni_column = TLS_SNI_COLUMN if dataset.metadata.protocol == Protocol.TLS else QUIC_SNI_COLUMN
+        self.sni_column = sni_column if sni_column in dataset.metadata.other_fields else None
         self.other_fields = dataset.metadata.other_fields if self.return_other_fields else []
         if self.use_packet_histograms:
             if len(dataset.metadata.packet_histograms) == 0:

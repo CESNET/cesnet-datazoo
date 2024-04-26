@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import os
+import time
 import warnings
 from collections import namedtuple
 from enum import Enum
@@ -9,7 +10,8 @@ import numpy as np
 import pandas as pd
 
 from cesnet_datazoo.config import DatasetConfig
-from cesnet_datazoo.constants import INDICES_INDEX_POS, INDICES_LABEL_POS, INDICES_TABLE_POS
+from cesnet_datazoo.constants import (INDICES_APP_FIELD, INDICES_DTYPE, INDICES_INDEX_FIELD,
+                                      INDICES_TABLE_FIELD)
 from cesnet_datazoo.pytables_data.pytables_dataset import init_test_indices, init_train_indices
 from cesnet_datazoo.utils.fileutils import yaml_dump, yaml_load
 from cesnet_datazoo.utils.random import RandomizedSection, get_fresh_random_generator
@@ -21,8 +23,8 @@ IndicesTuple = namedtuple("IndicesTuple", ["train_indices", "val_known_indices",
 
 
 def sort_indices(indices: np.ndarray) -> np.ndarray:
-    idxs = np.argsort(indices[:, INDICES_INDEX_POS])
-    res = idxs[np.argsort(indices[idxs, INDICES_TABLE_POS], kind="stable")]
+    idxs = np.argsort(indices[INDICES_INDEX_FIELD])
+    res = idxs[np.argsort(indices[idxs][INDICES_TABLE_FIELD], kind="stable")]
     return indices[res]
 
 def subset_and_sort_indices(dataset_config: DatasetConfig, dataset_indices: IndicesTuple) -> IndicesTuple:
@@ -61,7 +63,7 @@ def subset_and_sort_indices(dataset_config: DatasetConfig, dataset_indices: Indi
 
 def date_weight_sample_train_indices(dataset_config: DatasetConfig, train_indices: np.ndarray, num_samples: int) -> np.ndarray:
     rng = get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.DATE_WEIGHT_SAMPLING)
-    indices_per_date = [train_indices[train_indices[:, INDICES_TABLE_POS] == i] for i in np.unique(train_indices[:, INDICES_TABLE_POS])]
+    indices_per_date = [train_indices[train_indices[INDICES_TABLE_FIELD] == i] for i in np.unique(train_indices[INDICES_TABLE_FIELD])]
     weights = np.array(dataset_config.train_dates_weigths)
     weights = weights / weights.sum()
     samples_per_date = np.ceil((weights * (num_samples))).astype(int)
@@ -77,7 +79,7 @@ def date_weight_sample_train_indices(dataset_config: DatasetConfig, train_indice
     return sampled_train_indices
 
 def indices_to_app_counts(indices: np.ndarray, tables_app_enum: dict[int, str]) -> pd.Series:
-    app_counts = pd.Series(indices[:, INDICES_LABEL_POS]).value_counts()
+    app_counts = pd.Series(indices[INDICES_APP_FIELD]).value_counts()
     app_counts.index = app_counts.index.map(lambda x: tables_app_enum[x])
     return app_counts
 
@@ -99,23 +101,26 @@ def init_or_load_train_indices(dataset_config: DatasetConfig, tables_app_enum: d
     init_train_data(train_data_path)
     if not os.path.isfile(os.path.join(train_data_path, TRAIN_DATA_PARAMS_FILE)):
         log.info("Processing train indices")
+        start_time = time.time()
         train_data_params = dataset_config._get_train_data_params()
         train_known_indices, train_unknown_indices, known_apps, unknown_apps = init_train_indices(train_data_params=train_data_params,
                                                                                                   database_path=dataset_config.database_path,
                                                                                                   tables_app_enum=tables_app_enum,
+                                                                                                  sni_column=dataset_config.sni_column,
                                                                                                   servicemap=servicemap,
                                                                                                   rng=get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.INIT_TRAIN_INDICES))
         if not disable_indices_cache:
             yaml_dump({k: str(v) if isinstance(v, Enum) else list(v) if isinstance(v, tuple) else v for k, v in dataclasses.asdict(train_data_params).items()}, os.path.join(train_data_path, TRAIN_DATA_PARAMS_FILE))
             yaml_dump(known_apps, os.path.join(train_data_path, "known_apps.yaml"))
             yaml_dump(unknown_apps, os.path.join(train_data_path, "unknown_apps.yaml"))
-            np.save(os.path.join(train_data_path, "train_known_indices.npy"), train_known_indices)
-            np.save(os.path.join(train_data_path, "train_unknown_indices.npy"), train_unknown_indices)
+            np.savez_compressed(os.path.join(train_data_path, "train_indices.npz"), train_known_indices=train_known_indices, train_unknown_indices=train_unknown_indices)
+        log.info(f"Processing indices took {time.time() - start_time:.2f} seconds")
     else:
         known_apps = yaml_load(os.path.join(train_data_path, "known_apps.yaml"))
         unknown_apps = yaml_load(os.path.join(train_data_path, "unknown_apps.yaml"))
-        train_known_indices = np.load(os.path.join(train_data_path, "train_known_indices.npy"))
-        train_unknown_indices = np.load(os.path.join(train_data_path, "train_unknown_indices.npy"))
+        loaded = np.load(os.path.join(train_data_path, "train_indices.npz"))
+        train_known_indices = loaded["train_known_indices"]
+        train_unknown_indices = loaded["train_unknown_indices"]
     return train_known_indices, train_unknown_indices, known_apps, unknown_apps
 
 def init_or_load_val_indices(dataset_config: DatasetConfig, known_apps: list[str], unknown_apps: list[str], tables_app_enum: dict[int, str], disable_indices_cache: bool) -> tuple[np.ndarray, np.ndarray, str]:
@@ -123,17 +128,20 @@ def init_or_load_val_indices(dataset_config: DatasetConfig, known_apps: list[str
     init_test_data(val_data_path)
     if not os.path.isfile(os.path.join(val_data_path, TEST_DATA_PARAMS_FILE)):
         log.info("Processing validation indices")
+        start_time = time.time()
         val_known_indices, val_unknown_indices = init_test_indices(test_data_params=val_data_params,
                                                                    database_path=dataset_config.database_path,
                                                                    tables_app_enum=tables_app_enum,
+                                                                   sni_column=dataset_config.sni_column,
                                                                    rng=get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.INIT_VAL_INIDICES))
         if not disable_indices_cache:
             yaml_dump(dataclasses.asdict(val_data_params), os.path.join(val_data_path, TEST_DATA_PARAMS_FILE))
-            np.save(os.path.join(val_data_path, "val_known_indices.npy"), val_known_indices)
-            np.save(os.path.join(val_data_path, "val_unknown_indices.npy"), val_unknown_indices)
+            np.savez_compressed(os.path.join(val_data_path, "val_indices.npz"), val_known_indices=val_known_indices, val_unknown_indices=val_unknown_indices)
+        log.info(f"Processing indices took {time.time() - start_time:.2f} seconds")
     else:
-        val_known_indices = np.load(os.path.join(val_data_path, "val_known_indices.npy"))
-        val_unknown_indices = np.load(os.path.join(val_data_path, "val_unknown_indices.npy"))
+        loaded = np.load(os.path.join(val_data_path, "val_indices.npz"))
+        val_known_indices = loaded["val_known_indices"]
+        val_unknown_indices = loaded["val_unknown_indices"]
     return val_known_indices, val_unknown_indices, val_data_path
 
 def init_or_load_test_indices(dataset_config: DatasetConfig, known_apps: list[str], unknown_apps: list[str], tables_app_enum: dict[int, str], disable_indices_cache: bool) -> tuple[np.ndarray, np.ndarray, str]:
@@ -141,17 +149,20 @@ def init_or_load_test_indices(dataset_config: DatasetConfig, known_apps: list[st
     init_test_data(test_data_path)
     if not os.path.isfile(os.path.join(test_data_path, TEST_DATA_PARAMS_FILE)):
         log.info("Processing test indices")
+        start_time = time.time()
         test_known_indices, test_unknown_indices = init_test_indices(test_data_params=test_data_params,
                                                                      database_path=dataset_config.database_path,
                                                                      tables_app_enum=tables_app_enum,
+                                                                     sni_column=dataset_config.sni_column,
                                                                      rng=get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.INIT_TEST_INDICES))
         if not disable_indices_cache:
             yaml_dump(dataclasses.asdict(test_data_params), os.path.join(test_data_path, TEST_DATA_PARAMS_FILE))
-            np.save(os.path.join(test_data_path, "test_known_indices.npy"), test_known_indices)
-            np.save(os.path.join(test_data_path, "test_unknown_indices.npy"), test_unknown_indices)
+            np.savez_compressed(os.path.join(test_data_path, "test_indices.npz"), test_known_indices=test_known_indices, test_unknown_indices=test_unknown_indices)
+        log.info(f"Processing indices took {time.time() - start_time:.2f} seconds")
     else:
-        test_known_indices = np.load(os.path.join(test_data_path, "test_known_indices.npy"))
-        test_unknown_indices = np.load(os.path.join(test_data_path, "test_unknown_indices.npy"))
+        loaded = np.load(os.path.join(test_data_path, "test_indices.npz"))
+        test_known_indices = loaded["test_known_indices"]
+        test_unknown_indices = loaded["test_unknown_indices"]
     return test_known_indices, test_unknown_indices, test_data_path
 
 def init_train_data(train_data_path: str):
@@ -164,4 +175,4 @@ def init_test_data(test_data_path: str):
     os.makedirs(os.path.join(test_data_path, "preload"), exist_ok=True)
 
 def no_indices() -> np.ndarray:
-    return np.zeros((0,3), dtype=np.int64)
+    return np.empty(shape=(0,), dtype=INDICES_DTYPE)

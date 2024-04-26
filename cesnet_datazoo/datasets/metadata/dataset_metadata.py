@@ -39,5 +39,5 @@ class DatasetMetadata():
 metadata_df = pd.read_csv(os.path.join(os.path.dirname(__file__), "metadata.csv"), index_col="Name", keep_default_na=False)
 def load_metadata(dataset_name: str) -> DatasetMetadata:
     d = metadata_df.loc[dataset_name].to_dict()
-    d = {k.replace(" ", "_").lower(): v for k, v in d.items()}
+    d = {k.replace(" ", "_").lower(): v for k, v in d.items()} # type: ignore
     return DatasetMetadata(**d)

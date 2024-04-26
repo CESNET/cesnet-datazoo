@@ -16,7 +16,7 @@ from torch.utils.data import BatchSampler, DataLoader, RandomSampler, Sampler, S
 from typing_extensions import assert_never
 
 from cesnet_datazoo.config import AppSelection, DataLoaderOrder, DatasetConfig, ValidationApproach
-from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, DATASET_SIZES, INDICES_LABEL_POS,
+from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, DATASET_SIZES, INDICES_APP_FIELD,
                                       SERVICEMAP_FILE, UNKNOWN_STR_LABEL)
 from cesnet_datazoo.datasets.loaders import collate_fn_simple, create_df_from_dataloader
 from cesnet_datazoo.datasets.metadata.dataset_metadata import DatasetMetadata, load_metadata
@@ -555,7 +555,7 @@ class CesnetDataset():
                 train_val_rng = get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.TRAIN_VAL_SPLIT)
                 val_data_path = dataset_config._get_train_data_path()
                 val_unknown_indices = train_unknown_indices
-                train_labels = train_indices[:, INDICES_LABEL_POS]
+                train_labels = train_indices[INDICES_APP_FIELD]
                 if dataset_config.train_dates_weigths is not None:
                     assert dataset_config.val_known_size != "all"
                     # When weight sampling is used, val_known_size is kept but the resulting train size can be smaller due to no enough samples in some train dates
@@ -626,6 +626,7 @@ class CesnetDataset():
                 flowstats_features_boolean=dataset_config.flowstats_features_boolean,
                 flowstats_features_phist=dataset_config.flowstats_features_phist,
                 other_fields=self.dataset_config.other_fields,
+                sni_column=self.dataset_config.sni_column,
                 ppi_channels=dataset_config.get_ppi_channels(),
                 ppi_transform=dataset_config.ppi_transform,
                 flowstats_transform=dataset_config.flowstats_transform,
@@ -644,6 +645,7 @@ class CesnetDataset():
                 flowstats_features_boolean=dataset_config.flowstats_features_boolean,
                 flowstats_features_phist=dataset_config.flowstats_features_phist,
                 other_fields=self.dataset_config.other_fields,
+                sni_column=self.dataset_config.sni_column,
                 ppi_channels=dataset_config.get_ppi_channels(),
                 ppi_transform=dataset_config.ppi_transform,
                 flowstats_transform=dataset_config.flowstats_transform,
@@ -664,6 +666,7 @@ class CesnetDataset():
                 flowstats_features_boolean=dataset_config.flowstats_features_boolean,
                 flowstats_features_phist=dataset_config.flowstats_features_phist,
                 other_fields=self.dataset_config.other_fields,
+                sni_column=self.dataset_config.sni_column,
                 ppi_channels=dataset_config.get_ppi_channels(),
                 ppi_transform=dataset_config.ppi_transform,
                 flowstats_transform=dataset_config.flowstats_transform,

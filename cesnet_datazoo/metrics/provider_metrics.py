@@ -3,13 +3,13 @@ import numpy as np
 from cesnet_datazoo.utils.class_info import ClassInfo
 
 
-def provider_accuracies(y_true: np.ndarray, y_pred: np.ndarray, class_info: ClassInfo) -> tuple[float, float]:
+def provider_accuracies(true_labels: np.ndarray, preds: np.ndarray, class_info: ClassInfo) -> tuple[float, float]:
     provider_mapping_arr = np.array(list(class_info.provider_mapping.values()))
-    y_true_sc = provider_mapping_arr[y_true]
-    y_pred_sc = provider_mapping_arr[y_pred]
-    mistakes = y_true != y_pred
-    provider_acc = (y_true_sc == y_pred_sc).sum() / len(y_true_sc)
-    failed_provider_acc = (y_true_sc[mistakes] == y_pred_sc[mistakes]).sum() / mistakes.sum()
+    true_labels_provider = provider_mapping_arr[true_labels]
+    preds_provider = provider_mapping_arr[preds]
+    mistakes = true_labels != preds
+    provider_acc = (true_labels_provider == preds_provider).sum() / len(true_labels_provider)
+    failed_provider_acc = (true_labels_provider[mistakes] == preds_provider[mistakes]).sum() / mistakes.sum()
     return provider_acc, failed_provider_acc
 
 def per_app_provider_metrics(cm, class_info: ClassInfo):
