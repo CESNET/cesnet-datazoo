@@ -46,18 +46,20 @@ def fit_scalers(dataset_config: DatasetConfig, train_indices: np.ndarray) -> Non
         data_ppi = data_ppi.transpose(0, 2, 1).reshape(-1, ppi_channels)
         padding_mask = data_ppi[:, DIR_POS] == 0 # Mask of padded packets
         # Fit IPT scaler
-        train_ipt = data_ppi[:, IPT_POS].clip(max=clip_and_scale_ppi_transform.ipt_max, min=clip_and_scale_ppi_transform.ipt_min)
-        train_ipt[padding_mask] = np.nan # NaNs are ignored in sklearn scalers
-        if isinstance(clip_and_scale_ppi_transform.ipt_scaler, MinMaxScaler):
-            # Let zero be the minimum for minmax scaling
-            train_ipt = np.concatenate((train_ipt, [0]))
-        clip_and_scale_ppi_transform.ipt_scaler.fit(train_ipt.reshape(-1, 1))
+        if clip_and_scale_ppi_transform.ipt_scaler:
+            train_ipt = data_ppi[:, IPT_POS].clip(max=clip_and_scale_ppi_transform.ipt_max, min=clip_and_scale_ppi_transform.ipt_min)
+            train_ipt[padding_mask] = np.nan # NaNs are ignored in sklearn scalers
+            if isinstance(clip_and_scale_ppi_transform.ipt_scaler, MinMaxScaler):
+                # Let zero be the minimum for minmax scaling
+                train_ipt = np.concatenate((train_ipt, [0]))
+            clip_and_scale_ppi_transform.ipt_scaler.fit(train_ipt.reshape(-1, 1))
         # Fit packet sizes scaler
-        train_psizes = data_ppi[:, SIZE_POS].clip(max=clip_and_scale_ppi_transform.psizes_max, min=clip_and_scale_ppi_transform.pszies_min)
-        train_psizes[padding_mask] = np.nan
-        if isinstance(clip_and_scale_ppi_transform.psizes_scaler, MinMaxScaler):
-            train_psizes = np.concatenate((train_psizes, [0]))
-        clip_and_scale_ppi_transform.psizes_scaler.fit(train_psizes.reshape(-1, 1))
+        if clip_and_scale_ppi_transform.psizes_scaler:
+            train_psizes = data_ppi[:, SIZE_POS].clip(max=clip_and_scale_ppi_transform.psizes_max, min=clip_and_scale_ppi_transform.pszies_min)
+            train_psizes[padding_mask] = np.nan
+            if isinstance(clip_and_scale_ppi_transform.psizes_scaler, MinMaxScaler):
+                train_psizes = np.concatenate((train_psizes, [0]))
+            clip_and_scale_ppi_transform.psizes_scaler.fit(train_psizes.reshape(-1, 1))
         clip_and_scale_ppi_transform.needs_fitting = False
         json.dump(clip_and_scale_ppi_transform.to_dict(), open(os.path.join(train_data_path, "transforms", "ppi-transform.json"), "w"), indent=4)
 
