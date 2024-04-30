@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import tables as tb
 import torch
+from numpy.lib.recfunctions import repack_fields
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import BatchSampler, DataLoader, RandomSampler, Sampler, SequentialSampler
@@ -17,7 +18,8 @@ from typing_extensions import assert_never
 
 from cesnet_datazoo.config import AppSelection, DataLoaderOrder, DatasetConfig, ValidationApproach
 from cesnet_datazoo.constants import (APP_COLUMN, CATEGORY_COLUMN, DATASET_SIZES, INDICES_APP_FIELD,
-                                      SERVICEMAP_FILE, UNKNOWN_STR_LABEL)
+                                      INDICES_INDEX_FIELD, INDICES_TABLE_FIELD, SERVICEMAP_FILE,
+                                      UNKNOWN_STR_LABEL)
 from cesnet_datazoo.datasets.loaders import collate_fn_simple, create_df_from_dataloader
 from cesnet_datazoo.datasets.metadata.dataset_metadata import DatasetMetadata, load_metadata
 from cesnet_datazoo.datasets.statistics import compute_dataset_statistics
@@ -619,7 +621,7 @@ class CesnetDataset():
             train_dataset = PyTablesDataset(
                 database_path=dataset_config.database_path,
                 tables_paths=dataset_config._get_train_tables_paths(),
-                indices=dataset_indices.train_indices,
+                indices=repack_fields(dataset_indices.train_indices[[INDICES_TABLE_FIELD, INDICES_INDEX_FIELD]]), # type: ignore
                 tables_app_enum=self._tables_app_enum,
                 tables_cat_enum=self._tables_cat_enum,
                 flowstats_features=dataset_config.flowstats_features,
@@ -638,7 +640,7 @@ class CesnetDataset():
             val_dataset = PyTablesDataset(
                 database_path=dataset_config.database_path,
                 tables_paths=dataset_config._get_val_tables_paths(),
-                indices=dataset_indices.val_known_indices,
+                indices=repack_fields(dataset_indices.val_known_indices[[INDICES_TABLE_FIELD, INDICES_INDEX_FIELD]]), # type: ignore
                 tables_app_enum=self._tables_app_enum,
                 tables_cat_enum=self._tables_cat_enum,
                 flowstats_features=dataset_config.flowstats_features,
@@ -659,7 +661,7 @@ class CesnetDataset():
             test_dataset = PyTablesDataset(
                 database_path=dataset_config.database_path,
                 tables_paths=dataset_config._get_test_tables_paths(),
-                indices=test_combined_indices,
+                indices=repack_fields(test_combined_indices[[INDICES_TABLE_FIELD, INDICES_INDEX_FIELD]]), # type: ignore
                 tables_app_enum=self._tables_app_enum,
                 tables_cat_enum=self._tables_cat_enum,
                 flowstats_features=dataset_config.flowstats_features,

@@ -158,11 +158,9 @@ class PyTablesDataset(Dataset):
         for i in range(len(tables)):
             base_labels[i] = tables[i].read(field=APP_COLUMN)
             base_indices[i] = np.nonzero(np.isin(base_labels[i], disabled_apps_ids, invert=True))[0]
-        indices = np.column_stack((
+        indices = np.array(list(zip(
             np.concatenate([[table_id] * len(base_indices[table_id]) for table_id in tables]),
-            np.concatenate(list(base_indices.values())),
-            np.concatenate(list(base_labels.values()))
-        )).astype(np.int32)
+            np.concatenate(list(base_indices.values())))), dtype=[field for field in INDICES_DTYPE if field[0] in [INDICES_INDEX_FIELD, INDICES_TABLE_FIELD]])
         self.indices = indices
         database.close()
 
