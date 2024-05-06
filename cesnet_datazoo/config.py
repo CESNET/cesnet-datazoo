@@ -8,6 +8,7 @@ import warnings
 from dataclasses import InitVar, field
 from datetime import datetime
 from enum import Enum
+from importlib.metadata import version
 from typing import TYPE_CHECKING, Callable, Literal, Optional
 
 import yaml
@@ -83,6 +84,7 @@ class DataLoaderOrder(Enum):
 
 @dataclass(frozen=True)
 class TrainDataParams():
+    datazoo_version: str
     database_filename: str
     train_period_name: str
     train_tables_paths: list[str]
@@ -97,6 +99,7 @@ class TrainDataParams():
 
 @dataclass(frozen=True)
 class TestDataParams():
+    datazoo_version: str
     database_filename: str
     test_period_name: str
     test_tables_paths: list[str]
@@ -497,14 +500,12 @@ class DatasetConfig():
         return params_hash
 
     def _get_train_data_path(self) -> str:
-        if self.need_train_set:
-            params_hash = self._get_train_data_hash()
-            return os.path.join(self.data_root, "train-data", f"{params_hash}_{self.random_state}", f"fold_{self.fold_id}")
-        else:
-            return os.path.join(self.data_root, "train-data", "default")
+        params_hash = self._get_train_data_hash()
+        return os.path.join(self.data_root, "train-data", f"{params_hash}_{self.random_state}", f"fold_{self.fold_id}")
 
     def _get_train_data_params(self) -> TrainDataParams:
         return TrainDataParams(
+            datazoo_version=version("cesnet_datazoo"),
             database_filename=self.database_filename,
             train_period_name=self.train_period_name,
             train_tables_paths=self._get_train_tables_paths(),
@@ -520,6 +521,7 @@ class DatasetConfig():
     def _get_val_data_params_and_path(self, known_apps: list[str], unknown_apps: list[str]) -> tuple[TestDataParams, str]:
         assert self.val_approach == ValidationApproach.VALIDATION_DATES
         val_data_params = TestDataParams(
+            datazoo_version=version("cesnet_datazoo"),
             database_filename=self.database_filename,
             test_period_name=self.val_period_name,
             test_tables_paths=self._get_val_tables_paths(),
@@ -532,6 +534,7 @@ class DatasetConfig():
 
     def _get_test_data_params_and_path(self, known_apps: list[str], unknown_apps: list[str]) -> tuple[TestDataParams, str]:
         test_data_params = TestDataParams(
+            datazoo_version=version("cesnet_datazoo"),
             database_filename=self.database_filename,
             test_period_name=self.test_period_name,
             test_tables_paths=self._get_test_tables_paths(),
