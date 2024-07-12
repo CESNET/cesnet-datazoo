@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cesnet-datazoo"
-version = "0.1.6"
+version = "0.1.7"
 authors = [
   {name = "Jan Luxemburk", email = "luxemburk@cesnet.cz"},
   {name = "Karel Hynek", email = "hynekkar@cesnet.cz"},
@@ -31,14 +31,14 @@ requires-python = ">=3.10"
 dependencies = [
   "cesnet_models",
   "matplotlib",
-  "numpy",
+  "numpy<2.0",
   "pandas",
   "pydantic>=2.0",
   "PyYAML",
   "requests",
   "scikit-learn",
   "seaborn",
-  "tables>=3.8.0",
+  "tables>=3.8.0,<=3.9.2",
   "torch>=1.10",
   "tqdm",
 ]
