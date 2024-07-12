@@ -1216,9 +1216,7 @@ This will initialize the dataset — select classes, split data into train/valid
 
             <details class="quote">
               <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 41</span>
-<span class="normal"> 42</span>
-<span class="normal"> 43</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 43</span>
 <span class="normal"> 44</span>
 <span class="normal"> 45</span>
 <span class="normal"> 46</span>
@@ -1857,7 +1855,12 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="normal">679</span>
 <span class="normal">680</span>
 <span class="normal">681</span>
-<span class="normal">682</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CesnetDataset</span><span class="p">():</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CesnetDataset</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The main class for accessing CESNET datasets. It handles downloading, train/validation/test splitting, and class selection. Access to data is provided through:</span>
 
@@ -2374,7 +2377,7 @@ This will initialize the dataset — select classes, split data into train/valid
                 <span class="n">train_val_rng</span> <span class="o">=</span> <span class="n">get_fresh_random_generator</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">=</span><span class="n">dataset_config</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="n">RandomizedSection</span><span class="o">.</span><span class="n">TRAIN_VAL_SPLIT</span><span class="p">)</span>
                 <span class="n">val_data_path</span> <span class="o">=</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_train_data_path</span><span class="p">()</span>
                 <span class="n">val_unknown_indices</span> <span class="o">=</span> <span class="n">train_unknown_indices</span>
-                <span class="n">train_labels</span> <span class="o">=</span> <span class="n">train_indices</span><span class="p">[:,</span> <span class="n">INDICES_LABEL_POS</span><span class="p">]</span>
+                <span class="n">train_labels</span> <span class="o">=</span> <span class="n">train_indices</span><span class="p">[</span><span class="n">INDICES_APP_FIELD</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">train_dates_weigths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">assert</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span>
                     <span class="c1"># When weight sampling is used, val_known_size is kept but the resulting train size can be smaller due to no enough samples in some train dates</span>
@@ -2438,13 +2441,14 @@ This will initialize the dataset — select classes, split data into train/valid
             <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">PyTablesDataset</span><span class="p">(</span>
                 <span class="n">database_path</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span>
                 <span class="n">tables_paths</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_train_tables_paths</span><span class="p">(),</span>
-                <span class="n">indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="o">.</span><span class="n">train_indices</span><span class="p">,</span>
+                <span class="n">indices</span><span class="o">=</span><span class="n">repack_fields</span><span class="p">(</span><span class="n">dataset_indices</span><span class="o">.</span><span class="n">train_indices</span><span class="p">[[</span><span class="n">INDICES_TABLE_FIELD</span><span class="p">,</span> <span class="n">INDICES_INDEX_FIELD</span><span class="p">]]),</span> <span class="c1"># type: ignore</span>
                 <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
                 <span class="n">tables_cat_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_cat_enum</span><span class="p">,</span>
                 <span class="n">flowstats_features</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">,</span>
                 <span class="n">flowstats_features_boolean</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">,</span>
                 <span class="n">flowstats_features_phist</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">,</span>
                 <span class="n">other_fields</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">other_fields</span><span class="p">,</span>
+                <span class="n">sni_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">sni_column</span><span class="p">,</span>
                 <span class="n">ppi_channels</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">get_ppi_channels</span><span class="p">(),</span>
                 <span class="n">ppi_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="p">,</span>
                 <span class="n">flowstats_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="p">,</span>
@@ -2456,13 +2460,14 @@ This will initialize the dataset — select classes, split data into train/valid
             <span class="n">val_dataset</span> <span class="o">=</span> <span class="n">PyTablesDataset</span><span class="p">(</span>
                 <span class="n">database_path</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span>
                 <span class="n">tables_paths</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_val_tables_paths</span><span class="p">(),</span>
-                <span class="n">indices</span><span class="o">=</span><span class="n">dataset_indices</span><span class="o">.</span><span class="n">val_known_indices</span><span class="p">,</span>
+                <span class="n">indices</span><span class="o">=</span><span class="n">repack_fields</span><span class="p">(</span><span class="n">dataset_indices</span><span class="o">.</span><span class="n">val_known_indices</span><span class="p">[[</span><span class="n">INDICES_TABLE_FIELD</span><span class="p">,</span> <span class="n">INDICES_INDEX_FIELD</span><span class="p">]]),</span> <span class="c1"># type: ignore</span>
                 <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
                 <span class="n">tables_cat_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_cat_enum</span><span class="p">,</span>
                 <span class="n">flowstats_features</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">,</span>
                 <span class="n">flowstats_features_boolean</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">,</span>
                 <span class="n">flowstats_features_phist</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">,</span>
                 <span class="n">other_fields</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">other_fields</span><span class="p">,</span>
+                <span class="n">sni_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">sni_column</span><span class="p">,</span>
                 <span class="n">ppi_channels</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">get_ppi_channels</span><span class="p">(),</span>
                 <span class="n">ppi_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="p">,</span>
                 <span class="n">flowstats_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="p">,</span>
@@ -2476,13 +2481,14 @@ This will initialize the dataset — select classes, split data into train/valid
             <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">PyTablesDataset</span><span class="p">(</span>
                 <span class="n">database_path</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">database_path</span><span class="p">,</span>
                 <span class="n">tables_paths</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_test_tables_paths</span><span class="p">(),</span>
-                <span class="n">indices</span><span class="o">=</span><span class="n">test_combined_indices</span><span class="p">,</span>
+                <span class="n">indices</span><span class="o">=</span><span class="n">repack_fields</span><span class="p">(</span><span class="n">test_combined_indices</span><span class="p">[[</span><span class="n">INDICES_TABLE_FIELD</span><span class="p">,</span> <span class="n">INDICES_INDEX_FIELD</span><span class="p">]]),</span> <span class="c1"># type: ignore</span>
                 <span class="n">tables_app_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_app_enum</span><span class="p">,</span>
                 <span class="n">tables_cat_enum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables_cat_enum</span><span class="p">,</span>
                 <span class="n">flowstats_features</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features</span><span class="p">,</span>
                 <span class="n">flowstats_features_boolean</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_boolean</span><span class="p">,</span>
                 <span class="n">flowstats_features_phist</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_features_phist</span><span class="p">,</span>
                 <span class="n">other_fields</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">other_fields</span><span class="p">,</span>
+                <span class="n">sni_column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">sni_column</span><span class="p">,</span>
                 <span class="n">ppi_channels</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">get_ppi_channels</span><span class="p">(),</span>
                 <span class="n">ppi_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="p">,</span>
                 <span class="n">flowstats_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="p">,</span>
@@ -2581,9 +2587,7 @@ This will initialize the dataset — select classes, split data into train/valid
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">179</span>
 <span class="normal">180</span>
 <span class="normal">181</span>
 <span class="normal">182</span>
@@ -2591,7 +2595,9 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span>
-<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_dataset_config_and_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_config</span><span class="p">:</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">disable_indices_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_dataset_config_and_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_config</span><span class="p">:</span> <span class="n">DatasetConfig</span><span class="p">,</span> <span class="n">disable_indices_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize train, validation, and test sets. Data cannot be accessed before calling this method.</span>
 
@@ -2680,9 +2686,7 @@ The dataloader is configured with the following config attributes:</p>
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
@@ -2729,7 +2733,9 @@ The dataloader is configured with the following config attributes:</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Provides a PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for training. The dataloader is created on the first call and then cached.</span>
 <span class="sd">    When the dataloader is iterated in random order, the last incomplete batch is dropped.</span>
@@ -2849,9 +2855,7 @@ The dataloader is configured with the following config attributes:</p>
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">242</span>
 <span class="normal">243</span>
 <span class="normal">244</span>
 <span class="normal">245</span>
@@ -2882,7 +2886,9 @@ The dataloader is configured with the following config attributes:</p>
 <span class="normal">270</span>
 <span class="normal">271</span>
 <span class="normal">272</span>
-<span class="normal">273</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Provides a PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for validation.</span>
 <span class="sd">    The dataloader is created on the first call and then cached.</span>
@@ -2988,9 +2994,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">277</span>
 <span class="normal">278</span>
 <span class="normal">279</span>
 <span class="normal">280</span>
@@ -3025,7 +3029,9 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="normal">309</span>
 <span class="normal">310</span>
 <span class="normal">311</span>
-<span class="normal">312</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Provides a PyTorch [`DataLoader`](https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader) for testing.</span>
 <span class="sd">    The dataloader is created on the first call and then cached.</span>
@@ -3091,14 +3097,14 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">316</span>
 <span class="normal">317</span>
 <span class="normal">318</span>
 <span class="normal">319</span>
 <span class="normal">320</span>
-<span class="normal">321</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_dataloaders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">]:</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_dataloaders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataLoader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets train, validation, and test dataloaders in one call.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting dataloaders&quot;</span><span class="p">)</span>
@@ -3190,9 +3196,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">325</span>
 <span class="normal">326</span>
 <span class="normal">327</span>
 <span class="normal">328</span>
@@ -3221,7 +3225,9 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="normal">351</span>
 <span class="normal">352</span>
 <span class="normal">353</span>
-<span class="normal">354</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_train_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_train_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a train Pandas [`DataFrame`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html). The dataframe is in sequential (datetime) order. Consider shuffling the dataframe if needed.</span>
 
@@ -3337,9 +3343,7 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">358</span>
 <span class="normal">359</span>
 <span class="normal">360</span>
 <span class="normal">361</span>
@@ -3359,7 +3363,9 @@ the test dataloader returns <code>test_known_size</code> samples of known classe
 <span class="normal">375</span>
 <span class="normal">376</span>
 <span class="normal">377</span>
-<span class="normal">378</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_val_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_val_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates validation Pandas [`DataFrame`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html). The dataframe is in sequential (datetime) order.</span>
 
@@ -3468,9 +3474,7 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">382</span>
 <span class="normal">383</span>
 <span class="normal">384</span>
 <span class="normal">385</span>
@@ -3495,7 +3499,9 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 <span class="normal">404</span>
 <span class="normal">405</span>
 <span class="normal">406</span>
-<span class="normal">407</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_test_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flatten_ppi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates test Pandas [`DataFrame`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html). The dataframe is in sequential (datetime) order.</span>
 
@@ -3549,11 +3555,11 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">411</span>
 <span class="normal">412</span>
-<span class="normal">413</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_num_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_num_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the number of classes in the current configuration of the dataset.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting the number of classes&quot;</span><span class="p">)</span>
@@ -3584,11 +3590,11 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">417</span>
 <span class="normal">418</span>
-<span class="normal">419</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_known_apps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_known_apps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the list of known applications in the current configuration of the dataset.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting known apps&quot;</span><span class="p">)</span>
@@ -3619,11 +3625,11 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">423</span>
 <span class="normal">424</span>
-<span class="normal">425</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_unknown_apps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_unknown_apps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the list of unknown applications in the current configuration of the dataset.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset is not initialized, use set_dataset_config_and_initialize() before getting unknown apps&quot;</span><span class="p">)</span>
@@ -3731,9 +3737,7 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 
           <details class="quote">
             <summary>Source code in <code>cesnet_datazoo\datasets\cesnet_dataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">427</span>
-<span class="normal">428</span>
-<span class="normal">429</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">429</span>
 <span class="normal">430</span>
 <span class="normal">431</span>
 <span class="normal">432</span>
@@ -3759,7 +3763,9 @@ the returned test dataframe is composed of <code>test_known_size</code> samples 
 <span class="normal">452</span>
 <span class="normal">453</span>
 <span class="normal">454</span>
-<span class="normal">455</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">compute_dataset_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10_000_000</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16384</span><span class="p">,</span> <span class="n">disabled_apps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">compute_dataset_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10_000_000</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16384</span><span class="p">,</span> <span class="n">disabled_apps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes dataset statistics and saves them to the `statistics_path` folder.</span>
 
