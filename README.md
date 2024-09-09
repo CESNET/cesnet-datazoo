@@ -23,7 +23,11 @@ The goal of this project is to provide tools for working with large network traf
 :notebook: :notebook: Example Jupyter notebooks are included in a separate [CESNET Traffic Classification Examples](https://github.com/CESNET/cesnet-tcexamples) repo. :notebook: :notebook:
 
 ## Datasets
-The following datasets are available in the `cesnet-datazoo` package:
+The `cesnet-datazoo` package currently provides three datasets with details in the following table (you might need to scroll the table horizontally to see all datasets).
+
+1. CESNET-TLS22
+2. CESNET-QUIC22
+3. CESNET-TLS-Year22
 
 | Name                               | CESNET-TLS22                                                                                                                                                                                   | CESNET-QUIC22                                                                                                                                             | CESNET-TLS-Year22                                                                                                                                                                              |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
