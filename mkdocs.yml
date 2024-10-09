@@ -32,7 +32,7 @@ extra:
 nav:
   - Introduction: index.md
   - Installation: installation.md
-  - Oveview of datasets: datasets_overview.md
+  - Overview of datasets: datasets_overview.md
   - Data features: features.md
   - Transforms: transforms.md
   - Tutorials:
