@@ -55,7 +55,7 @@ def fit_scalers(dataset_config: DatasetConfig, train_indices: np.ndarray) -> Non
             clip_and_scale_ppi_transform.ipt_scaler.fit(train_ipt.reshape(-1, 1))
         # Fit packet sizes scaler
         if clip_and_scale_ppi_transform.psizes_scaler:
-            train_psizes = data_ppi[:, SIZE_POS].clip(max=clip_and_scale_ppi_transform.psizes_max, min=clip_and_scale_ppi_transform.pszies_min)
+            train_psizes = data_ppi[:, SIZE_POS].clip(max=clip_and_scale_ppi_transform.psizes_max, min=clip_and_scale_ppi_transform.psizes_min)
             train_psizes[padding_mask] = np.nan
             if isinstance(clip_and_scale_ppi_transform.psizes_scaler, MinMaxScaler):
                 train_psizes = np.concatenate((train_psizes, [0]))
