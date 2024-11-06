@@ -176,7 +176,7 @@ class CesnetDataset():
             raise ValueError(f"Found {len(available_applications)} applications in the servicemap (omitting background traffic classes), but expected {self.metadata.application_count}. Please report this issue.")
         self.available_classes = available_applications + self.metadata.background_traffic_classes
 
-    def set_dataset_config_and_initialize(self, dataset_config: DatasetConfig, disable_indices_cache: bool = False) -> None:
+    def set_dataset_config_and_initialize(self, dataset_config: DatasetConfig, disable_indices_cache: bool = False, silent_warning: bool = False) -> None:
         """
         Initialize train, validation, and test sets. Data cannot be accessed before calling this method.
 
@@ -184,6 +184,11 @@ class CesnetDataset():
             dataset_config: Desired configuration of the dataset.
             disable_indices_cache: Whether to disable caching of the dataset indices. This is useful when the dataset is used in many different configurations and you want to save disk space.
         """
+        if self.name.startswith("CESNET-TLS-Year22") and not silent_warning:
+            warnings.warn("The CESNET-TLS-Year22 dataset contains traffic from the entire year of 2022. During the dataset collection, in week 10 (7.3.2022 - 13.3.2022), " + \
+                          "the used flow exporter was updated with new features resulting in a change in the distribution of packet sequence data. " + \
+                          "This can lead to a decrease in model performance when a model is trained on traffic before week 10 and tested on traffic after week 10. " + \
+                          "More details can be found in the paper at https://doi.org/10.1038/s41597-024-03927-4. To disable this warning set silent_warning=True.")
         self.dataset_config = dataset_config
         self._clear()
         self._initialize_train_val_test(disable_indices_cache=disable_indices_cache)
