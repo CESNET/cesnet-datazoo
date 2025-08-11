@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cesnet-datazoo"
-version = "0.1.10"
+version = "0.1.11"
 authors = [
   {name = "Jan Luxemburk", email = "luxemburk@cesnet.cz"},
   {name = "Karel Hynek", email = "hynekkar@cesnet.cz"},
@@ -15,7 +15,7 @@ maintainers = [
 ]
 description = "A toolkit for large network traffic datasets"
 readme = "README.md"
-license = {text = "BSD-3-Clause"}
+license = "BSD-3-Clause"
 keywords = [
   "traffic classification",
   "datasets",
@@ -24,7 +24,6 @@ keywords = [
 classifiers = [
   "Programming Language :: Python :: 3.10",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
 ]
 requires-python = ">=3.10"
