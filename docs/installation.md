@@ -15,16 +15,16 @@ The `cesnet-datazoo` package requires Python >=3.10.
 
 ### Dependencies
 
-| Name         | Version         |
-|--------------|-----------------|
-| matplotlib   |                 |
-| numpy        | <2.0            |
-| pandas       |                 |
-| pydantic     | >=2.0           |
-| PyYAML       |                 |
-| requests     |                 |
-| scikit-learn |                 |
-| seaborn      |                 |
-| tables       | >=3.8.0,<=3.9.2 |
-| torch        | >=1.10          |
-| tqdm         |                 |
+| Name         | Version                            |
+|--------------|------------------------------------|
+| matplotlib   |                                    |
+| numpy        |                                    |
+| pandas       |                                    |
+| pydantic     | >=2.0, !=2.9.*, !=2.10.*, <2.12.0  |
+| PyYAML       |                                    |
+| requests     |                                    |
+| scikit-learn |                                    |
+| seaborn      |                                    |
+| tables       | >=3.10.0                           |
+| torch        | >=1.10                             |
+| tqdm         |                                    |
