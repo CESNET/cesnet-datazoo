@@ -20,7 +20,7 @@ The `cesnet-datazoo` package requires Python >=3.10.
 | matplotlib   |                                    |
 | numpy        |                                    |
 | pandas       |                                    |
-| pydantic     | >=2.0, !=2.9.*, !=2.10.*, <2.12.0  |
+| pydantic     | >=2.0, !=2.9.*, <2.12.0            |
 | PyYAML       |                                    |
 | requests     |                                    |
 | scikit-learn |                                    |
