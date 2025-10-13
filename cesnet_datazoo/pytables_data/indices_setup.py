@@ -64,11 +64,11 @@ def subset_and_sort_indices(dataset_config: DatasetConfig, dataset_indices: Indi
 def date_weight_sample_train_indices(dataset_config: DatasetConfig, train_indices: np.ndarray, num_samples: int) -> np.ndarray:
     rng = get_fresh_random_generator(dataset_config=dataset_config, section=RandomizedSection.DATE_WEIGHT_SAMPLING)
     indices_per_date = [train_indices[train_indices[INDICES_TABLE_FIELD] == i] for i in np.unique(train_indices[INDICES_TABLE_FIELD])]
-    weights = np.array(dataset_config.train_dates_weigths)
+    weights = np.array(dataset_config.train_dates_weights)
     weights = weights / weights.sum()
     samples_per_date = np.ceil((weights * (num_samples))).astype(int)
     samples_per_date_clipped = np.clip(samples_per_date, a_max=list(map(len, indices_per_date)), a_min=0)
-    df = pd.DataFrame(data={"Dates": dataset_config.train_dates, "Weights": dataset_config.train_dates_weigths, "Requested Samples": samples_per_date, "Available Samples": samples_per_date_clipped})
+    df = pd.DataFrame(data={"Dates": dataset_config.train_dates, "Weights": dataset_config.train_dates_weights, "Requested Samples": samples_per_date, "Available Samples": samples_per_date_clipped})
     log.info(f"Weight sampling per date with requsted total number of samples {num_samples} (train_size + val_known_size when using the split-from-train validation approach; train_size otherwise)")
     for l in df.to_string(index=False).splitlines():
         log.info(l)

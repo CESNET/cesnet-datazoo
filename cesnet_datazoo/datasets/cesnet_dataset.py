@@ -532,7 +532,7 @@ class CesnetDataset():
                                                                                                         servicemap=servicemap,
                                                                                                         disable_indices_cache=disable_indices_cache,)
             # Date weight sampling of train indices
-            if dataset_config.train_dates_weigths is not None:
+            if dataset_config.train_dates_weights is not None:
                 assert dataset_config.train_size != "all"
                 if dataset_config.val_approach == ValidationApproach.SPLIT_FROM_TRAIN:
                     # requested number of samples is train_size + val_known_size when using the split-from-train validation approach
@@ -563,7 +563,7 @@ class CesnetDataset():
                 val_data_path = dataset_config._get_train_data_path()
                 val_unknown_indices = train_unknown_indices
                 train_labels = train_indices[INDICES_APP_FIELD]
-                if dataset_config.train_dates_weigths is not None:
+                if dataset_config.train_dates_weights is not None:
                     assert dataset_config.val_known_size != "all"
                     # When weight sampling is used, val_known_size is kept but the resulting train size can be smaller due to no enough samples in some train dates
                     if dataset_config.val_known_size > len(train_indices):

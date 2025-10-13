@@ -142,7 +142,7 @@ class DatasetConfig():
         need_test_set: Use to disable the test set. `Default: True`
         train_period_name: Name of the train period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
         train_dates: Dates used for creating a train set.
-        train_dates_weigths: To use a non-uniform distribution of samples across train dates.
+        train_dates_weights: To use a non-uniform distribution of samples across train dates.
         val_approach: How a validation set should be created. Either split train data into train and validation or have a separate validation period. `Default: SPLIT_FROM_TRAIN`
         train_val_split_fraction: The fraction of validation samples when splitting from the train set. `Default: 0.2`
         val_period_name: Name of the validation period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].
@@ -219,7 +219,7 @@ class DatasetConfig():
     need_test_set: bool = True
     train_period_name: str = ""
     train_dates: list[str] = field(default_factory=list)
-    train_dates_weigths: Optional[list[int]] = None
+    train_dates_weights: Optional[list[int]] = None
     val_approach: ValidationApproach = ValidationApproach.SPLIT_FROM_TRAIN
     train_val_split_fraction: float = 0.2
     val_period_name: str = ""
@@ -369,16 +369,16 @@ class DatasetConfig():
                 raise ValueError("QUIC datasets do not support use_tcp_features")
             if self.use_push_flags:
                 raise ValueError("QUIC datasets do not support use_push_flags")
-        # When train_dates_weigths are used, train_size and val_known_size have to be specified
-        if self.train_dates_weigths is not None:
+        # When train_dates_weights are used, train_size and val_known_size have to be specified
+        if self.train_dates_weights is not None:
             if not self.need_train_set:
-                raise ValueError("train_dates_weigths cannot be specified when need_train_set is false")
-            if len(self.train_dates_weigths) != len(self.train_dates):
-                raise ValueError("train_dates_weigths has to have the same length as train_dates")
+                raise ValueError("train_dates_weights cannot be specified when need_train_set is false")
+            if len(self.train_dates_weights) != len(self.train_dates):
+                raise ValueError("train_dates_weights has to have the same length as train_dates")
             if self.train_size == "all":
-                raise ValueError("train_size cannot be 'all' when train_dates_weigths are speficied")
+                raise ValueError("train_size cannot be 'all' when train_dates_weights are speficied")
             if self.val_approach == ValidationApproach.SPLIT_FROM_TRAIN and self.val_known_size == "all":
-                raise ValueError("val_known_size cannot be 'all' when train_dates_weigths are speficied and validation_approach is split-from-train")
+                raise ValueError("val_known_size cannot be 'all' when train_dates_weights are speficied and validation_approach is split-from-train")
         # App selection
         if self.apps_selection == AppSelection.ALL_KNOWN:
             self.val_unknown_size = 0
