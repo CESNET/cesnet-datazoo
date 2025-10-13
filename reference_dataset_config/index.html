@@ -1072,7 +1072,7 @@
           </td>
         </tr>
         <tr>
-          <td><code>train_dates_weigths</code></td>
+          <td><code>train_dates_weights</code></td>
           <td>
                 <code><span title="typing.Optional">Optional</span>[list[int]]</code>
           </td>
@@ -2024,7 +2024,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
 <span class="sd">        need_test_set: Use to disable the test set. `Default: True`</span>
 <span class="sd">        train_period_name: Name of the train period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
 <span class="sd">        train_dates: Dates used for creating a train set.</span>
-<span class="sd">        train_dates_weigths: To use a non-uniform distribution of samples across train dates.</span>
+<span class="sd">        train_dates_weights: To use a non-uniform distribution of samples across train dates.</span>
 <span class="sd">        val_approach: How a validation set should be created. Either split train data into train and validation or have a separate validation period. `Default: SPLIT_FROM_TRAIN`</span>
 <span class="sd">        train_val_split_fraction: The fraction of validation samples when splitting from the train set. `Default: 0.2`</span>
 <span class="sd">        val_period_name: Name of the validation period. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets].</span>
@@ -2101,7 +2101,7 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
     <span class="n">need_test_set</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">train_period_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">train_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-    <span class="n">train_dates_weigths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">train_dates_weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">val_approach</span><span class="p">:</span> <span class="n">ValidationApproach</span> <span class="o">=</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span>
     <span class="n">train_val_split_fraction</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span>
     <span class="n">val_period_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -2251,16 +2251,16 @@ This is especially useful when using the <code>ORIG</code> dataset size and want
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;QUIC datasets do not support use_tcp_features&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_push_flags</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;QUIC datasets do not support use_push_flags&quot;</span><span class="p">)</span>
-        <span class="c1"># When train_dates_weigths are used, train_size and val_known_size have to be specified</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dates_weigths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># When train_dates_weights are used, train_size and val_known_size have to be specified</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dates_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_dates_weigths cannot be specified when need_train_set is false&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates_weigths</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_dates_weigths has to have the same length as train_dates&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_dates_weights cannot be specified when need_train_set is false&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates_weights</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dates</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_dates_weights has to have the same length as train_dates&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_size</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_size cannot be &#39;all&#39; when train_dates_weigths are speficied&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_size cannot be &#39;all&#39; when train_dates_weights are speficied&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_approach</span> <span class="o">==</span> <span class="n">ValidationApproach</span><span class="o">.</span><span class="n">SPLIT_FROM_TRAIN</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_known_size</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_known_size cannot be &#39;all&#39; when train_dates_weigths are speficied and validation_approach is split-from-train&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;val_known_size cannot be &#39;all&#39; when train_dates_weights are speficied and validation_approach is split-from-train&quot;</span><span class="p">)</span>
         <span class="c1"># App selection</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps_selection</span> <span class="o">==</span> <span class="n">AppSelection</span><span class="o">.</span><span class="n">ALL_KNOWN</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">val_unknown_size</span> <span class="o">=</span> <span class="mi">0</span>
