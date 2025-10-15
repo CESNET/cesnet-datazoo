@@ -1,6 +1,7 @@
 import atexit
 import logging
 import os
+import sys
 import time
 import warnings
 from datetime import datetime
@@ -198,7 +199,7 @@ def init_train_indices(train_data_params: TrainDataParams, database_path: str, t
         if train_data_params.min_train_samples_check == MinTrainSamplesCheck.WARN_AND_EXIT:
             warnings.warn(f"Found applications with less than {train_data_params.min_train_samples_per_app} train samples: {min_samples_apps_names}. " +
                             "To disable these applications, add them to config.disabled_apps or set config.min_train_samples_check to disable-apps. To turn off this check, set config.min_train_samples_per_app to zero. Exiting")
-            exit()
+            sys.exit()
         elif train_data_params.min_train_samples_check == MinTrainSamplesCheck.DISABLE_APPS:
             log.info(f"Found applications with less than {train_data_params.min_train_samples_per_app} train samples: {min_samples_apps_names}. " +
                        "Disabling these applications")

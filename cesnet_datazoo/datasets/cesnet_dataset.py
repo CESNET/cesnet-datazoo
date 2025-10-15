@@ -619,7 +619,10 @@ class CesnetDataset():
         encoder = LabelEncoder().fit(known_apps)
         encoder.classes_ = np.append(encoder.classes_, UNKNOWN_STR_LABEL)
         class_info = create_class_info(servicemap=servicemap, encoder=encoder, known_apps=known_apps, unknown_apps=unknown_apps)
-        encode_labels_with_unknown_fn = partial(_encode_labels_with_unknown, encoder=encoder, class_info=class_info)
+        if dataset_config.disable_label_encoding:
+            label_encoder_fn = None
+        else:
+            label_encoder_fn = partial(_encode_labels_with_unknown, encoder=encoder, class_info=class_info)
         # Create train, validation, and test datasets
         train_dataset = val_dataset = test_dataset = None
         if dataset_config.need_train_set:
@@ -638,7 +641,7 @@ class CesnetDataset():
                 ppi_transform=dataset_config.ppi_transform,
                 flowstats_transform=dataset_config.flowstats_transform,
                 flowstats_phist_transform=dataset_config.flowstats_phist_transform,
-                target_transform=encode_labels_with_unknown_fn,
+                target_transform=label_encoder_fn,
                 return_tensors=dataset_config.return_tensors,)
         if dataset_config.need_val_set:
             assert val_data_path is not None
@@ -657,7 +660,7 @@ class CesnetDataset():
                 ppi_transform=dataset_config.ppi_transform,
                 flowstats_transform=dataset_config.flowstats_transform,
                 flowstats_phist_transform=dataset_config.flowstats_phist_transform,
-                target_transform=encode_labels_with_unknown_fn,
+                target_transform=label_encoder_fn,
                 return_tensors=dataset_config.return_tensors,
                 preload=dataset_config.preload_val,
                 preload_blob=os.path.join(val_data_path, "preload", f"val_dataset-{dataset_config.val_known_size}.npz"),)
@@ -678,7 +681,7 @@ class CesnetDataset():
                 ppi_transform=dataset_config.ppi_transform,
                 flowstats_transform=dataset_config.flowstats_transform,
                 flowstats_phist_transform=dataset_config.flowstats_phist_transform,
-                target_transform=encode_labels_with_unknown_fn,
+                target_transform=label_encoder_fn,
                 return_tensors=dataset_config.return_tensors,
                 preload=dataset_config.preload_test,
                 preload_blob=os.path.join(test_data_path, "preload", f"test_dataset-{dataset_config.test_known_size}-{dataset_config.test_unknown_size}.npz"),)

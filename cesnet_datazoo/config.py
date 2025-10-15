@@ -178,6 +178,7 @@ class DatasetConfig():
 
         return_other_fields: Whether to return [auxiliary fields][other-fields], such as communicating hosts, flow times, and more fields extracted from the ClientHello message. `Default: False`
         return_tensors: Use for returning `torch.Tensor` from dataloaders. Dataframes are not available when this option is used. `Default: False`
+        disable_label_encoding: Whether to disable label encoding and return application names as strings. The original labels of configured unknown classes are preserved. `Default: False`
         use_packet_histograms: Whether to use packet histogram features, if available in the dataset. `Default: True`
         use_tcp_features: Whether to use TCP features, if available in the dataset. `Default: True`
         use_push_flags: Whether to use push flags in packet sequences, if available in the dataset. `Default: False`
@@ -255,6 +256,7 @@ class DatasetConfig():
 
     return_other_fields: bool = False
     return_tensors: bool = False
+    disable_label_encoding: bool = False
     use_packet_histograms: bool = False
     use_tcp_features: bool = False
     use_push_flags: bool = False
