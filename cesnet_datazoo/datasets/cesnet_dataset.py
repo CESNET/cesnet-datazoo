@@ -642,7 +642,9 @@ class CesnetDataset():
                 flowstats_transform=dataset_config.flowstats_transform,
                 flowstats_phist_transform=dataset_config.flowstats_phist_transform,
                 target_transform=label_encoder_fn,
-                return_tensors=dataset_config.return_tensors,)
+                return_tensors=dataset_config.return_tensors,
+                preload=dataset_config.preload_train,
+                preload_blob=os.path.join(dataset_config._get_train_data_path(), "preload", f"train_dataset-{dataset_config.train_size}.npz"),)
         if dataset_config.need_val_set:
             assert val_data_path is not None
             val_dataset = PyTablesDataset(

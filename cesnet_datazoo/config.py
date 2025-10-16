@@ -166,7 +166,8 @@ class DatasetConfig():
         val_workers: Number of workers for loading validation data. `0` means that the data will be loaded in the main process. `Default: 1`
         batch_size: Number of samples per batch. `Default: 192`
         test_batch_size: Number of samples per batch for loading validation and test data. `Default: 2048`
-        preload_val: Whether to dump the validation set with `numpy.savez_compressed` and preload it in future runs. Useful when running a lot of experiments with the same dataset configuration. `Default: False`
+        preload_train: Whether to dump the train set with `numpy.savez_compressed` and preload it in future runs. Useful when running a lot of experiments with the same dataset configuration. `Default: False`
+        preload_val: Whether to dump the validation set with `numpy.savez_compressed` and preload it in future runs. `Default: False`
         preload_test: Whether to dump the test set with `numpy.savez_compressed` and preload it in future runs. `Default: False`
         train_size: Size of the train set. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets]. `Default: all`
         val_known_size: Size of the validation set. See [instructions][config.DatasetConfig--how-to-configure-train-validation-and-test-sets]. `Default: all`
@@ -244,6 +245,7 @@ class DatasetConfig():
     val_workers: int = 1
     batch_size: int = 192
     test_batch_size: int = 2048
+    preload_train: bool = False
     preload_val: bool = False
     preload_test: bool = False
     train_size: int | Literal["all"] = "all"
