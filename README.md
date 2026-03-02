@@ -6,6 +6,7 @@
 [![](https://img.shields.io/badge/docs-cesnet--datazoo-blue.svg)](https://cesnet.github.io/cesnet-datazoo/)
 [![](https://img.shields.io/badge/python->=3.10-blue.svg)](https://pypi.org/project/cesnet-datazoo/)
 [![](https://img.shields.io/pypi/v/cesnet-datazoo)](https://pypi.org/project/cesnet-datazoo/)
+[![](https://img.shields.io/uptimerobot/status/m801936469-e8219ca3245b73b08cf33ef4?label=storage%20status)](https://stats.uptimerobot.com/6a75HRSoRU)
 
 
 The goal of this project is to provide tools for working with large network traffic datasets and to facilitate research in the traffic classification area. The core functions of the `cesnet-datazoo` package are:
@@ -18,9 +19,11 @@ The goal of this project is to provide tools for working with large network traf
 - Built on suitable data structures for experiments with large datasets. There are several caching mechanisms to make repeated runs faster, for example, when searching for the best model configuration.
 - Datasets are offered in multiple sizes to give users an option to start the experiments at a smaller scale (also faster dataset download, disk space, etc.). The default is the `S` size containing 25 million samples.
 
-:brain: :brain: See a related project [CESNET Models](https://github.com/CESNET/cesnet-models) providing pre-trained neural networks for traffic classification. :brain: :brain:
+:brain: :brain: See a related project [CESNET Models](https://github.com/CESNET/cesnet-models) providing pretrained neural networks for traffic classification. :brain: :brain:
 
-:notebook: :notebook: Example Jupyter notebooks are included in a separate [CESNET Traffic Classification Examples](https://github.com/CESNET/cesnet-tcexamples) repo. :notebook: :notebook:
+:notebook: :notebook: Example Jupyter notebooks are included in a separate [Traffic Classification Examples](https://github.com/CESNET/cesnet-tcexamples) repository. :notebook: :notebook:
+
+:rocket: :rocket: [Transfer Learning Codebase](https://github.com/CESNET/tc-transfer/) for reproducing experiments from our paper — covering ten downstream traffic classification tasks with three transfer approaches (k-NN, linear probing, and full model fine-tuning). :rocket: :rocket:
 
 ## Datasets
 The `cesnet-datazoo` package currently provides three datasets with details in the following table (you might need to scroll the table horizontally to see all datasets).
@@ -86,6 +89,14 @@ See more examples in the [documentation](https://cesnet.github.io/cesnet-datazoo
 * [DataZoo: Streamlining Traffic Classification Experiments](https://doi.org/10.1145/3630050.3630176) <br>
 Jan Luxemburk and Karel Hynek <br>
 CoNEXT Workshop on Explainable and Safety Bounded, Fidelitous, Machine Learning for Networking (SAFE), 2023
+
+* [CESNET-TLS-Year22: A year-spanning TLS network traffic dataset from backbone lines](https://doi.org/10.1038/s41597-024-03927-4) <br>
+Karel Hynek, Jan Luxemburk, Jaroslav Pešek, Tomáš Čejka, and Pavel Šiška  <br>
+Scientific Data (Nature Portfolio), 2024
+
+* [CESNET-QUIC22: A large one-month QUIC network traffic dataset from backbone lines](https://doi.org/10.1016/j.dib.2023.108888) <br>
+Jan Luxemburk, Karel Hynek, Tomáš Čejka, Andrej Lukačovič, and Pavel Šiška  <br>
+Data in Brief, 2023
 
 ## Acknowledgments
 
