@@ -18,3 +18,11 @@ The goal of this project is to provide tools for working with large network traf
 * [DataZoo: Streamlining Traffic Classification Experiments](https://doi.org/10.1145/3630050.3630176) <br>
 Jan Luxemburk and Karel Hynek <br>
 CoNEXT Workshop on Explainable and Safety Bounded, Fidelitous, Machine Learning for Networking (SAFE), 2023
+
+* [CESNET-TLS-Year22: A year-spanning TLS network traffic dataset from backbone lines](https://doi.org/10.1038/s41597-024-03927-4) <br>
+Karel Hynek, Jan Luxemburk, Jaroslav Pešek, Tomáš Čejka, and Pavel Šiška  <br>
+Scientific Data (Nature Portfolio), 2024
+
+* [CESNET-QUIC22: A large one-month QUIC network traffic dataset from backbone lines](https://doi.org/10.1016/j.dib.2023.108888) <br>
+Jan Luxemburk, Karel Hynek, Tomáš Čejka, Andrej Lukačovič, and Pavel Šiška  <br>
+Data in Brief, 2023
