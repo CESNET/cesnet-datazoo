@@ -1865,7 +1865,12 @@ This will initialize the dataset — select classes, split data into train/valid
 <span class="normal">689</span>
 <span class="normal">690</span>
 <span class="normal">691</span>
-<span class="normal">692</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CesnetDataset</span><span class="p">():</span>
+<span class="normal">692</span>
+<span class="normal">693</span>
+<span class="normal">694</span>
+<span class="normal">695</span>
+<span class="normal">696</span>
+<span class="normal">697</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CesnetDataset</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The main class for accessing CESNET datasets. It handles downloading, train/validation/test splitting, and class selection. Access to data is provided through:</span>
 
@@ -2444,7 +2449,10 @@ This will initialize the dataset — select classes, split data into train/valid
         <span class="n">encoder</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">known_apps</span><span class="p">)</span>
         <span class="n">encoder</span><span class="o">.</span><span class="n">classes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">classes_</span><span class="p">,</span> <span class="n">UNKNOWN_STR_LABEL</span><span class="p">)</span>
         <span class="n">class_info</span> <span class="o">=</span> <span class="n">create_class_info</span><span class="p">(</span><span class="n">servicemap</span><span class="o">=</span><span class="n">servicemap</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span> <span class="n">known_apps</span><span class="o">=</span><span class="n">known_apps</span><span class="p">,</span> <span class="n">unknown_apps</span><span class="o">=</span><span class="n">unknown_apps</span><span class="p">)</span>
-        <span class="n">encode_labels_with_unknown_fn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_encode_labels_with_unknown</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span> <span class="n">class_info</span><span class="o">=</span><span class="n">class_info</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">disable_label_encoding</span><span class="p">:</span>
+            <span class="n">label_encoder_fn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">label_encoder_fn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_encode_labels_with_unknown</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span> <span class="n">class_info</span><span class="o">=</span><span class="n">class_info</span><span class="p">)</span>
         <span class="c1"># Create train, validation, and test datasets</span>
         <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">val_dataset</span> <span class="o">=</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">need_train_set</span><span class="p">:</span>
@@ -2463,8 +2471,10 @@ This will initialize the dataset — select classes, split data into train/valid
                 <span class="n">ppi_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="p">,</span>
                 <span class="n">flowstats_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="p">,</span>
                 <span class="n">flowstats_phist_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_phist_transform</span><span class="p">,</span>
-                <span class="n">target_transform</span><span class="o">=</span><span class="n">encode_labels_with_unknown_fn</span><span class="p">,</span>
-                <span class="n">return_tensors</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">,)</span>
+                <span class="n">target_transform</span><span class="o">=</span><span class="n">label_encoder_fn</span><span class="p">,</span>
+                <span class="n">return_tensors</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">,</span>
+                <span class="n">preload</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">preload_train</span><span class="p">,</span>
+                <span class="n">preload_blob</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">_get_train_data_path</span><span class="p">(),</span> <span class="s2">&quot;preload&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;train_dataset-</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">train_size</span><span class="si">}</span><span class="s2">.npz&quot;</span><span class="p">),)</span>
         <span class="k">if</span> <span class="n">dataset_config</span><span class="o">.</span><span class="n">need_val_set</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">val_data_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="n">val_dataset</span> <span class="o">=</span> <span class="n">PyTablesDataset</span><span class="p">(</span>
@@ -2482,7 +2492,7 @@ This will initialize the dataset — select classes, split data into train/valid
                 <span class="n">ppi_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="p">,</span>
                 <span class="n">flowstats_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="p">,</span>
                 <span class="n">flowstats_phist_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_phist_transform</span><span class="p">,</span>
-                <span class="n">target_transform</span><span class="o">=</span><span class="n">encode_labels_with_unknown_fn</span><span class="p">,</span>
+                <span class="n">target_transform</span><span class="o">=</span><span class="n">label_encoder_fn</span><span class="p">,</span>
                 <span class="n">return_tensors</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">,</span>
                 <span class="n">preload</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">preload_val</span><span class="p">,</span>
                 <span class="n">preload_blob</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">val_data_path</span><span class="p">,</span> <span class="s2">&quot;preload&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;val_dataset-</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">val_known_size</span><span class="si">}</span><span class="s2">.npz&quot;</span><span class="p">),)</span>
@@ -2503,7 +2513,7 @@ This will initialize the dataset — select classes, split data into train/valid
                 <span class="n">ppi_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">ppi_transform</span><span class="p">,</span>
                 <span class="n">flowstats_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_transform</span><span class="p">,</span>
                 <span class="n">flowstats_phist_transform</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">flowstats_phist_transform</span><span class="p">,</span>
-                <span class="n">target_transform</span><span class="o">=</span><span class="n">encode_labels_with_unknown_fn</span><span class="p">,</span>
+                <span class="n">target_transform</span><span class="o">=</span><span class="n">label_encoder_fn</span><span class="p">,</span>
                 <span class="n">return_tensors</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">return_tensors</span><span class="p">,</span>
                 <span class="n">preload</span><span class="o">=</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">preload_test</span><span class="p">,</span>
                 <span class="n">preload_blob</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">test_data_path</span><span class="p">,</span> <span class="s2">&quot;preload&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;test_dataset-</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">test_known_size</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">dataset_config</span><span class="o">.</span><span class="n">test_unknown_size</span><span class="si">}</span><span class="s2">.npz&quot;</span><span class="p">),)</span>
