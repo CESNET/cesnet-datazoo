@@ -725,14 +725,14 @@ This dataset is similar to CESNET-TLS22, containing almost the same classes (180
 <li>Spans 12 months</li>
 <li>Contains 194 million samples</li>
 <li>Has 50 application classes and three background traffic classes</li>
-<li>Includeds extended set of QUIC protocol fields</li>
+<li>Includes extended set of QUIC protocol fields</li>
 </ul>
 </div>
-<p>This is our latest QUIC dateset, which was collected with an updated version of <a href="https://github.com/CESNET/ipfixprobe">ipfixprobe</a> QUIC plugin, which exports <a href="extended-quic-fields">extended set</a> of QUIC protocol metadata. Parts of the dataset were used in <em>Waiting for QUIC: Passive Measurements to Understand QUIC Deployments</em> (<a href="https://doi.org/10.1145/3768988">DOI</a>).</p>
+<p>This is our latest QUIC dataset, which was collected with an updated version of the <a href="https://github.com/CESNET/ipfixprobe">ipfixprobe</a> QUIC plugin that exports an <a href="extended-quic-fields">extended set</a> of QUIC protocol metadata. Parts of the dataset were used in <em>Waiting for QUIC: Passive Measurements to Understand QUIC Deployments</em> (<a href="https://doi.org/10.1145/3768988">DOI</a>). Overall, the dataset is suitable for QUIC deployment studies as well as experiments in QUIC traffic classification.</p>
 <p>For detailed information about the dataset, please refer to the linked paper and the <a class="autorefs autorefs-internal" href="../dataset_metadata/#metadata">dataset metadata</a> page.</p>
 <div class="admonition warning">
-<p class="admonition-title">Sampling</p>
-<p>Compared to previous datasets, which had per-application sampler for softening class imblanaces, CESNET-QUICEXT-25 used 1:100 uniform sampling WITHOUT class rebalancing.</p>
+<p class="admonition-title">Change in data sampling</p>
+<p>Compared to previous datasets, which had per-application sampler to soften class imbalances, CESNET-QUICEXT-25 used 1:100 uniform sampling <strong>WITHOUT</strong> class rebalancing.</p>
 </div>
 
 
