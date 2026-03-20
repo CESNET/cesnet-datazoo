@@ -70,12 +70,18 @@ Set `return_other_fields` to include those fields in returned dataframes. See [u
 | PROTOCOL                | Transport protocol                                                                  |
 | TLS_SNI / QUIC_SNI      | Server Name Indication domain                                                       |
 | TLS_JA3                 | JA3 fingerprint                                                                     |
-| QUIC_VERSION            | QUIC protocol version                                                               |
-| QUIC_USER_AGENT         | User agent string if available in the QUIC Initial Packet                           |
-<!-- 
-| APP                     | Web service label                                                                   |
-| CATEGORY                | Service category label                                                              | 
--->
+| QUIC_VERSION            | QUIC version from the first server long-header packet                               |
+| QUIC_USER_AGENT         | User-Agent string, if available in an Initial packet                                |
+
+### Other fields in CESNET-QUICEXT-25
+The CESNET-QUICEXT-25 dataset used an anonymization procedure based on SHA hashing, with no conversion back to IP addresses. Thus, `DST_IP` and `DST_IP_SUBNET` are represented as simple string identifiers. Also, this dataset includes `DST_COUNTRY` derived from the original, non-anonymized destination IP address.
+
+| **Name**            | **Description**                                                                                              |
+|---------------------|--------------------------------------------------------------------------------------------------------------|
+| DST_IP              | An anonymized identifier of the destination host                                                             |
+| DST_IP_SUBNET       | An anonymized identifier of the destination host subnet (a /24 prefix for IPv4 and a /64 prefix for IPv6)    |
+| DST_IP_VERSION      | IP version (IPv4 or IPv6)                                                                                    |
+| DST_COUNTRY         | Country of the destination host, derived from a geolocation database                                         |
 
 ## Details about packet histograms and PPI
 Due to differences in implementation between packet sequences ([pstats.cpp](https://github.com/CESNET/ipfixprobe/blob/master/process/pstats.cpp)) and packet histogram ([phist.cpp](https://github.com/CESNET/ipfixprobe/blob/master/process/phists.cpp)) plugins of the ipfixprobe exporter, the number of packets in PPI and histograms can differ (even for flows shorter than 30 packets). The differences are summarized in the following table.
@@ -90,3 +96,23 @@ Note that this is related to TLS over TCP datasets.
 **The implementation for the detection of TCP retransmissions and out-of-order packets is far from perfect. Packets with a non-increasing SEQ number are skipped.*
 
 For QUIC, there is no detection of retransmissions or out-of-order packets, and QUIC acknowledgment packets are included in both packet sequences and packet histograms.
+
+## Extended QUIC metadata
+The CESNET-QUICEXT-25 dataset includes the following set of QUIC protocol metadata:
+
+| **Name**            | **Description**                                                                                              |
+|---------------------|--------------------------------------------------------------------------------------------------------------|
+| QUIC_VERSION        | QUIC version from the first server long-header packet                                                        |
+| QUIC_CLIENT_VERSION | QUIC version from the first client long-header packet                                                        |
+| QUIC_TOKEN_LENGTH   | Token length from an Initial or Retry packet                                                                 |
+| QUIC_MULTIPLEXED    | Indicates whether multiplexing occurred (value > 0 if at least two distinct QUIC_OSCID values were observed) |
+| QUIC_ZERO_RTT       | Number of 0-RTT packets observed in the flow                                                                 |
+| QUIC_OCCID          | Original client Connection ID from the first client packet                                                   |
+| QUIC_OSCID          | Original server Connection ID from the first client packet                                                   |
+| QUIC_SCID           | Server Connection ID                                                                                         |
+| QUIC_RETRY_SCID     | Server Connection ID from a Retry packet                                                                     |
+| QUIC_SNI            | Server Name Indication domain                                                                                |
+| QUIC_USER_AGENT     | User-Agent string, if available in an Initial packet                                                         |
+| QUIC_TLS_EXT_TYPE   | List of TLS extensions used                                                                                  |
+| QUIC_TLS_EXT_LEN    | Corresponding lengths of the listed TLS extensions                                                           |
+| QUIC_PACKETS        | Sequence of QUIC long-header packet types observed in the flow                                               |

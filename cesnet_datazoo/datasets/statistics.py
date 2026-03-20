@@ -20,9 +20,10 @@ from cesnet_datazoo.pytables_data.pytables_dataset import (PyTablesDataset, list
 
 
 def pick_quic_fields(batch):
+    # sadly, QUIC_USERAGENT is the column name in CESNET-QUIC22, while QUIC_USER_AGENT is the column name in CESNET-QUICEXT-25
     return (
         batch["QUIC_SNI"],
-        batch["QUIC_USERAGENT"],
+        batch["QUIC_USERAGENT"] if "QUIC_USERAGENT" in batch.dtype.names else batch["QUIC_USER_AGENT"], 
         batch["QUIC_VERSION"],
     )
 

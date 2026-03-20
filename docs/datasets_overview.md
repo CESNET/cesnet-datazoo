@@ -37,7 +37,25 @@ For detailed information about the dataset, please refer to the linked paper and
     - Contains 507 million samples
     - Has 180 application classes
 
-Our newest dataset was published in the Scientific Data journal - *"CESNET-TLS-Year22: A year-spanning TLS network traffic dataset from backbone lines"* ([DOI](https://doi.org/10.1038/s41597-024-03927-4)).
+Our latest TLS dataset was published in the Scientific Data journal as *"CESNET-TLS-Year22: A year-spanning TLS network traffic dataset from backbone lines"* ([DOI](https://doi.org/10.1038/s41597-024-03927-4)).
 This dataset is similar to CESNET-TLS22, containing almost the same classes (180 of the 191 application classes from CESNET-TLS22), while also providing additional features and covering the entire year of 2022. It is suitable for a comprehensive evaluation of traffic classification models and an assessment of their robustness in the ever-evolving environment of production networks.
 
 For detailed information about the dataset, please refer to the linked paper and the [dataset metadata][metadata] page.
+
+## CESNET-QUICEXT-25
+
+!!! info inline end "CESNET-QUICEXT-25"
+    - QUIC protocol
+    - Collected in 2024-2025
+    - Spans 12 months
+    - Contains 194 million samples
+    - Has 50 application classes and three background traffic classes
+    - Includes extended set of QUIC protocol fields
+
+This is our latest QUIC dataset, which was collected with an updated version of the [ipfixprobe](https://github.com/CESNET/ipfixprobe) QUIC plugin that exports an [extended set](../features/#extended-quic-fields) of QUIC protocol metadata. Parts of the dataset were used in *"Waiting for QUIC: Passive Measurements to Understand QUIC Deployments"* ([DOI](https://doi.org/10.1145/3768988)). Overall, the dataset is suitable for QUIC deployment studies as well as experiments in QUIC traffic classification.
+
+For detailed information about the dataset, please refer to the linked paper and the [dataset metadata][metadata] page.
+
+!!! warning "Change in data sampling"
+
+    Compared to previous datasets, which had a per-application sampler to soften class imbalances, CESNET-QUICEXT-25 used 1:100 uniform sampling **WITHOUT** class rebalancing.

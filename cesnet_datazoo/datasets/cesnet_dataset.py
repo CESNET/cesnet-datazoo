@@ -461,27 +461,6 @@ class CesnetDataset():
                                    batch_size=batch_size,
                                    silent=self.silent)
 
-    def _generate_time_periods(self) -> None:
-        time_periods = {}
-        for period in self.time_periods:
-            time_periods[period] = []
-            if period.startswith("W"):
-                split = period.split("-")
-                collection_year, week = int(split[1]), int(split[2])
-                for d in range(1, 8):
-                    s = datetime.date.fromisocalendar(collection_year, week, d).strftime("%Y%m%d")
-                    # last week of a year can span into the following year
-                    if s not in self.metadata.missing_dates_in_collection_period and s.startswith(str(collection_year)):
-                        time_periods[period].append(s)
-            elif period.startswith("M"):
-                split = period.split("-")
-                collection_year, month = int(split[1]), int(split[2])
-                for d in range(1, calendar.monthrange(collection_year, month)[1]):
-                    s = datetime.date(collection_year, month, d).strftime("%Y%m%d")
-                    if s not in self.metadata.missing_dates_in_collection_period:
-                        time_periods[period].append(s)
-        self.time_periods = time_periods
-
     def _is_downloaded(self) -> bool:
         """Servicemap is downloaded after the database; thus if it exists, the database is also downloaded"""
         return os.path.exists(self.servicemap_path) and os.path.exists(self.database_path)

@@ -2,6 +2,10 @@ from cesnet_datazoo.datasets.cesnet_dataset import CesnetDataset
 from cesnet_datazoo.datasets.datasets_constants import (_CESNET_QUIC22_AVAILABLE_DATES,
                                                         _CESNET_QUIC22_TABLES_APP_ENUM,
                                                         _CESNET_QUIC22_TABLES_CATEGORY_ENUM,
+                                                        _CESNET_QUICEXT_25_AVAILABLE_DATES,
+                                                        _CESNET_QUICEXT_25_TABLES_APP_ENUM,
+                                                        _CESNET_QUICEXT_25_TABLES_CATEGORY_ENUM,
+                                                        _CESNET_QUICEXT_25_TIME_PERIODS,
                                                         _CESNET_TLS22_AVAILABLE_DATES,
                                                         _CESNET_TLS22_TABLES_APP_ENUM,
                                                         _CESNET_TLS22_TABLES_CATEGORY_ENUM,
@@ -58,4 +62,14 @@ class CESNET_TLS_Year22(CesnetDataset):
     _tables_app_enum = _CESNET_TLS_YEAR22_TABLES_APP_ENUM
     _tables_cat_enum = _CESNET_TLS_YEAR22_TABLES_CATEGORY_ENUM
 
-
+class CESNET_QUICEXT_25(CesnetDataset):
+    """Dataset class for [CESNET-QUICEXT-25][cesnet-quicext-25]."""
+    name = "CESNET-QUICEXT-25"
+    database_filename = "CESNET-QUICEXT-25.h5"
+    bucket_url = "https://liberouter.org/datazoo/download?bucket=cesnet-quicext-25"
+    available_dates = _CESNET_QUICEXT_25_AVAILABLE_DATES
+    time_periods = _CESNET_QUICEXT_25_TIME_PERIODS
+    default_train_period_name = "M-2025-1"
+    default_test_period_name = "M-2025-2"
+    _tables_app_enum = _CESNET_QUICEXT_25_TABLES_APP_ENUM
+    _tables_cat_enum = _CESNET_QUICEXT_25_TABLES_CATEGORY_ENUM

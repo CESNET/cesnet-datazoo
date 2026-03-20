@@ -11,7 +11,7 @@ from cesnet_datazoo.config import Protocol
 class DatasetMetadata():
     protocol: Protocol
     published_in: int
-    collected_in: int
+    collected_in: str
     collection_duration: str
     available_samples: int
     available_dataset_sizes: list[str]

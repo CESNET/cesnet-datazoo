@@ -108,9 +108,20 @@ class PyTablesDataset(Dataset):
         if self.target_transform:
             labels = self.target_transform(labels)
         # Prepare dataframe with other fields
-        other_fields_df = pd.DataFrame(batch_data[self.other_fields]) if len(self.other_fields) > 0 else pd.DataFrame()
+        if len(self.other_fields) > 0:
+            fields_dict = {}
+            for field in self.other_fields:
+                col = batch_data[field]
+                if col.ndim > 1:
+                    fields_dict[field] = list(col)
+                else:
+                    fields_dict[field] = col
+            other_fields_df = pd.DataFrame(fields_dict)
+        else:
+            other_fields_df = pd.DataFrame()
+
         for column in other_fields_df.columns:
-            if other_fields_df[column].dtype.kind == "O":
+            if other_fields_df[column].dtype.kind == "O" and column not in ["QUIC_TLS_EXT_LEN", "QUIC_TLS_EXT_TYPE", "QUIC_PACKETS"]:
                 other_fields_df[column] = other_fields_df[column].astype(str)
             elif column.startswith("TIME_"):
                 other_fields_df[column] = other_fields_df[column].map(lambda x: datetime.fromtimestamp(x))

@@ -18,3 +18,9 @@ These are subclasses of [`CesnetDataset`][datasets.cesnet_dataset.CesnetDataset]
         heading_level: 2
         show_root_heading: true
         separate_signature: true
+
+::: datasets.datasets.CESNET_QUICEXT_25
+    options:
+        heading_level: 2
+        show_root_heading: true
+        separate_signature: true

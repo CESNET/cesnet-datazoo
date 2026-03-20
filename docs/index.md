@@ -4,7 +4,7 @@ This is documentation of the [CESNET DataZoo](https://github.com/CESNET/cesnet-d
 
 The goal of this project is to provide tools for working with large network traffic datasets and to facilitate research in the traffic classification area. The core functions of the `cesnet-datazoo` package are:
 
-- A common API for downloading, configuring, and loading of three public datasets of encrypted network traffic — CESNET-TLS22, CESNET-QUIC22, and CESNET-TLS-Year22. Details about the available datasets are on the [dataset overview][overview-of-datasets] page.
+- A common API for downloading, configuring, and loading of four public datasets of encrypted network traffic — CESNET-TLS22, CESNET-QUIC22, CESNET-TLS-Year22, and CESNET-QUICEXT-25. Details about the available datasets are on the [dataset overview][overview-of-datasets] page.
 - Provides standard features used for traffic classification, such as sizes, directions, and inter-packet times of the first 30 packets of each flow. More details on the [data features][features] page.
 - Extensive configuration options for:
     - Selection of train, validation, and test periods. The datasets span from two weeks to one year; therefore, it is possible to evaluate classification methods in a time-based fashion that is closer to practical deployment.
