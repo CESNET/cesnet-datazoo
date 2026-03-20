@@ -947,7 +947,7 @@ Set <code>return_other_fields</code> to include those fields in returned datafra
 </tbody>
 </table>
 <h3 id="other-fields-in-cesnet-quixext-25">Other fields in CESNET-QUIXEXT-25</h3>
-<p>The CESNET-QUIXEXT-25 dataset used anonymization procedure based on SHA hashing, with no conversion back to IP addresses. Thus, <code>DST_IP</code> and <code>DST_IP_SUBNET</code> are represented as a simple string identifiers.</p>
+<p>The CESNET-QUIXEXT-25 dataset used anonymization procedure based on SHA hashing, with no conversion back to IP addresses. Thus, <code>DST_IP</code> and <code>DST_IP_SUBNET</code> are represented as a simple string identifiers. Also, this dataset includes <code>DST_COUNTRY</code> derived from the original, non-anonymzed destination IP address.</p>
 <table>
 <thead>
 <tr>
