@@ -641,6 +641,7 @@
 <th>CESNET-TLS22</th>
 <th>CESNET-QUIC22</th>
 <th>CESNET-TLS-Year22</th>
+<th>CESNET-QUICEXT-25</th>
 </tr>
 </thead>
 <tbody>
@@ -649,23 +650,27 @@
 <td>TLS</td>
 <td>QUIC</td>
 <td>TLS</td>
+<td>QUIC</td>
 </tr>
 <tr>
 <td><em>Published in</em></td>
 <td>2022</td>
 <td>2023</td>
 <td>2024</td>
+<td>2025</td>
 </tr>
 <tr>
 <td><em>Collected in</em></td>
 <td>2021</td>
 <td>2022</td>
 <td>2022</td>
+<td>2024-2025</td>
 </tr>
 <tr>
 <td><em>Collection duration</em></td>
 <td>2 weeks</td>
 <td>4 weeks</td>
+<td>1 year</td>
 <td>1 year</td>
 </tr>
 <tr>
@@ -673,9 +678,11 @@
 <td>141392195</td>
 <td>153226273</td>
 <td>507739073</td>
+<td>194296462</td>
 </tr>
 <tr>
 <td><em>Available dataset sizes</em></td>
+<td>XS, S, M, L</td>
 <td>XS, S, M, L</td>
 <td>XS, S, M, L</td>
 <td>XS, S, M, L</td>
@@ -685,33 +692,39 @@
 <td>4.10.2021 - 17.10.2021</td>
 <td>31.10.2022 - 27.11.2022</td>
 <td>1.1.2022 - 31.12.2022</td>
+<td>1.6.2024 - 31.5.2025</td>
 </tr>
 <tr>
 <td><em>Missing dates in collection period</em></td>
 <td></td>
 <td></td>
 <td>20220128, 20220129, 20220130, 20221212, 20221213, 20221229, 20221230, 20221231</td>
+<td>20241031, 20241211, 20241212, 20241213, 20241214</td>
 </tr>
 <tr>
 <td><em>Application count</em></td>
 <td>191</td>
 <td>102</td>
 <td>180</td>
+<td>50</td>
 </tr>
 <tr>
 <td><em>Background traffic classes</em></td>
 <td></td>
 <td>default-background, google-background, facebook-background</td>
 <td></td>
+<td>default-background, google-background, facebook-background</td>
 </tr>
 <tr>
 <td><em>PPI features</em></td>
 <td>IPT, DIR, SIZE</td>
 <td>IPT, DIR, SIZE</td>
 <td>IPT, DIR, SIZE, PUSH_FLAG</td>
+<td>IPT, DIR, SIZE</td>
 </tr>
 <tr>
 <td><em>Flowstats features</em></td>
+<td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, DURATION, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION</td>
 <td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, DURATION, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION</td>
 <td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, DURATION, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION</td>
 <td>BYTES, BYTES_REV, PACKETS, PACKETS_REV, DURATION, PPI_LEN, PPI_ROUNDTRIPS, PPI_DURATION</td>
@@ -721,10 +734,12 @@
 <td></td>
 <td>FLOW_ENDREASON_IDLE, FLOW_ENDREASON_ACTIVE, FLOW_ENDREASON_OTHER</td>
 <td>FLOW_ENDREASON_IDLE, FLOW_ENDREASON_ACTIVE, FLOW_ENDREASON_END, FLOW_ENDREASON_OTHER</td>
+<td>FLOW_ENDREASON_IDLE, FLOW_ENDREASON_ACTIVE, FLOW_ENDREASON_OTHER</td>
 </tr>
 <tr>
 <td><em>Packet histograms</em></td>
 <td></td>
+<td>PHIST_SRC_SIZES, PHIST_DST_SIZES, PHIST_SRC_IPT, PHIST_DST_IPT</td>
 <td>PHIST_SRC_SIZES, PHIST_DST_SIZES, PHIST_SRC_IPT, PHIST_DST_IPT</td>
 <td>PHIST_SRC_SIZES, PHIST_DST_SIZES, PHIST_SRC_IPT, PHIST_DST_IPT</td>
 </tr>
@@ -733,30 +748,35 @@
 <td>FLAG_CWR, FLAG_CWR_REV, FLAG_ECE, FLAG_ECE_REV, FLAG_URG, FLAG_URG_REV, FLAG_ACK, FLAG_ACK_REV, FLAG_PSH, FLAG_PSH_REV, FLAG_RST, FLAG_RST_REV, FLAG_SYN, FLAG_SYN_REV, FLAG_FIN, FLAG_FIN_REV</td>
 <td></td>
 <td>FLAG_CWR, FLAG_CWR_REV, FLAG_ECE, FLAG_ECE_REV, FLAG_URG, FLAG_URG_REV, FLAG_ACK, FLAG_ACK_REV, FLAG_PSH, FLAG_PSH_REV, FLAG_RST, FLAG_RST_REV, FLAG_SYN, FLAG_SYN_REV, FLAG_FIN, FLAG_FIN_REV</td>
+<td></td>
 </tr>
 <tr>
 <td><em>Other fields</em></td>
 <td>ID</td>
 <td>ID, SRC_IP, DST_IP, DST_ASN, SRC_PORT, DST_PORT, PROTOCOL, QUIC_VERSION, QUIC_SNI, QUIC_USERAGENT, TIME_FIRST, TIME_LAST</td>
 <td>ID, SRC_IP, DST_IP, DST_ASN, DST_PORT, PROTOCOL, TLS_SNI, TLS_JA3, TIME_FIRST, TIME_LAST</td>
+<td>ID, DST_IP, DST_IP_SUBNET, DST_IP_VERSION, DST_ASN, DST_COUNTRY, DST_PORT, PROTOCOL, TIME_FIRST, TIME_LAST, QUIC_VERSION, QUIC_CLIENT_VERSION, QUIC_TOKEN_LENGTH, QUIC_MULTIPLEXED, QUIC_ZERO_RTT, QUIC_OCCID, QUIC_OSCID, QUIC_SCID, QUIC_RETRY_SCID, QUIC_SNI, QUIC_USER_AGENT, QUIC_TLS_EXT_LEN, QUIC_TLS_EXT_TYPE, QUIC_PACKETS</td>
 </tr>
 <tr>
 <td><em>Cite</em></td>
 <td><a href="https://doi.org/10.1016/j.comnet.2022.109467">https://doi.org/10.1016/j.comnet.2022.109467</a></td>
 <td><a href="https://doi.org/10.1016/j.dib.2023.108888">https://doi.org/10.1016/j.dib.2023.108888</a></td>
 <td><a href="https://doi.org/10.1038/s41597-024-03927-4">https://doi.org/10.1038/s41597-024-03927-4</a></td>
+<td></td>
 </tr>
 <tr>
 <td><em>Zenodo URL</em></td>
 <td><a href="https://zenodo.org/record/7965515">https://zenodo.org/record/7965515</a></td>
 <td><a href="https://zenodo.org/record/7963302">https://zenodo.org/record/7963302</a></td>
 <td><a href="https://zenodo.org/records/10608607">https://zenodo.org/records/10608607</a></td>
+<td><a href="https://zenodo.org/records/17249078">https://zenodo.org/records/17249078</a></td>
 </tr>
 <tr>
 <td><em>Related papers</em></td>
 <td></td>
 <td><a href="https://doi.org/10.23919/TMA58422.2023.10199052">https://doi.org/10.23919/TMA58422.2023.10199052</a></td>
 <td></td>
+<td><a href="https://doi.org/10.1145/3768988">https://doi.org/10.1145/3768988</a></td>
 </tr>
 </tbody>
 </table>

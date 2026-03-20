@@ -367,11 +367,31 @@
     Other fields
   </a>
   
+    <nav class="md-nav" aria-label="Other fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#other-fields-in-cesnet-quixext-25" class="md-nav__link">
+    Other fields in CESNET-QUIXEXT-25
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
   <a href="#details-about-packet-histograms-and-ppi" class="md-nav__link">
     Details about packet histograms and PPI
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extended-quic-fields" class="md-nav__link">
+    Extended QUIC fields
   </a>
   
 </li>
@@ -674,11 +694,31 @@
     Other fields
   </a>
   
+    <nav class="md-nav" aria-label="Other fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#other-fields-in-cesnet-quixext-25" class="md-nav__link">
+    Other fields in CESNET-QUIXEXT-25
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
   <a href="#details-about-packet-histograms-and-ppi" class="md-nav__link">
     Details about packet histograms and PPI
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extended-quic-fields" class="md-nav__link">
+    Extended QUIC fields
   </a>
   
 </li>
@@ -898,19 +938,42 @@ Set <code>return_other_fields</code> to include those fields in returned datafra
 </tr>
 <tr>
 <td>QUIC_VERSION</td>
-<td>QUIC protocol version</td>
+<td>QUIC version from the first server long-header packet</td>
 </tr>
 <tr>
 <td>QUIC_USER_AGENT</td>
-<td>User agent string if available in the QUIC Initial Packet</td>
+<td>User-Agent string, if available in an Initial packet</td>
 </tr>
 </tbody>
 </table>
-<!-- 
-| APP                     | Web service label                                                                   |
-| CATEGORY                | Service category label                                                              | 
--->
-
+<h3 id="other-fields-in-cesnet-quixext-25">Other fields in CESNET-QUIXEXT-25</h3>
+<p>The CESNET-QUIXEXT-25 dataset used anonymization procedure based on SHA hashing, with no conversion back to the IP format. Thus, <code>DST_IP</code> and <code>DST_IP_SUBNET</code> are represented as a simple string identifiers.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DST_IP</td>
+<td>An anonymized identifier of the destination host</td>
+</tr>
+<tr>
+<td>DST_IP_SUBNET</td>
+<td>An anonymized identifier of the destination host subnet (a /24 prefix for IPv4 and a /64 prefix for IPv6)</td>
+</tr>
+<tr>
+<td>DST_IP_VERSION</td>
+<td>IP version (IPv4 or IPv6)</td>
+</tr>
+<tr>
+<td>DST_COUNTRY</td>
+<td>Country of the destination host, derived from a geolocation database</td>
+</tr>
+</tbody>
+</table>
 <h2 id="details-about-packet-histograms-and-ppi">Details about packet histograms and PPI</h2>
 <p>Due to differences in implementation between packet sequences (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/pstats.cpp">pstats.cpp</a>) and packet histogram (<a href="https://github.com/CESNET/ipfixprobe/blob/master/process/phists.cpp">phist.cpp</a>) plugins of the ipfixprobe exporter, the number of packets in PPI and histograms can differ (even for flows shorter than 30 packets). The differences are summarized in the following table.
 Note that this is related to TLS over TCP datasets.</p>
@@ -946,6 +1009,73 @@ Note that this is related to TLS over TCP datasets.</p>
 </table>
 <p>*<em>The implementation for the detection of TCP retransmissions and out-of-order packets is far from perfect. Packets with a non-increasing SEQ number are skipped.</em></p>
 <p>For QUIC, there is no detection of retransmissions or out-of-order packets, and QUIC acknowledgment packets are included in both packet sequences and packet histograms.</p>
+<h2 id="extended-quic-fields">Extended QUIC fields</h2>
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QUIC_VERSION</td>
+<td>QUIC version from the first server long-header packet</td>
+</tr>
+<tr>
+<td>QUIC_CLIENT_VERSION</td>
+<td>QUIC version from the first client long-header packet</td>
+</tr>
+<tr>
+<td>QUIC_TOKEN_LENGTH</td>
+<td>Token length from an Initial or Retry packet</td>
+</tr>
+<tr>
+<td>QUIC_MULTIPLEXED</td>
+<td>Indicates whether multiplexing occurred (value &gt; 0 if at least two distinct QUIC_OSCID values were observed)</td>
+</tr>
+<tr>
+<td>QUIC_ZERO_RTT</td>
+<td>Number of 0-RTT packets observed in the flow</td>
+</tr>
+<tr>
+<td>QUIC_OCCID</td>
+<td>Original client Connection ID from the first client packet</td>
+</tr>
+<tr>
+<td>QUIC_OSCID</td>
+<td>Original server Connection ID from the first client packet</td>
+</tr>
+<tr>
+<td>QUIC_SCID</td>
+<td>Server Connection ID</td>
+</tr>
+<tr>
+<td>QUIC_RETRY_SCID</td>
+<td>Server Connection ID from a Retry packet</td>
+</tr>
+<tr>
+<td>QUIC_SNI</td>
+<td>Server Name Indication domain</td>
+</tr>
+<tr>
+<td>QUIC_USER_AGENT</td>
+<td>User-Agent string, if available in an Initial packet</td>
+</tr>
+<tr>
+<td>QUIC_TLS_EXT_TYPE</td>
+<td>List of TLS extensions used</td>
+</tr>
+<tr>
+<td>QUIC_TLS_EXT_LEN</td>
+<td>Corresponding lengths of the listed TLS extensions</td>
+</tr>
+<tr>
+<td>QUIC_PACKETS</td>
+<td>Sequence of QUIC long-header packet types observed in the flow</td>
+</tr>
+</tbody>
+</table>
 
 
   
