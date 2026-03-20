@@ -947,7 +947,7 @@ Set <code>return_other_fields</code> to include those fields in returned datafra
 </tbody>
 </table>
 <h3 id="other-fields-in-cesnet-quixext-25">Other fields in CESNET-QUIXEXT-25</h3>
-<p>The CESNET-QUIXEXT-25 dataset used anonymization procedure based on SHA hashing, with no conversion back to the IP format. Thus, <code>DST_IP</code> and <code>DST_IP_SUBNET</code> are represented as a simple string identifiers.</p>
+<p>The CESNET-QUIXEXT-25 dataset used anonymization procedure based on SHA hashing, with no conversion back to IP addresses. Thus, <code>DST_IP</code> and <code>DST_IP_SUBNET</code> are represented as a simple string identifiers.</p>
 <table>
 <thead>
 <tr>
@@ -1010,6 +1010,7 @@ Note that this is related to TLS over TCP datasets.</p>
 <p>*<em>The implementation for the detection of TCP retransmissions and out-of-order packets is far from perfect. Packets with a non-increasing SEQ number are skipped.</em></p>
 <p>For QUIC, there is no detection of retransmissions or out-of-order packets, and QUIC acknowledgment packets are included in both packet sequences and packet histograms.</p>
 <h2 id="extended-quic-fields">Extended QUIC fields</h2>
+<p>The CESNET-QUICEXT-25 dataset includes the following set of QUIC protocol metadata:</p>
 <table>
 <thead>
 <tr>
